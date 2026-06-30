@@ -1,0 +1,396 @@
+{
+  "generated": "2026-06-30",
+  "data_window": [
+    "2025-01-01",
+    "2026-06-30"
+  ],
+  "graph": {
+    "nodes": [
+      "Aave",
+      "Binance",
+      "Ethena",
+      "Lido",
+      "retail"
+    ],
+    "edges": [
+      [
+        "Binance",
+        "retail",
+        33053138143.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "Ethena",
+        "retail",
+        313916606.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "Binance",
+        38898941115.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "Ethena",
+        312478538.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "Ethena",
+        "Binance",
+        0.0,
+        0.7,
+        "documented"
+      ],
+      [
+        "Ethena",
+        "Aave",
+        0.0,
+        0.7,
+        "documented"
+      ],
+      [
+        "Lido",
+        "Aave",
+        0.0,
+        0.7,
+        "documented"
+      ],
+      [
+        "Binance",
+        "Ethena",
+        0.0,
+        0.7,
+        "documented"
+      ]
+    ],
+    "parents": {
+      "Aave": [
+        "Ethena",
+        "Lido"
+      ],
+      "Binance": [
+        "retail",
+        "Ethena"
+      ],
+      "Ethena": [
+        "retail",
+        "Binance"
+      ],
+      "Lido": [],
+      "retail": [
+        "Binance",
+        "Ethena"
+      ]
+    }
+  },
+  "n_event_days": 7,
+  "scm_residual_std": {
+    "Binance": 0.9959611346342542,
+    "Ethena": 0.6859587012223989,
+    "Aave": 0.46123940663148977,
+    "Lido": 1.7546197784253066,
+    "MakerSky": 0.6558217379001593,
+    "retail": 1.1135873327670198
+  },
+  "scm_coefficients": {
+    "Binance": {
+      "parents": [
+        "retail",
+        "Ethena"
+      ],
+      "w_stress": [
+        0.0536,
+        0.0856
+      ],
+      "w_flow": [
+        -0.095682,
+        0.0
+      ],
+      "intercept": 1.0966
+    },
+    "Ethena": {
+      "parents": [
+        "retail",
+        "Binance"
+      ],
+      "w_stress": [
+        -0.1755,
+        -0.0001
+      ],
+      "w_flow": [
+        -0.059306,
+        0.0
+      ],
+      "intercept": 0.1713
+    },
+    "Aave": {
+      "parents": [
+        "Ethena",
+        "Lido"
+      ],
+      "w_stress": [
+        -0.0753,
+        0.2096
+      ],
+      "w_flow": [
+        0.0,
+        0.0
+      ],
+      "intercept": 0.0252
+    },
+    "Lido": {
+      "parents": [],
+      "w_stress": [],
+      "w_flow": [],
+      "intercept": 0.2981
+    },
+    "MakerSky": {
+      "parents": [],
+      "w_stress": [],
+      "w_flow": [],
+      "intercept": 0.044
+    },
+    "retail": {
+      "parents": [
+        "Binance",
+        "Ethena"
+      ],
+      "w_stress": [
+        0.0575,
+        -0.4652
+      ],
+      "w_flow": [
+        0.002351,
+        0.820186
+      ],
+      "intercept": -10.7073
+    }
+  },
+  "oc_covar_ranking": [
+    {
+      "entity": "Lido",
+      "exported_risk": 3.563029905678361
+    },
+    {
+      "entity": "Binance",
+      "exported_risk": 0.4778344111544146
+    },
+    {
+      "entity": "retail",
+      "exported_risk": 0.20283612010448282
+    },
+    {
+      "entity": "Ethena",
+      "exported_risk": 0.08358266359104505
+    },
+    {
+      "entity": "Aave",
+      "exported_risk": 0.0
+    },
+    {
+      "entity": "MakerSky",
+      "exported_risk": 0.0
+    }
+  ],
+  "delta_covar_ranking": [
+    {
+      "asset": "ETH",
+      "delta_covar": -0.021958930961948984,
+      "rank": 1
+    },
+    {
+      "asset": "stETH",
+      "delta_covar": -0.017569273877368022,
+      "rank": 2
+    },
+    {
+      "asset": "BTC",
+      "delta_covar": -0.016659161742705635,
+      "rank": 3
+    },
+    {
+      "asset": "BNB",
+      "delta_covar": -0.014650197252146033,
+      "rank": 4
+    },
+    {
+      "asset": "AAVE",
+      "delta_covar": -0.01266267627218428,
+      "rank": 5
+    },
+    {
+      "asset": "ENA",
+      "delta_covar": -0.011389282832260535,
+      "rank": 6
+    },
+    {
+      "asset": "DAI",
+      "delta_covar": -0.0034599117675140623,
+      "rank": 7
+    },
+    {
+      "asset": "USDe",
+      "delta_covar": -0.002561798961025971,
+      "rank": 8
+    },
+    {
+      "asset": "USDC",
+      "delta_covar": -0.002479014441415732,
+      "rank": 9
+    }
+  ],
+  "H3_spearman_oc_vs_deltacovar": {
+    "rho": 0.6,
+    "p_value": 0.28475697986529386,
+    "entities": [
+      "Lido",
+      "Binance",
+      "retail",
+      "Ethena",
+      "Aave"
+    ]
+  },
+  "counterfactual_attribution": [
+    {
+      "i": "Ethena",
+      "j": "retail",
+      "L_observed": 6.114947409649226,
+      "L_counterfactual": 5.2937129766770035,
+      "attribution": 0.8212344329722221,
+      "attribution_share": 0.13429950872125831
+    },
+    {
+      "i": "Ethena",
+      "j": "Aave",
+      "L_observed": 0.6599382115664115,
+      "L_counterfactual": 0.5262597879279908,
+      "attribution": 0.13367842363842075,
+      "attribution_share": 0.20256202974082263
+    },
+    {
+      "i": "Binance",
+      "j": "retail",
+      "L_observed": 6.035397086761055,
+      "L_counterfactual": 5.907508427854967,
+      "attribution": 0.12788865890608747,
+      "attribution_share": 0.02118976714665844
+    },
+    {
+      "i": "Binance",
+      "j": "Aave",
+      "L_observed": 0.5625868520804964,
+      "L_counterfactual": 0.5616231979189295,
+      "attribution": 0.0009636541615669625,
+      "attribution_share": 0.0017128984760366925
+    },
+    {
+      "i": "Ethena",
+      "j": "Binance",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Ethena",
+      "j": "Lido",
+      "L_observed": 2.0865630643442907,
+      "L_counterfactual": 2.0865630643442907,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Ethena",
+      "j": "MakerSky",
+      "L_observed": 0.3077885456159002,
+      "L_counterfactual": 0.3077885456159002,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "Lido",
+      "L_observed": 2.0865630643442907,
+      "L_counterfactual": 2.0865630643442907,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "MakerSky",
+      "L_observed": 0.3077885456159002,
+      "L_counterfactual": 0.3077885456159002,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "Ethena",
+      "L_observed": 0.6923847289722329,
+      "L_counterfactual": 0.7029865928933001,
+      "attribution": -0.010601863921067212,
+      "attribution_share": -0.015312099584871671
+    }
+  ],
+  "falsification": [
+    {
+      "model": "true_direction",
+      "rmse": 1.9315165687680376,
+      "corr": -0.058676025065230716,
+      "n": 42
+    },
+    {
+      "model": "reversed_edges",
+      "rmse": 1.1587678510260413,
+      "corr": 0.4161471733682977,
+      "n": 42
+    },
+    {
+      "model": "symmetric",
+      "rmse": 1.1798341590599715,
+      "corr": 0.40877557457309155,
+      "n": 42
+    }
+  ],
+  "backtests": {
+    "BTC": {
+      "kupiec": {
+        "n": 810,
+        "failures": 48,
+        "rate": 0.05925925925925926,
+        "expected_rate": 0.05,
+        "LR_pof": 1.3836456014277019,
+        "p_value": 0.23948114359672124
+      },
+      "christoffersen": {
+        "LR_ind": 3.102354280560462,
+        "p_value_ind": 0.07817916018747673,
+        "LR_cc": 4.485999881988164,
+        "p_value_cc": 0.10613961371354574
+      }
+    },
+    "ETH": {
+      "kupiec": {
+        "n": 810,
+        "failures": 44,
+        "rate": 0.05432098765432099,
+        "expected_rate": 0.05,
+        "LR_pof": 0.3100576820339711,
+        "p_value": 0.5776447915014238
+      },
+      "christoffersen": {
+        "LR_ind": 12.909011570353584,
+        "p_value_ind": 0.00032700393151186,
+        "LR_cc": 13.219069252387555,
+        "p_value_cc": 0.0013474590756819005
+      }
+    }
+  }
+}
