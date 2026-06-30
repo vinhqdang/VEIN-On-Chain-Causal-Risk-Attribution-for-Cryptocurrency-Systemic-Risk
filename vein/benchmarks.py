@@ -49,6 +49,25 @@ def delta_covar(returns: pd.DataFrame, system_col: str | None = None,
     return df.sort_values("delta_covar").reset_index(drop=True)
 
 
+def mes(returns: pd.DataFrame, q: float = 0.05) -> pd.DataFrame:
+    """Marginal Expected Shortfall (Acharya et al. 2017): an asset's mean return
+    on the worst-q days of the system (mean of the other assets). More negative =
+    larger systemic-risk contribution. Standard non-causal benchmark."""
+    rets = returns.dropna()
+    rows = []
+    for i in rets.columns:
+        others = [c for c in rets.columns if c != i]
+        if not others:
+            continue
+        sys = rets[others].mean(axis=1)
+        thr = np.quantile(sys.values, q)
+        tail = rets[i][sys <= thr]
+        rows.append({"asset": i, "MES": float(tail.mean()) if len(tail) else float("nan")})
+    df = pd.DataFrame(rows)
+    df["rank"] = df["MES"].rank(method="min").astype(int)
+    return df.sort_values("MES").reset_index(drop=True)
+
+
 def correlation_graph(returns: pd.DataFrame, threshold: float = 0.3) -> dict:
     """Undirected price-correlation graph (parents = correlated assets)."""
     corr = returns.corr().abs()
