@@ -1,0 +1,37 @@
+{
+  "generated": "2026-06-30",
+  "nonflow_H1": {
+    "contemporaneous": {
+      "observed_wrmse": 1.6810813914160914,
+      "granger_wrmse": 1.3586416929618168,
+      "observed_dir_acc": 0.6701388888888888,
+      "granger_dir_acc": 0.78125,
+      "observed_better": false
+    },
+    "lagged": {
+      "observed_wrmse": 1.6814151464171971,
+      "granger_wrmse": 1.358662403451361,
+      "observed_dir_acc": 0.6666666666666666,
+      "granger_dir_acc": 0.78125,
+      "observed_better": false
+    }
+  },
+  "nonflow_falsification": {
+    "true": 1.025328824869076,
+    "reversed": 1.129163331775864,
+    "symmetric": 0.9416469381777698
+  },
+  "ranking_stability": {
+    "base_top5": [
+      "retail",
+      "HTX",
+      "Bitfinex",
+      "Copper",
+      "FalconX"
+    ],
+    "mean_spearman_vs_base": 0.8804590120071846,
+    "min_spearman": 0.6592585514111473,
+    "mean_top3_overlap": 0.7866666666666667,
+    "n_perturbations": 25
+  }
+}

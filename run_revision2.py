@@ -101,30 +101,47 @@ def main():
 
     print("[3] OC-CoVaR ranking stability under coefficient perturbation")
     ev_days = list(stress.index[evm2])
+    init = stress[stress.index < EVENT_START].iloc[-1].to_dict()
+    hi = {e: float(np.quantile(stress[e].values, 0.95)) for e in stress.columns}
+    Z = {e: np.zeros(len(ev_days)) for e in graph["nodes"]}   # zero-shock (deterministic)
+
+    def det_exported(scm):
+        """Deterministic exported-risk proxy: sum_j max(L_j(do hi) - L_j(do 0), 0)."""
+        scores = {}
+        for i in scm.stress_cols:
+            tot = 0.0
+            for j in scm.stress_cols:
+                if j == i:
+                    continue
+                hi_loss = risk.loss_functional(scm.simulate(ev_days, init, Z, do={i: np.full(len(ev_days), hi[i])})[j].values)
+                lo_loss = risk.loss_functional(scm.simulate(ev_days, init, Z, do={i: np.zeros(len(ev_days))})[j].values)
+                tot += max(hi_loss - lo_loss, 0.0)
+            scores[i] = tot
+        return pd.Series(scores).sort_values(ascending=False)
+
     scm = StructuralCausalModel(graph, alpha=1.0).fit(stress[stress.index < EVENT_START],
                                                       flows[flows.day < EVENT_START]).set_flows(flows)
-    hi = {e: float(np.quantile(stress[e].values, 0.95)) for e in stress.columns}
-    init = stress[stress.index < EVENT_START].iloc[-1].to_dict()
-    base = risk.systemic_ranking(scm, ev_days, init, hi, n_sims=100, seed=7)
-    base_order = list(base.entity)
-    base_score = base.set_index("entity").exported_risk
-    rhos, top3_overlap = [], []
-    for k in range(15):
+    base = det_exported(scm); base_order = list(base.index)
+    rhos, top3 = [], []
+    for k in range(25):
         scmp = StructuralCausalModel(graph, alpha=1.0).fit(stress[stress.index < EVENT_START],
                                                            flows[flows.day < EVENT_START]).set_flows(flows)
         for e in scmp.coef_:
             c = scmp.coef_[e]
             if len(c["w_stress"]):
                 c["w_stress"] = c["w_stress"] * (1 + rng.normal(0, 0.15, len(c["w_stress"])))
-        r = risk.systemic_ranking(scmp, ev_days, init, hi, n_sims=60, seed=7)
-        common = [e for e in base_score.index if e in set(r.entity)]
-        rs = r.set_index("entity").exported_risk
-        rho, _ = spearmanr(base_score.loc[common].values, rs.loc[common].values)
-        rhos.append(float(rho))
-        top3_overlap.append(len(set(base_order[:3]) & set(list(r.entity)[:3])) / 3.0)
-    out["ranking_stability"] = {"mean_spearman_vs_base": float(np.mean(rhos)),
+            if len(c["w_flow"]):
+                c["w_flow"] = c["w_flow"] * (1 + rng.normal(0, 0.15, len(c["w_flow"])))
+        r = det_exported(scmp)
+        common = [e for e in base.index if e in r.index]
+        rho, _ = spearmanr(base.loc[common].values, r.loc[common].values)
+        if not np.isnan(rho):
+            rhos.append(float(rho))
+        top3.append(len(set(base_order[:3]) & set(list(r.index)[:3])) / 3.0)
+    out["ranking_stability"] = {"base_top5": base_order[:5],
+                                "mean_spearman_vs_base": float(np.mean(rhos)),
                                 "min_spearman": float(np.min(rhos)),
-                                "mean_top3_overlap": float(np.mean(top3_overlap))}
+                                "mean_top3_overlap": float(np.mean(top3)), "n_perturbations": len(top3)}
 
     (RESULTS / "revision2.json").write_text(json.dumps(out, indent=2, default=float))
     print("WROTE results/revision2.json"); print(json.dumps(out, indent=2, default=float))

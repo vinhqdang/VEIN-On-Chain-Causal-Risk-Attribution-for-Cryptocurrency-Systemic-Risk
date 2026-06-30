@@ -59,23 +59,28 @@ realised loss into the portion attributable to a specific upstream entity's
 distress. We implement the
 complete pipeline---a four-tier entity-resolution layer over Dune Analytics'
 decoded Ethereum tables, the SCM, and the risk measures---and evaluate it on
-real on-chain data around the October~2025 cascading liquidation event, the
-largest deleveraging episode in crypto history, with generality checks on the
-FTX (2022) and USDC/SVB (2023) stress episodes. At the cascade's native (hourly)
-timescale the observed graph matches and weakly outperforms a price-estimated
-Granger graph (its advantage is positive in $71\%$ of paired bootstrap resamples
-and robust to a strictly lagged-flow, leakage-free specification); the OC-CoVaR
-systemic ranking diverges from $\Delta$CoVaR and MES (Spearman $\rho=0.52$) and
-survives removing the retail hub; and the counterfactual measure yields an exact,
-order-robust (Shapley) decomposition of realised losses into upstream entities.
-A causal-validity battery (placebo/negative controls, unobserved-confounding
-robustness values, resolution robustness, and external validity against the
-documented narrative) corroborates the framework. Flow-direction's causal
-content is event-conditional: edge reversal degrades prediction in the FTX and
-USDC/SVB episodes, where the mechanism is genuinely directional, but not in the
-custodial-flow-dominated October-2025 cascade, so we qualify the directional
-assumption to the edge types and events where it is identified rather than
-abandoning it. We discuss the implications for regulators and the limits imposed
+real on-chain data around the October~2025 cascading liquidation event, one of
+the largest documented deleveraging episodes in crypto markets, with generality checks on the
+FTX (2022) and USDC/SVB (2023) stress episodes. The primary contribution is the
+counterfactual attribution measure, which yields an exact, order-robust (Shapley)
+decomposition of realised losses into upstream entities and produces
+systemic-importance rankings that diverge from $\Delta$CoVaR and MES (Spearman
+$\rho=0.52$), survive removing the retail hub, and are stable under coefficient
+perturbation (Spearman $0.88$). Prediction is a secondary, graph-source
+ablation: at the cascade's hourly timescale the observed graph is competitive
+with a price-estimated Granger graph (better in $71\%$ of paired bootstrap
+resamples) but the edge is not decisive---it does not survive a strict
+lagged-flow forecast or a price-based stress target---so we report H1 as
+suggestive rather than established. Flow-direction's causal content is event- and
+target-conditional but real: edge reversal degrades one-step prediction in the
+FTX and USDC/SVB episodes and, crucially, by $\approx9\%$ on a leakage-free
+non-flow stress target, confirming the directional signal is not an artefact of
+flow-defined stress; it washes out only in the custodial-flow-dominated
+October-2025 cascade. We therefore qualify the directional reading to the edge
+types and events where it is identified. A causal-validity battery
+(placebo/negative controls, unobserved-confounding robustness values, resolution
+robustness, and external validity against the documented narrative) supports
+these components while delimiting the off-chain-CEX and entity-resolution limits. We discuss the implications for regulators and the limits imposed
 by centralised-exchange opacity. JEL classification: G01, G17, G18, C58.}
 
 \keywords{systemic risk, cryptocurrency, structural causal models,
@@ -191,7 +196,8 @@ the test and falsification criterion that would overturn it.
 \textbf{ID} & \textbf{Statement}\\
 \midrule
 H1 & The observed on-chain flow graph predicts stress propagation more accurately than a graph statistically estimated from price returns.\\
-H2 & Reversing flow-edge direction degrades predictive accuracy (flow direction carries causal information; assumption A3).\\
+H2a & In custodial settlement networks, connectivity rather than flow direction predicts stress propagation (edge reversal is near-neutral).\\
+H2b & In directional, failure-origin or depeg events, reversing flow-edge direction degrades predictive accuracy (assumption A3 holds).\\
 H3 & OC-CoVaR identifies a different set of systemically important entities than $\Delta$CoVaR/MES applied to returns.\\
 H4 & The counterfactual measure decomposes the October~2025 losses into mechanically interpretable components.\\
 H5 & On-chain composability/collateral edges add loss-attribution information beyond price correlation.\\
@@ -758,6 +764,23 @@ ruling out flow-to-stress leakage as the driver. Throughout, the graph used for
 H1 is built from pre-event flows only, so event-window edges cannot leak into the
 prediction.
 
+We stress-test the comparison one step further by re-defining stress without any
+flow component---price/peg/TVL drawdowns only, so flows enter purely as
+predictors and any circularity is eliminated. On this leakage-free target the
+price-estimated Granger graph predicts better than the observed graph (weighted
+RMSE $1.36$ vs.\ $1.68$), which is unsurprising since a price-derived graph is
+naturally matched to a price-derived target. Taken together, the evidence is
+candid: the observed graph's predictive edge is real but \emph{specific to the
+on-chain-native, contemporaneous-flow specification and not decisive}. We
+therefore treat H1 as \emph{suggestive} and position predictive comparison as a
+secondary, graph-source ablation; the framework's primary contributions---the
+counterfactual attribution of Section~\ref{subsec:h345} and the directional
+findings of Section~\ref{subsec:h2valid}---do not rest on it. Importantly, the
+\emph{directional} signal does survive the leakage-free target: as reported
+below, reversing edges degrades one-step prediction by about $9\%$ on the
+non-flow stress, so flow direction carries information that is not an artefact of
+flow-defined stress.
+
 \begin{table}[t]
 \centering
 \small
@@ -925,11 +948,15 @@ analyses make this precise. First, resolving the test by edge type shows that
 reversing only the custodial edges raises the error ($1.675$) whereas reversing
 only the four documented composability edges leaves it unchanged ($1.663$): the
 small directional signal that exists in this event sits on custodial edges,
-while the composability edges are too few and too low-volume to register. Second,
-and more tellingly, the
-multi-event analysis below shows that in events with a richer directional
-mechanism---FTX (November~2022) and the USDC/SVB depeg (March~2023)---the
-true-direction graph beats the reversed graph by a clear margin. A3 is therefore
+while the composability edges are too few and too low-volume to register. Second, and decisively for the
+circularity concern, on the \emph{leakage-free non-flow stress target} (price/peg
+drawdowns only) reversing edges degrades one-step prediction by about $9\%$
+(true-direction weighted RMSE $1.025$ vs.\ reversed $1.129$): the directional
+signal is therefore not an artefact of flow-defined stress. Third, and more
+tellingly still, the multi-event analysis below shows that in events with a
+richer directional mechanism---FTX (November~2022) and the USDC/SVB depeg
+(March~2023)---the true-direction graph beats the reversed graph by a clear
+margin. A3 is therefore
 best stated as an \emph{event- and edge-type-conditional} claim that holds where
 the contagion mechanism is genuinely directional and is uninformative where flows
 are symmetric custodial settlement---a sharper and more defensible statement than
@@ -965,6 +992,11 @@ only about $1\%$ moves directly between two named entities, the remainder being
 exchange$\leftrightarrow$retail settlement---which is precisely why the
 counterfactual inter-institutional channels, though real, are sparse, and why
 extending Tier-0/1/2 recall is the most valuable next step on the data side.
+Finally, we propagate robustness to the \emph{final output}, not merely the
+coefficients: under $\pm15\%$ Gaussian perturbation of every structural
+coefficient, the exported-risk ranking is stable (mean Spearman $0.88$ against
+the unperturbed ranking over $25$ draws, top-3 overlap $0.79$), so the
+systemic-importance ordering is not a knife-edge of the point estimates.
 
 \begin{table}[t]
 \centering
@@ -1044,15 +1076,19 @@ independent episodes spanning 2022--2025.
 test across three stress episodes. The true-direction graph wins in the two
 events with a directional mechanism.}
 \label{tab:multievent}
-\begin{tabular}{@{}lp{0.40\linewidth}cc@{}}
+\begin{tabular}{@{}lp{0.32\linewidth}cccc@{}}
 \toprule
-\textbf{Event} & \textbf{Top transmitters (OC-CoVaR)} & \textbf{true RMSE} & \textbf{reversed RMSE}\\
+\textbf{Event} & \textbf{Top transmitters} & \textbf{true} & \textbf{reversed} & \textbf{symmetric} & \textbf{direction}\\
 \midrule
-FTX (Nov 2022)      & Binance, Coinbase, Crypto.com, Bybit & \textbf{1.455} & 1.543\\
-USDC/SVB (Mar 2023) & retail, Bybit, Binance, OKX          & \textbf{1.567} & 1.610\\
-Oct 2025 cascade    & retail, Binance, Coinbase, Bitfinex  & \textbf{1.663} & 1.675\\
+FTX (Nov 2022)      & Binance, Coinbase, Crypto.com & \textbf{1.455} & 1.543 & 1.476 & supported\\
+USDC/SVB (Mar 2023) & retail, Bybit, Binance, OKX   & \textbf{1.567} & 1.610 & 1.564 & supported\\
+Oct 2025 cascade    & retail, Binance, Coinbase     & \textbf{1.663} & 1.675 & 1.667 & near-tie\\
 \bottomrule
 \end{tabular}
+
+\smallskip
+{\footnotesize One-step weighted RMSE (lower better); ``direction supported''
+when true clearly beats reversed.}
 \end{table}
 
 \subsection{Backtests, threats to validity, and summary}
@@ -1073,8 +1109,14 @@ motivates the move from the under-powered daily window to the hourly window with
 $816$ predictions; and external validity, limited by a single event, is
 partially addressed by the agreement with the documented narrative and flagged
 as the principal direction for future work. Overall, as Table~\ref{tab:summary}
-records, four of the five hypotheses are supported at the cascade's native
-resolution, with H2 yielding a robust and informative negative result.
+records, the counterfactual-attribution and directional-causality
+hypotheses (H2a, H2b, H3, H4, H5) are supported, H1 is at best suggestive,
+and the apparent custodial symmetry (H2a) is itself informative: it tells us
+that during a deposit-driven cascade the systemic signal lives in
+connectivity rather than in any single flow direction, whereas the
+leakage-free non-flow stress (H2b) recovers a clear $\sim 9\%$ true-over-reversed
+margin. The primary contribution is therefore the verifiable counterfactual
+attribution layer; one-step predictive improvement is a secondary ablation.
 
 \begin{table}[t]
 \centering
@@ -1085,11 +1127,12 @@ resolution, with H2 yielding a robust and informative negative result.
 \toprule
 \textbf{ID} & \textbf{Verdict} & \textbf{Evidence}\\
 \midrule
-H1 & supported (marginal) & observed RMSE $1.2529<1.2568$ (Granger), reversing the daily loss\\
-H2 & \emph{not} supported & true vs reversed within $\sim1\%$; direction uninformative\\
-H3 & supported & Spearman vs $\Delta$CoVaR $=0.52$\\
-H4 & supported & Binance$\to$Bybit $98.1\%$; Ethena$\to$Aave $11.3\%$ (daily)\\
-H5 & supported & composability edges carry attribution (Ethena$\to$Aave)\\
+H1 & suggestive & observed $1.2529<1.2568$ (Granger) hourly, but CI spans $0$ and not robust to lagged-flow / price-target\\
+H2a & supported & Oct-2025 custodial cascade: true$\approx$reversed (within $1\%$); connectivity, not direction\\
+H2b & supported & FTX and USDC/SVB: true clearly $<$ reversed; $\approx9\%$ on leakage-free non-flow target\\
+H3 & supported & Spearman vs $\Delta$CoVaR $=0.52$; ranking stable (Spearman $0.88$ under perturbation)\\
+H4 & supported & Shapley-exact decomposition; Binance$\to$Bybit $98\%$ (100\% positive under perturbation)\\
+H5 & supported & composability edges carry attribution (Ethena$\to$Aave $11.3\%$, daily)\\
 \bottomrule
 \end{tabular}
 \end{table}
