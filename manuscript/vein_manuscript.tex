@@ -83,19 +83,34 @@ counterfactual inference, blockchain, CoVaR, contagion}
 
 On 10--11 October 2025, cryptocurrency markets experienced the largest
 deleveraging event in their history: on the order of nineteen billion US
-dollars of leveraged positions were liquidated within thirty-six hours. Unlike
-the 2022 episodes (Terra/Luna, Celsius, FTX), which were rooted in fundamental
-insolvency, the October~2025 cascade was largely \emph{mechanical}: a
-mispricing in a centralised exchange's internal valuation engine propagated
-into automated liquidations, which in turn forced sales that depressed prices
-and triggered further liquidations---a classic funding-liquidity spiral
-operating at machine speed. A defining feature was architectural: decentralised
+dollars of leveraged positions were liquidated within thirty-six
+hours.\footnote{For event overviews and the minute-level liquidation mechanics,
+see CoinDesk Research, \url{https://www.coindesk.com/research/market-spotlight-the-19-billion-liquidation-that-shook-crypto};
+CoinGecko, \url{https://www.coingecko.com/learn/october-10-crypto-crash-explained};
+and FTI Consulting, \url{https://www.fticonsulting.com/insights/articles/crypto-crash-october-2025-leverage-met-liquidity}.}
+Unlike the 2022 episodes (Terra/Luna, Celsius, FTX), which were rooted in
+fundamental insolvency, the October~2025 cascade was largely \emph{mechanical}:
+a mispricing in a centralised exchange's internal valuation
+engine\footnote{The proximate trigger has been attributed to Binance's
+unified-account margin system, which valued posted collateral (including USDe,
+wBETH and BNSOL) using its own internal spot prices rather than external
+oracles; see \url{https://www.ccn.com/education/crypto/ethena-usde-depeg-binance-crash-explained/}
+and \url{https://ambcrypto.com/not-a-true-depeg-says-ethena-founder-as-usde-faces-binance-only-slip/}.}
+propagated into automated liquidations, which in turn forced sales that
+depressed prices and triggered further liquidations---a classic
+funding-liquidity spiral operating at machine speed. A defining feature was architectural: decentralised
 finance (DeFi) lending protocols with transparent, over-collateralised
 positions (e.g.\ Aave) emerged with essentially zero bad debt, whereas
 centralised-exchange (CEX) risk engines amplified the shock. The synchronised
 depeg of the synthetic dollar USDe---which remained fully solvent throughout,
 so that the depeg was a pricing and liquidity artefact rather than a
-default---is emblematic of this architecture-dependent fragility. Crucially for
+default---is emblematic of this architecture-dependent
+fragility.\footnote{USDe's price fell to roughly \$0.65 on Binance while
+holding near \$1 on other venues and in DeFi, and remained redeemable as supply
+contracted from about \$9bn to \$6bn, confirming an exchange-specific pricing
+artefact rather than insolvency; see CoinDesk,
+\url{https://www.coindesk.com/markets/2025/10/11/ethena-s-usde-briefly-loses-peg-during-usd19b-crypto-liquidation-cascade}
+and \url{https://www.coindesk.com/markets/2025/10/13/no-ethena-s-usde-didn-t-de-peg}.} Crucially for
 risk measurement, the proximate mechanism left a high-resolution footprint
 \emph{on chain}: liquidation transfers, collateral movements, and exchange
 in/out-flows are all recorded, timestamped to the block, in a public ledger.
