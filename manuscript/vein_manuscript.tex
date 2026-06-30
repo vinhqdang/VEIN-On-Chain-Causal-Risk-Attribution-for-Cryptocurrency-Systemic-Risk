@@ -247,26 +247,47 @@ graph-convolutional anti-money-laundering classifiers on the Elliptic dataset
 \cite{weber2019antimoney}. We reuse this resolution machinery, but no prior work
 treats the resulting graph as a causal structure for a systemic-risk measure.
 
-Taken together, the literature leaves two specific capabilities unfilled, and
-the most recent 2026 work confirms the gap remains open. Detailed forensic
-analyses of the very event we study---Lim's minute-level reconstruction of the
-October~2025 crash \cite{lim2026cascade} and Ali's anatomy of the cascade
-\cite{ali2025anatomy}---characterise the mechanism descriptively but build no
-causal risk measure; the latest crypto systemic-risk index, ASRI
-\cite{farzulla2026asri}, is an associational composite of weighted sub-indices;
-and the 2025 comparative mappings of TradFi--DeFi contagion
-\cite{aufiero2025mapping} remain conceptual. Against this 2026 state of the art,
-\emph{to the best of our knowledge VEIN is the first framework to (i) use an
-observed on-chain transaction graph as a Pearl structural causal model for a
-systemic-risk measure, and (ii) define a counterfactual (Pearl Level-3)
-systemic-risk attribution measure in finance}. Both sub-claims were checked
-against standard term combinations across arXiv, SSRN and Semantic Scholar as of
-mid-2026 and returned no prior instance; as with any negative existence claim
-they are bounded by search coverage, and we state them as ``no evidence of''
-rather than proof of absence. Table~\ref{tab:position} situates VEIN against the
-nearest neighbours; throughout, we treat Causal-NECO VaR (nearest method) and
-TV-DIG (nearest crypto application) as the reference points, and we re-implement
-the estimated-graph approach on our own data as the head-to-head baseline for H1.
+Taken together, the literature leaves two specific capabilities unfilled, and a
+deliberate survey of the most recent 2025--2026 work---the period in which one
+might most expect the gap to have closed---confirms that it remains open. We
+organise the evidence around the two sub-claims.
+
+\emph{On the on-chain-graph-as-SCM claim.} The 2026 crypto systemic-risk
+literature uses the on-chain graph descriptively or builds the network from
+prices, never as a Pearl SCM. Sankaewtong \cite{sankaewtong2026tracing} traces
+the USDC depeg contagion through high-granularity on-chain transactions, but
+observationally, with no interventional or counterfactual semantics; Zhang et
+al.\ \cite{zhang2026defi} measure DeFi systemic fragility from the
+\emph{correlation} structure of total-value-locked dynamics; ASRI
+\cite{farzulla2026asri} is an associational composite of weighted sub-indices;
+and the comparative TradFi--DeFi ``crosstagion'' mapping of Aufiero et al.\
+\cite{aufiero2025mapping} is conceptual. The detailed forensic reconstructions
+of the very event we study---Lim's minute-level analysis \cite{lim2026cascade}
+and Ali's anatomy \cite{ali2025anatomy}---characterise the mechanism but build
+no causal risk measure. None reads the causal parent set off the ledger.
+
+\emph{On the counterfactual-systemic-risk claim.} Counterfactual reasoning has
+reached finance, but not systemic-risk measurement. Xu \cite{xu2025counterfactual}
+applies counterfactual analysis to credit-portfolio losses, not to a networked
+tail-risk measure; and the comprehensive 2025 survey of causal inference across
+banking, finance and insurance by Kumar et al.\ \cite{kumar2025causalreview},
+covering decades of work, documents only association and Granger usage around
+SRISK, MES and CoVaR, with no counterfactual systemic-risk measure. The nearest
+causal precedents---Causal-NECO VaR \cite{rigana2024neco} and TV-DIG
+\cite{etesami2023tvdig}---stop at Pearl Level~2.
+
+Against this 2026 state of the art, \emph{to the best of our knowledge VEIN is
+the first framework to (i) use an observed on-chain transaction graph as a Pearl
+structural causal model for a systemic-risk measure, and (ii) define a
+counterfactual (Pearl Level-3) systemic-risk attribution measure in finance}.
+Both sub-claims were checked against standard term combinations across arXiv,
+SSRN and Semantic Scholar as of mid-2026 and returned no prior instance; as with
+any negative existence claim they are bounded by search coverage, and we state
+them as ``no evidence of'' rather than proof of absence. Table~\ref{tab:position}
+situates VEIN against the nearest neighbours; throughout, we treat Causal-NECO
+VaR (nearest method) and TV-DIG (nearest crypto application) as the reference
+points, and we re-implement the estimated-graph approach on our own data as the
+head-to-head baseline for H1.
 
 \begin{table}[t]
 \centering
