@@ -27,13 +27,23 @@ def _key() -> str:
     return k
 
 
-def _req(method: str, url: str, body: dict | None = None) -> dict:
+def _req(method: str, url: str, body: dict | None = None, retries: int = 5) -> dict:
     data = json.dumps(body).encode() if body is not None else None
-    req = urllib.request.Request(url, data=data, method=method)
-    req.add_header("X-Dune-API-Key", _key())
-    req.add_header("Content-Type", "application/json")
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read().decode())
+    last = None
+    for i in range(retries):
+        req = urllib.request.Request(url, data=data, method=method)
+        req.add_header("X-Dune-API-Key", _key())
+        req.add_header("Content-Type", "application/json")
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return json.loads(r.read().decode())
+        except urllib.error.HTTPError as e:
+            last = e
+            if e.code in (429, 502, 503, 504):
+                time.sleep(2 ** i + 1)   # backoff on rate-limit / transient
+                continue
+            raise
+    raise RuntimeError(f"Dune request failed after {retries} tries: {last}")
 
 
 def run_sql(sql: str, name: str = "vein_query", poll_s: float = 4.0,
@@ -44,6 +54,7 @@ def run_sql(sql: str, name: str = "vein_query", poll_s: float = 4.0,
     if cache.exists() and not refresh:
         return json.loads(cache.read_text())["rows"]
 
+    time.sleep(1.0)   # politeness spacing to respect free-tier rate limits
     created = _req("POST", f"{API}/query",
                    {"name": f"{name}_{h}", "query_sql": sql, "is_private": False})
     qid = created.get("query_id")

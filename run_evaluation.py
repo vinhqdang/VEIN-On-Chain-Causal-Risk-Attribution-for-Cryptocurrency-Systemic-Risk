@@ -25,6 +25,7 @@ import pandas as pd
 from scipy import stats
 
 from vein import config, market_data as md, onchain_graph as og, stress as st
+from vein import entity_resolution as er, resolver
 from vein.scm import StructuralCausalModel
 from vein import risk, falsification as fz, benchmarks as bm, backtest as bt
 
@@ -67,22 +68,29 @@ def main():
             tvl[slug] = pd.Series(dtype=float)
     print("      TVL slugs:", {k: len(v) for k, v in tvl.items()})
 
-    # ---- 2. on-chain flows (real, Dune) --------------------------------------
-    print("[3/8] Fetching on-chain inter-entity flows (Dune SQL) ...")
-    flows_core = og.load_flows(FLOW_START, FLOW_END, eth_price=eth_px,
-                               tokens=og.CORE_TOKENS)
-    # Enrich the event-window graph with the dominant inter-entity settlement
-    # assets (USDC/USDT/WETH) over a tight 3-week window. These move *between*
-    # labeled entities (Binance<->Ethena/Aave/Lido) and expose the directed
-    # inter-entity structure the systemic-core tokens alone miss. Tight window
-    # keeps the (large) USDC/USDT scan within Dune free-tier credits.
-    flows_extra = og.load_flows(dt.date(2025, 10, 1), dt.date(2025, 10, 22),
-                                eth_price=eth_px, tokens=["USDC", "USDT", "WETH"])
+    # ---- 2. on-chain flows with ENTITY RESOLUTION (real, Dune) ---------------
+    print("[3/8] Fetching resolved on-chain inter-entity flows (Dune SQL) ...")
+    # Tier-3 resolution: both transfer endpoints resolved against our seed labels
+    # and Dune's labels.cex_ethereum, sub-wallets collapsed to exchange roots.
+    flows_core = er.load_resolved_flows(FLOW_START, FLOW_END, og.CORE_TOKENS, eth_px)
+    flows_extra = er.load_resolved_flows(dt.date(2025, 10, 1), dt.date(2025, 10, 22),
+                                         ["USDC", "USDT", "WETH"], eth_px)
     flows = pd.concat([flows_core, flows_extra], ignore_index=True)
     flows = (flows.groupby(["day", "from_entity", "to_entity"], as_index=False)
-                  .agg(usd_volume=("usd_volume", "sum"), n_tx=("n_tx", "sum")))
-    print(f"      flow rows {len(flows)} (core {len(flows_core)} + extra {len(flows_extra)});"
-          f" days {flows.day.nunique()}")
+                  .agg(usd_volume=("usd_volume", "sum"), n_tx=("n_tx", "sum"),
+                       from_src=("from_src", "max"), to_src=("to_src", "max")))
+    flows = er.top_k_entities(flows, k=12)
+    entity_types = er.entity_types(flows)
+    out["entity_types"] = entity_types
+    print(f"      flow rows {len(flows)}; entities {sorted(entity_types)}")
+
+    # ---- 2b. entity-resolution quality (Tier-1/2 + Tier-3 reconciliation) ----
+    print("      validating entity resolution (classifier + embedding) ...")
+    try:
+        out["entity_resolution_validation"] = resolver.run_resolution_validation(
+            "USDe", config.EVENT_START, config.EVENT_END)
+    except Exception as e:  # noqa: BLE001
+        out["entity_resolution_validation"] = {"ok": False, "reason": str(e)}
 
     # ---- 3. graph + stress ---------------------------------------------------
     graph = og.build_graph(flows, min_usd=1e6)
@@ -93,7 +101,7 @@ def main():
                     "parents": graph["parents"]}
     print(f"      graph: {len(graph['nodes'])} nodes, {len(graph['edges'])} edges")
 
-    stress = st.build_stress_panel(flows, prices, tvl)
+    stress = st.build_stress_panel(flows, prices, tvl, entity_types)
     stress = stress.sort_index()
     print(f"      stress panel {stress.shape}: {list(stress.columns)}")
 
@@ -230,7 +238,27 @@ def write_report(out: dict):
           "intraday data before any causal-direction claim is made.")
     A("")
 
-    A("## 1. Observed on-chain graph G\n")
+    erv = out.get("entity_resolution_validation", {})
+    if erv.get("ok"):
+        t1 = erv.get("tier1_classifier", {})
+        t2 = erv.get("tier2_embedding", {})
+        A("## 0b. Entity resolution quality (Tier 1/2 + Tier-3 reconciliation)\n")
+        A(f"On {erv['n_addresses']:,} addresses in the USDe event-window graph, "
+          f"{erv['n_cex_labeled']:,} carry a Dune CEX label spanning "
+          f"{erv['n_distinct_cex']} distinct exchanges.")
+        if t1.get("trained"):
+            A(f"- **Tier-1 supervised classifier** (held-out): precision "
+              f"{t1['test_precision']:.2f}, recall {t1['test_recall']:.2f}, "
+              f"F1 {t1['test_f1']:.2f}, AUC {t1['test_auc']:.2f}. "
+              f"Top features: {', '.join(t1['top_features'])}.")
+        if t2.get("embedded"):
+            A(f"- **Tier-2 graph embedding** ({t2['dim']}-dim SVD, "
+              f"{t2['k_clusters']} clusters): CEX-cluster homogeneity "
+              f"{t2['cex_cluster_homogeneity']:.2f}.")
+        A("These are the resolution-layer robustness statistics algorithm.md §2.2 "
+          "requires (reported, not assumed away).\n")
+
+    A("## 1. Observed on-chain graph G (entity-resolved)\n")
     A(f"- Nodes ({len(out['graph']['nodes'])}): {', '.join(out['graph']['nodes'])}")
     A(f"- Directed edges: {len(out['graph']['edges'])} "
       "(observed-flow ≥ $1M cumulative + documented composability/collateral)\n")

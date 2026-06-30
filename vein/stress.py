@@ -20,11 +20,12 @@ import pandas as pd
 from . import config
 
 
-def entity_flow_series(flows: pd.DataFrame) -> dict[str, pd.DataFrame]:
+def entity_flow_series(flows: pd.DataFrame, entities=None) -> dict[str, pd.DataFrame]:
     """Per-entity daily inflow / outflow / net-outflow USD series from the panel."""
     out = {}
     days = pd.DatetimeIndex(sorted(flows["day"].unique()))
-    for ent in config.ENTITIES:
+    entities = entities if entities is not None else list(config.ENTITIES)
+    for ent in entities:
         inflow = (flows[flows.to_entity == ent].groupby("day").usd_volume.sum()
                   .reindex(days, fill_value=0.0))
         outflow = (flows[flows.from_entity == ent].groupby("day").usd_volume.sum()
@@ -43,19 +44,28 @@ def _zscore(s: pd.Series, win: int = 30) -> pd.Series:
 
 def build_stress_panel(flows: pd.DataFrame,
                        prices: pd.DataFrame,
-                       tvl: dict[str, pd.Series]) -> pd.DataFrame:
+                       tvl: dict[str, pd.Series],
+                       entity_types: dict[str, str] | None = None) -> pd.DataFrame:
     """Construct the daily stress panel S_{i,t} for every entity.
 
     All proxies are oriented so that larger = more stressed, then expressed as a
     rolling z-score so heterogeneous units are comparable in the SCM.
+
+    entity_types maps every resolved entity to a type. Seed protocols use their
+    price/TVL proxies; all other resolved entities are exchanges (CEX) and get
+    the net-outflow-ratio proxy computed from on-chain flows.
     """
-    flow_ser = entity_flow_series(flows)
+    if entity_types is None:
+        entity_types = {n: m["type"] for n, m in config.ENTITIES.items()}
     idx = pd.DatetimeIndex(sorted(flows["day"].unique()))
+    flow_ser = entity_flow_series(flows, entities=list(entity_types))
     cols = {}
 
-    for ent, meta in config.ENTITIES.items():
-        etype = meta["type"]
-        if etype == "CEX":
+    for ent, etype in entity_types.items():
+        if ent == "retail":
+            continue   # handled by the dedicated market-drawdown proxy below
+        meta = config.ENTITIES.get(ent, {"type": etype, "coingecko_id": None})
+        if etype in ("CEX", "RETAIL"):
             fs = flow_ser[ent]
             total = (fs.inflow + fs.outflow).rolling(30, min_periods=5).mean().replace(0, np.nan)
             ratio = (fs.net_outflow / total).fillna(0.0)   # >0 => net withdrawals
