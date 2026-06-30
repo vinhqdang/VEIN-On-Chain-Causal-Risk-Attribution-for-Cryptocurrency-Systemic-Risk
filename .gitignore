@@ -224,3 +224,11 @@ vein_secrets.env
 
 # VEIN data cache (regenerable, may be large / rate-limited)
 data_cache/
+
+# LaTeX build artifacts
+manuscript/*.aux
+manuscript/*.log
+manuscript/*.out
+manuscript/*.toc
+manuscript/*.bbl
+manuscript/*.blg
