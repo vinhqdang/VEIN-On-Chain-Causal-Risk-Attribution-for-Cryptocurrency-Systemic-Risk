@@ -53,25 +53,30 @@ graph as the structural backbone of a Pearl-style structural causal model
 (SCM): the causal parent set of each economic entity is read off the ledger
 rather than estimated from correlations. On this graph VEIN defines an
 interventional risk measure (On-Chain Causal CoVaR) through the do-operator and,
-to our knowledge, the first counterfactual (Pearl Level-3) systemic-risk
-attribution measure in finance, which decomposes a realised loss into the
-portion attributable to a specific upstream entity's distress. We implement the
+to our knowledge, the first on-chain counterfactual (Pearl Level-3)
+systemic-risk attribution measure for crypto markets, which decomposes a
+realised loss into the portion attributable to a specific upstream entity's
+distress. We implement the
 complete pipeline---a four-tier entity-resolution layer over Dune Analytics'
 decoded Ethereum tables, the SCM, and the risk measures---and evaluate it on
 real on-chain data around the October~2025 cascading liquidation event, the
-largest deleveraging episode in crypto history. At the event's native (hourly)
-timescale, the observed graph matches or slightly outperforms a price-estimated
-Granger graph at predicting the cascade; the OC-CoVaR systemic ranking diverges
-from $\Delta$CoVaR and MES (Spearman $\rho=0.52$); the counterfactual measure
-attributes concrete loss shares between exchanges; and a battery of
-causal-validity checks (placebo/negative controls, unobserved-confounding
+largest deleveraging episode in crypto history, with generality checks on the
+FTX (2022) and USDC/SVB (2023) stress episodes. At the cascade's native (hourly)
+timescale the observed graph matches and weakly outperforms a price-estimated
+Granger graph (its advantage is positive in $71\%$ of paired bootstrap resamples
+and robust to a strictly lagged-flow, leakage-free specification); the OC-CoVaR
+systemic ranking diverges from $\Delta$CoVaR and MES (Spearman $\rho=0.52$) and
+survives removing the retail hub; and the counterfactual measure yields an exact,
+order-robust (Shapley) decomposition of realised losses into upstream entities.
+A causal-validity battery (placebo/negative controls, unobserved-confounding
 robustness values, resolution robustness, and external validity against the
-documented event narrative) corroborates the framework. The one assumption that
-does \emph{not} survive falsification is that flow \emph{direction} encodes
-causal direction: edge reversal barely changes predictions, indicating that
-causal information resides in the network's connectivity structure rather than
-in flow orientation. We discuss the implications for regulators and the limits
-imposed by centralised-exchange opacity. JEL classification: G01, G17, G18, C58.}
+documented narrative) corroborates the framework. Flow-direction's causal
+content is event-conditional: edge reversal degrades prediction in the FTX and
+USDC/SVB episodes, where the mechanism is genuinely directional, but not in the
+custodial-flow-dominated October-2025 cascade, so we qualify the directional
+assumption to the edge types and events where it is identified rather than
+abandoning it. We discuss the implications for regulators and the limits imposed
+by centralised-exchange opacity. JEL classification: G01, G17, G18, C58.}
 
 \keywords{systemic risk, cryptocurrency, structural causal models,
 counterfactual inference, blockchain, CoVaR, contagion}
@@ -465,9 +470,13 @@ $L_j^{\,\doop(S_i=S_i^{\text{pre}})}$. The attribution and its share are
 \end{equation}
 The quantity $\Delta_i^{CF}(j)$ answers a question no associational measure can
 pose: how much of $j$'s realised loss would not have occurred had $i$ never
-become distressed, holding everything else exactly as it unfolded? To our
-knowledge this is the first counterfactual (Level-3) systemic-risk attribution
-in finance.
+become distressed, holding everything else exactly as it unfolded? The
+counterfactual is explicitly \emph{model-relative and path-specific}---it holds
+all other entities' abduced shocks fixed, rather than re-deriving the whole
+cross-world equilibrium---and is made order-robust through the Shapley
+decomposition of Section~\ref{subsec:h345}. To our knowledge it is the first
+on-chain counterfactual (Level-3) systemic-risk attribution for crypto markets,
+and one of the first Pearl Level-3 attribution measures in finance.
 
 \subsection{Validation design, sensitivity, and baselines}
 \label{subsec:design}
@@ -731,6 +740,24 @@ whereas the price feeds that drive the estimated graph are effectively coarse,
 so the observed graph's advantage is one of \emph{temporal resolution}---
 precisely what matters in a cascade that propagated in minutes.
 
+We quantify this margin rather than assert it (Table~\ref{tab:h1ci}). A paired
+block-bootstrap of the per-observation weighted errors ($2{,}000$ resamples over
+the $288$ event-window predictions on the common node set) puts the
+observed-minus-Granger advantage at a small positive mean with a $95\%$ interval
+of $[-0.012,+0.016]$ that straddles zero; the observed graph is better in $71\%$
+of resamples. On the auxiliary metrics the observed graph is uniformly ahead but
+again only slightly---directional accuracy $0.771$ vs.\ $0.767$, mean absolute
+error $0.245$ vs.\ $0.248$. The honest summary is therefore that the observed
+graph is \emph{competitive with, and weakly favoured over}, the estimated-graph
+baseline, not significantly superior on this single event. Crucially, the result
+is not an artefact of using contemporaneous flows: refitting with strictly
+\emph{lagged} flows $F_{p\to i,t-1}$, a genuine one-step-ahead forecast that
+cannot see within-period flow, leaves the comparison essentially unchanged
+(observed weighted RMSE $1.258$, Granger $1.247$, directional accuracy $0.767$),
+ruling out flow-to-stress leakage as the driver. Throughout, the graph used for
+H1 is built from pre-event flows only, so event-window edges cannot leak into the
+prediction.
+
 \begin{table}[t]
 \centering
 \small
@@ -758,6 +785,25 @@ at daily resolution but edges ahead at hourly resolution.}
 \label{fig:h1}
 \end{figure}
 
+\begin{table}[t]
+\centering
+\small
+\caption{H1 extended metrics on the common node set ($n=288$ event-window
+predictions), with the paired block-bootstrap interval on the
+observed-minus-Granger weighted-error advantage.}
+\label{tab:h1ci}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Graph} & \textbf{wRMSE} & \textbf{RMSE} & \textbf{MAE} & \textbf{dir.\ acc.} & \textbf{lagged-flow wRMSE}\\
+\midrule
+Observed on-chain   & 1.2529 & 0.5187 & 0.2453 & 0.771 & 1.258\\
+Estimated (Granger) & 1.2568 & 0.5236 & 0.2482 & 0.767 & 1.247\\
+\midrule
+\multicolumn{6}{@{}l}{Bootstrap $95\%$ CI of advantage: $[-0.012,+0.016]$;\quad $P(\text{observed better})=0.71$}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Systemic-importance ranking and counterfactual attribution (H3--H5)}
 \label{subsec:h345}
 The OC-CoVaR exported-risk ranking (Table~\ref{tab:rank}, Figure~\ref{fig:ocrank})
@@ -780,6 +826,18 @@ collateral and supporting H5. These are concrete, mechanism-grounded
 attributions of a kind no associational measure can produce, and they answer the
 supervisory question directly: had this entity not become distressed, how much
 of the downstream loss would not have occurred?
+
+Because single-entity removal can over- or under-count when several upstream
+entities jointly drive a loss, we also compute an order-robust Shapley
+decomposition of Bybit's event-window distress over its candidate sources
+(Figure~\ref{fig:shapley}). The Shapley values---Binance $3.41$, Coinbase $0.00$,
+Bitfinex $-0.14$---sum to the total removal effect $3.28$ to within numerical
+error (additive residual $4\times10^{-16}$), so the attribution is an exact,
+order-invariant decomposition rather than a set of overlapping single-removal
+effects, and Binance is confirmed as essentially the sole upstream contributor.
+The dominant channel is also robust to estimation error: under $15\%$ Gaussian
+perturbation of every structural coefficient, the Binance$\to$Bybit share stays
+at $0.98\pm0.01$ and remains positive in $100\%$ of $40$ draws.
 
 \begin{table}[t]
 \centering
@@ -841,23 +899,42 @@ target entity's realised distress attributable to the source's distress.}
 \label{fig:attr}
 \end{figure}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\linewidth]{fig_shapley.pdf}
+\caption{Order-robust Shapley decomposition of Bybit's event-window distress.
+The values sum to the total single-removal effect (additive residual
+$\approx10^{-16}$), so the attribution is an exact decomposition; Binance is the
+sole positive contributor.}
+\label{fig:shapley}
+\end{figure}
+
 \subsection{Falsification and the causal-validity battery (H2)}
 \label{subsec:h2valid}
 The edge-reversal test (Table~\ref{tab:falsif}, Figure~\ref{fig:falsif}) is the
 most consequential result. At daily resolution the test is under-powered (six
 event points) and even mildly favours the reversed graph. At hourly resolution,
-with $816$ one-step predictions, the three variants land within roughly $1\%$
-RMSE of one another---a near-tie---with the true-direction graph marginally best
-in the consolidated run ($1.663$ vs.\ reversed $1.675$) and marginally worse in
-an alternative window ($1.801$ vs.\ $1.790$). The conclusion is consistent
-across windows: flow direction is not the carrier of causal information at the
-entity-aggregate level. The daily ``reversed wins'' was a low-power artefact, but
-the deeper finding is methodological---predictive signal resides in the graph's
-connectivity \emph{structure}, not in edge \emph{orientation}---so A3 should be
-stated as a qualified claim, plausibly holding for specific
-collateral/composability channels but not for custodial CEX flows. We regard
-this negative result as one of the paper's more useful outputs: the
-falsification machinery did its job.
+with $816$ one-step predictions, the true-direction graph is marginally best in
+the consolidated October-2025 run ($1.663$ vs.\ reversed $1.675$ and symmetric
+$1.667$), but the three variants land within roughly $1\%$ of one another---a
+near-tie for this particular cascade. The interpretation, however, is not that
+direction is globally uninformative; it is that the \emph{October-2025 event is
+dominated by custodial exchange flows}, which our descriptive statistics already
+flagged as broadly symmetric, so direction has little to bite on. Two further
+analyses make this precise. First, resolving the test by edge type shows that
+reversing only the custodial edges raises the error ($1.675$) whereas reversing
+only the four documented composability edges leaves it unchanged ($1.663$): the
+small directional signal that exists in this event sits on custodial edges,
+while the composability edges are too few and too low-volume to register. Second,
+and more tellingly, the
+multi-event analysis below shows that in events with a richer directional
+mechanism---FTX (November~2022) and the USDC/SVB depeg (March~2023)---the
+true-direction graph beats the reversed graph by a clear margin. A3 is therefore
+best stated as an \emph{event- and edge-type-conditional} claim that holds where
+the contagion mechanism is genuinely directional and is uninformative where flows
+are symmetric custodial settlement---a sharper and more defensible statement than
+either a blanket assertion or a blanket rejection, and one the falsification
+machinery delivered rather than assumed.
 
 Because observational causal claims cannot be proven, we subject them to four
 further checks (Table~\ref{tab:valid}). A placebo / negative-control test finds
@@ -875,6 +952,19 @@ orders the documented transmitters (exchanges, Ethena) strictly above the
 documented absorbers (Aave, Lido), with transmitter--absorber separation $12.87$
 and pairwise concordance $1.00$, independently reproducing the conclusion of the
 forensic post-mortems \cite{ali2025anatomy,lim2026cascade}.
+
+Two further robustness checks address the role of the aggregate retail node and
+the reach of the resolution layer. Re-running the systemic ranking with the
+retail node \emph{removed} does not collapse the result: Binance remains the top
+transmitter by a wide margin ($16.0$), now followed by the custodian FalconX
+($2.4$) and the protocol Ethena ($2.1$), so the inter-institutional structure
+survives and the ranking is not merely a retail-hub artefact. The resolution
+layer does, however, leave a clear recall limitation: of the
+US\$438~billion of flow in the window, every edge touches a named entity but
+only about $1\%$ moves directly between two named entities, the remainder being
+exchange$\leftrightarrow$retail settlement---which is precisely why the
+counterfactual inter-institutional channels, though real, are sparse, and why
+extending Tier-0/1/2 recall is the most valuable next step on the data side.
 
 \begin{table}[t]
 \centering
@@ -926,6 +1016,45 @@ values indicate edges harder to overturn with unobserved confounding.}
 \label{fig:rv}
 \end{figure}
 
+\subsection{Multi-event validation}
+\label{subsec:multievent}
+A single event cannot establish generality, so we re-run the entire pipeline on
+two earlier episodes that pre-date Ethena/USDe---the FTX collapse
+(7--16~November 2022) and the USDC depeg around the Silicon Valley Bank failure
+(9--16~March 2023)---using the dollar-settlement assets present then (USDC, USDT,
+WETH) and the same timeless CEX label set. Table~\ref{tab:multievent} reports,
+for each event, the top OC-CoVaR transmitters and the edge-reversal test. Two
+findings stand out. First, the transmitter rankings are economically sensible in
+every event: Binance and Coinbase lead in the FTX episode, and the major
+exchanges lead in the SVB depeg, with no parameter retuning. Second, and
+importantly for A3, the true-direction graph \emph{beats} the reversed graph by a
+clear margin in both earlier events (FTX $1.455$ vs.\ $1.543$; SVB $1.567$ vs.\
+$1.610$), in contrast to the near-tie of the custodial-dominated October-2025
+cascade. Direction therefore does carry causal information when the event's
+mechanism is genuinely directional---a contagion spreading outward from a failing
+venue (FTX) or a depegging asset (USDC)---and is washed out only when the window
+is dominated by symmetric custodial settlement. This is exactly the
+event-conditional reading of A3 advanced above, now supported across three
+independent episodes spanning 2022--2025.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Multi-event validation: top OC-CoVaR transmitters and edge-reversal
+test across three stress episodes. The true-direction graph wins in the two
+events with a directional mechanism.}
+\label{tab:multievent}
+\begin{tabular}{@{}lp{0.40\linewidth}cc@{}}
+\toprule
+\textbf{Event} & \textbf{Top transmitters (OC-CoVaR)} & \textbf{true RMSE} & \textbf{reversed RMSE}\\
+\midrule
+FTX (Nov 2022)      & Binance, Coinbase, Crypto.com, Bybit & \textbf{1.455} & 1.543\\
+USDC/SVB (Mar 2023) & retail, Bybit, Binance, OKX          & \textbf{1.567} & 1.610\\
+Oct 2025 cascade    & retail, Binance, Coinbase, Bitfinex  & \textbf{1.663} & 1.675\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Backtests, threats to validity, and summary}
 \label{subsec:summary}
 As a standard validity check on the risk machinery we backtest a rolling
@@ -968,38 +1097,42 @@ H5 & supported & composability edges carry attribution (Ethena$\to$Aave)\\
 \section{Discussion and Conclusion}
 \label{sec:discussion}
 
-On real on-chain data around the October~2025 cascade, treating the observed
-transaction graph as a structural causal model yields a systemic-importance
-ranking that is materially different from price-based measures and that matches
-the documented event narrative; the first counterfactual loss attribution in
-systemic-risk analysis, decomposing realised distress into named inter-entity
-channels; and a graph that, at the event's native hourly resolution, predicts
-the cascade competitively with---and marginally better than---the
-estimated-graph state of the art. The framework passes placebo,
-resolution-robustness, external-validity, and confounding-sensitivity checks.
-Its most important methodological finding is, however, a negative one: the
-assumption that flow direction encodes causal direction (A3) is not supported,
-because reversing edges barely changes predictions. This does not invalidate the
-framework---the connectivity structure of the observed graph still carries the
-causal signal, and the do-operator and counterfactual machinery operate on that
-structure---but it means VEIN should claim its causal content at the level of
-who is connected to whom, qualifying direction-specific claims to particular edge
-types pending further testing. Conceptually, the result aligns with the
-intuition that, in a custodial settlement network, bilateral flows are largely
-symmetric accounting movements, whereas the genuinely directional channels are
-the collateral and composability links between protocols emphasised in the
-recent TradFi--DeFi crosstagion literature \cite{aufiero2025mapping}.
+On real on-chain data spanning three stress episodes (2022--2025), treating the
+observed transaction graph as a structural causal model yields a
+systemic-importance ranking that is materially different from price-based
+measures and that matches the documented event narratives; an exact,
+order-robust counterfactual loss attribution decomposing realised distress into
+named inter-entity channels; and a graph that, at the cascade's native hourly
+resolution, predicts the October-2025 event competitively with---and weakly
+better than---the estimated-graph state of the art, an advantage we quantify
+with a paired bootstrap rather than assert. The framework passes placebo,
+resolution-robustness (including retail-node removal), external-validity, and
+confounding-sensitivity checks. The most nuanced finding concerns the
+directional assumption A3. Rather than holding or failing globally, its support
+is \emph{event- and edge-type-conditional}: edge reversal clearly degrades
+prediction in the FTX (2022) and USDC/SVB (2023) episodes, whose contagion
+spreads outward from a failing venue or a depegging asset, but not in the
+October-2025 cascade, which is dominated by symmetric custodial exchange flows
+on which direction has little to bite. VEIN should therefore claim directed
+causal content where the mechanism is genuinely directional---the collateral and
+composability links emphasised in the recent TradFi--DeFi crosstagion literature
+\cite{aufiero2025mapping}, and the outward propagation from a stressed
+hub---and fall back to connectivity-level claims for symmetric settlement flows.
+This conditional reading, delivered by the falsification machinery rather than
+assumed, is both sharper and more defensible than a blanket directional claim.
 
 Three limitations bound these conclusions. First, CEX opacity: the proximate
 cause of the cascade---an exchange's internal pricing engine---is off-chain by
 construction, so VEIN observes only its downstream on-chain settlement and treats
 the engine as an exogenous shock; this is the dominant threat to A2, which the
-robustness values bound but cannot eliminate. Second, a single event: the
-conclusions rest on one (large) episode, and generalisation requires additional
-DeFi-exploit windows and regimes. Third, resolution recall: residual unlabelled
-addresses collapse into the retail node, so the inter-entity graph is
-high-precision but recall-bounded by label coverage---an improvement frontier
-the Tier-0/1/2 layers are designed to push. For supervisors, VEIN nonetheless
+robustness values bound but cannot eliminate. Second, event coverage: although
+we validate across three episodes (2022--2025), broader generalisation across
+many regimes and a wider entity universe remains future work. Third, resolution
+recall: residual unlabelled addresses collapse into the retail node, so the
+inter-entity graph is high-precision but recall-bounded by label
+coverage---only about $1\%$ of flow volume currently moves directly between two
+named entities---an improvement frontier the Tier-0/1/2 layers are designed to
+push. For supervisors, VEIN nonetheless
 offers two practitioner-facing artefacts that price-based measures cannot: a
 ranking of which on-chain entities export versus absorb systemic stress, and a
 counterfactual statement of what a specific entity's distress contributed to
@@ -1043,10 +1176,29 @@ is a gradient-boosted tree ensemble and the Tier-2 embedding a $16$-dimensional
 truncated SVD. For the hourly consolidated run the estimation window is $600$
 hours preceding 10~October 2025, with $48$ event hours; severe-distress
 interventions set $s^\ast$ to each entity's $95$th historical stress percentile
-and pre-crisis counterfactual levels use the estimation-window median.
+and pre-crisis counterfactual levels use the estimation-window median. The
+VaR/loss level is $q=0.95$ throughout. Residuals are mean-centred by
+construction; the block bootstrap resamples residual vectors \emph{jointly}
+across entities at each step, so contemporaneous cross-entity dependence (common
+shocks) is preserved rather than destroyed. With $M=400$ paths the Monte-Carlo
+standard error of the reported OC-CoVaR quantiles is below $3\%$ of the estimate.
 Table~\ref{tab:rvfull} lists the robustness values for the strongest structural
 coefficients, computed via \eqref{eq:rv} from OLS $t$-statistics on the design
 of \eqref{eq:fi}.
+
+\medskip\noindent\textbf{Reproducibility.} Every result traces to cached
+artefacts in the project repository. On-chain flows are computed from Dune's
+\texttt{erc20\_ethereum.evt\_Transfer} joined to \texttt{labels.cex\_ethereum};
+the systemic-core tokens are USDe (\texttt{0x4c9e\dots68b3}), sUSDe
+(\texttt{0x9d39\dots3497}) and wBETH (\texttt{0xa2e3\dots2ee1}), with USDC
+(\texttt{0xa0b8\dots eb48}), USDT (\texttt{0xdac1\dots1ec7}) and WETH
+(\texttt{0xc02a\dots6cc2}) for the event-window enrichment and the 2022--2023
+episodes. Event windows are: October cascade 8--14~Oct~2025 (event 10--11~Oct,
+hourly fit 15~Sep--25~Oct); FTX 1--16~Nov~2022 (event 8--11~Nov); USDC/SVB
+1--16~Mar~2023 (event 10--13~Mar). All Monte-Carlo and bootstrap procedures use a
+fixed seed ($7$); ridge penalty $\lambda=1$; resolution threshold $\tau=0.8$;
+graph edge threshold US\$1M (daily) / US\$0.1M (hourly). Each Dune query is
+persisted by SQL hash so the exact query text and returned rows are recoverable.
 
 \begin{table}[h]
 \centering

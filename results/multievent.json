@@ -1,0 +1,113 @@
+{
+  "generated": "2026-06-30",
+  "events": [
+    {
+      "event": "FTX_Nov2022",
+      "ok": true,
+      "n_entities": 11,
+      "n_pre_days": 7,
+      "n_event_days": 4,
+      "n_edges": 36,
+      "oc_ranking": [
+        {
+          "entity": "Binance",
+          "exported_risk": 1.9152927153016945
+        },
+        {
+          "entity": "Coinbase",
+          "exported_risk": 0.9712477064143116
+        },
+        {
+          "entity": "Crypto.com",
+          "exported_risk": 0.5480573751252529
+        },
+        {
+          "entity": "Bybit",
+          "exported_risk": 0.386304997326107
+        },
+        {
+          "entity": "Kraken",
+          "exported_risk": 0.21364944638216055
+        },
+        {
+          "entity": "FTX",
+          "exported_risk": 0.20224695407355853
+        }
+      ],
+      "falsification": [
+        {
+          "model": "true_direction",
+          "rmse": 1.4552132151556616,
+          "corr": 0.17960129684723056,
+          "n": 44
+        },
+        {
+          "model": "reversed_edges",
+          "rmse": 1.5431560215514042,
+          "corr": -0.04995217232823418,
+          "n": 44
+        },
+        {
+          "model": "symmetric",
+          "rmse": 1.4764999049440237,
+          "corr": -0.05804894821990526,
+          "n": 44
+        }
+      ]
+    },
+    {
+      "event": "USDC_SVB_Mar2023",
+      "ok": true,
+      "n_entities": 12,
+      "n_pre_days": 9,
+      "n_event_days": 4,
+      "n_edges": 32,
+      "oc_ranking": [
+        {
+          "entity": "retail",
+          "exported_risk": 3.3378239794167444
+        },
+        {
+          "entity": "Bybit",
+          "exported_risk": 2.1915018922464995
+        },
+        {
+          "entity": "Binance",
+          "exported_risk": 2.145559830620302
+        },
+        {
+          "entity": "OKX",
+          "exported_risk": 1.376717432840851
+        },
+        {
+          "entity": "Bitfinex",
+          "exported_risk": 0.8837206667673576
+        },
+        {
+          "entity": "Coinbase",
+          "exported_risk": 0.840981650451318
+        }
+      ],
+      "falsification": [
+        {
+          "model": "true_direction",
+          "rmse": 1.5673994166125056,
+          "corr": 0.08131903663758293,
+          "n": 48
+        },
+        {
+          "model": "reversed_edges",
+          "rmse": 1.6103164960436966,
+          "corr": 0.09124272446587939,
+          "n": 48
+        },
+        {
+          "model": "symmetric",
+          "rmse": 1.56446527706993,
+          "corr": 0.13678778740859246,
+          "n": 48
+        }
+      ]
+    }
+  ]
+}

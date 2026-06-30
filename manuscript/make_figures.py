@@ -203,3 +203,33 @@ if __name__ == "__main__":
     print("figures written to", FIG)
     for p in sorted(FIG.glob("*.pdf")):
         print(" ", p.name)
+
+
+# --- Revision figures -----------------------------------------------------------
+def fig_h1_ci():
+    import json
+    d = json.loads((RES / "revision.json").read_text())["H1"]
+    fig, ax = plt.subplots(figsize=(5.2, 2.6))
+    diff = d["mean_werr_diff_granger_minus_observed"]; ci = d["boot_ci95_diff"]
+    ax.errorbar([diff], [0], xerr=[[diff - ci[0]], [ci[1] - diff]], fmt="o",
+                color=BLUE, capsize=4, lw=1.5)
+    ax.axvline(0, color=GREY, ls="--", lw=1)
+    ax.set_yticks([]); ax.set_xlabel("weighted-error advantage of observed over Granger graph")
+    ax.set_title(f"H1 paired block-bootstrap ($P=${d['prob_observed_better']:.2f} observed better)")
+    fig.tight_layout(); fig.savefig(FIG / "fig_h1_ci.pdf"); plt.close(fig)
+
+
+def fig_shapley():
+    import json
+    d = json.loads((RES / "revision.json").read_text())["shapley"]
+    sv = d["shapley_values"]; names = list(sv)[::-1]; vals = [sv[n] for n in names]
+    fig, ax = plt.subplots(figsize=(5.0, 2.6))
+    ax.barh(names, vals, color=[GREEN if v >= 0 else RED for v in vals])
+    ax.axvline(0, color=GREY, lw=0.8)
+    ax.set_xlabel("Shapley contribution to " + d["target"] + " distress")
+    ax.set_title("Order-robust attribution (additive: residual $\\approx 0$)")
+    fig.tight_layout(); fig.savefig(FIG / "fig_shapley.pdf"); plt.close(fig)
+
+
+if __name__ == "__main__" and "--revision" in __import__("sys").argv:
+    fig_h1_ci(); fig_shapley(); print("revision figures done")
