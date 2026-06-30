@@ -76,6 +76,38 @@ def coingecko_prices(coin_id: str, start: dt.date, end: dt.date) -> pd.Series:
     return s
 
 
+def hourly_prices(coin_id: str, start: dt.date, end: dt.date) -> pd.Series:
+    """Hourly USD prices for a CoinGecko id over [start, end] via DefiLlama
+    (≤500 points/request, so chunk in ≤480-hour spans)."""
+    points: dict = {}
+    cur = dt.datetime.combine(start, dt.time())
+    end_dt = dt.datetime.combine(end, dt.time())
+    while cur <= end_dt:
+        chunk_end = min(end_dt, cur + dt.timedelta(hours=479))
+        frm = int(cur.timestamp())
+        span = max(1, int((chunk_end - cur).total_seconds() // 3600) + 1)
+        url = (f"https://coins.llama.fi/chart/coingecko:{coin_id}"
+               f"?start={frm}&span={span}&period=1h")
+        d = _get(url, f"llama_pxh_{coin_id}_{cur:%Y%m%d%H}_{span}.json")
+        entry = d.get("coins", {}).get(f"coingecko:{coin_id}", {})
+        for p in entry.get("prices", []):
+            points[pd.Timestamp(p["timestamp"], unit="s").floor("h")] = p["price"]
+        cur = chunk_end + dt.timedelta(hours=1)
+    if not points:
+        return pd.Series(dtype=float, name=coin_id)
+    s = pd.Series(points).sort_index()
+    return s[~s.index.duplicated(keep="last")].rename(coin_id)
+
+
+def build_hourly_price_panel(assets: dict[str, str], start: dt.date, end: dt.date) -> pd.DataFrame:
+    cols = {}
+    for ticker, cg in assets.items():
+        s = hourly_prices(cg, start, end)
+        if not s.empty:
+            cols[ticker] = s
+    return pd.DataFrame(cols).sort_index().ffill()
+
+
 def defillama_tvl(slug: str) -> pd.Series:
     """Daily total USD TVL series for a DefiLlama protocol slug.
 
