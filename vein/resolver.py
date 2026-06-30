@@ -22,7 +22,7 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import precision_recall_fscore_support, roc_auc_score
-from sklearn.metrics import homogeneity_score
+from sklearn.metrics import average_precision_score, homogeneity_score
 from sklearn.model_selection import train_test_split
 
 from . import config
@@ -106,53 +106,69 @@ def train_classifier(nodes: pd.DataFrame, seed: int = 0) -> dict:
                 "n_pos": int(y.sum()), "n": int(len(y))}
     Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=seed,
                                           stratify=y)
+    # balance the ~0.5% positive rate via sample weights
+    w = np.where(ytr == 1, (len(ytr) - ytr.sum()) / max(ytr.sum(), 1), 1.0)
     clf = GradientBoostingClassifier(random_state=seed)
-    clf.fit(Xtr, ytr)
+    clf.fit(Xtr, ytr, sample_weight=w)
     proba = clf.predict_proba(Xte)[:, 1]
-    pred = (proba >= 0.5).astype(int)
-    p, r, f, _ = precision_recall_fscore_support(yte, pred, average="binary",
-                                                 zero_division=0)
     auc = roc_auc_score(yte, proba) if len(set(yte)) > 1 else float("nan")
-    imp = dict(sorted(zip(FEATURES, clf.feature_importances_),
-                      key=lambda kv: -kv[1]))
+    ap = average_precision_score(yte, proba) if yte.sum() else float("nan")
+    # report at the F1-maximizing threshold (0.5 is meaningless at 0.5% base rate)
+    best = {"f1": -1, "precision": 0.0, "recall": 0.0, "threshold": 0.5}
+    for thr in np.unique(proba):
+        pred = (proba >= thr).astype(int)
+        p, r, f, _ = precision_recall_fscore_support(yte, pred, average="binary",
+                                                     zero_division=0)
+        if f > best["f1"]:
+            best = {"f1": float(f), "precision": float(p), "recall": float(r),
+                    "threshold": float(thr)}
+    imp = dict(sorted(zip(FEATURES, clf.feature_importances_), key=lambda kv: -kv[1]))
     return {"trained": True, "n": int(len(y)), "n_cex": int(y.sum()),
-            "test_precision": float(p), "test_recall": float(r),
-            "test_f1": float(f), "test_auc": float(auc),
+            "test_auc": float(auc), "test_avg_precision": float(ap),
+            "base_rate": float(y.mean()),
+            "best_f1": best["f1"], "precision_at_bestF1": best["precision"],
+            "recall_at_bestF1": best["recall"],
             "top_features": {k: round(float(v), 3) for k, v in list(imp.items())[:5]}}
 
 
 def embed_and_cluster(edges: pd.DataFrame, nodes: pd.DataFrame,
                       dim: int = 16, k_clusters: int = 20, seed: int = 0) -> dict:
-    """Tier-2: SVD embedding of the symmetric adjacency, KMeans clustering,
-    cluster purity vs known CEX labels (homogeneity)."""
-    from scipy.sparse import coo_matrix
-    from scipy.sparse.linalg import svds
+    """Tier-2: SVD embedding of the symmetric normalized adjacency, KMeans
+    clustering, cluster purity vs known CEX labels (homogeneity).
+
+    Uses sklearn's randomized TruncatedSVD (robust on large sparse graphs;
+    ARPACK svds can fail to converge here). Degrades gracefully on error."""
+    from scipy.sparse import coo_matrix, diags
+    from sklearn.decomposition import TruncatedSVD
 
     idx = {a: i for i, a in enumerate(nodes.index)}
     n = len(idx)
     if n < dim + 2:
         return {"embedded": False, "reason": "too few nodes", "n": n}
-    rows, cols, vals = [], [], []
-    for _, e in edges.iterrows():
-        a, b = idx.get(e["from_addr"]), idx.get(e["to_addr"])
-        if a is None or b is None:
-            continue
-        w = np.log1p(float(e["volume"]))
-        rows += [a, b]; cols += [b, a]; vals += [w, w]   # symmetrize
-    A = coo_matrix((vals, (rows, cols)), shape=(n, n)).tocsr()
-    deg = np.asarray(A.sum(axis=1)).ravel() + 1e-9
-    Dinv = 1.0 / np.sqrt(deg)
-    A = A.multiply(Dinv[:, None]).multiply(Dinv[None, :]).tocsr()   # normalized
-    kdim = min(dim, n - 2)
-    U, S, _ = svds(A.asfptype(), k=kdim)
-    emb = U * S
-    km = KMeans(n_clusters=min(k_clusters, n), random_state=seed, n_init=10)
-    labels = km.fit_predict(emb)
-    mask = nodes["is_cex"].values.astype(bool)
-    homo = (homogeneity_score(nodes["cex_name"].fillna("unknown").values[mask],
-                              labels[mask]) if mask.sum() > 2 else float("nan"))
-    return {"embedded": True, "n": n, "dim": kdim, "k_clusters": int(km.n_clusters),
-            "cex_cluster_homogeneity": float(homo)}
+    try:
+        a_idx = edges["from_addr"].map(idx).to_numpy()
+        b_idx = edges["to_addr"].map(idx).to_numpy()
+        w = np.log1p(pd.to_numeric(edges["volume"], errors="coerce").fillna(0.0).to_numpy())
+        rows = np.concatenate([a_idx, b_idx])
+        cols = np.concatenate([b_idx, a_idx])
+        vals = np.concatenate([w, w])
+        A = coo_matrix((vals, (rows, cols)), shape=(n, n)).tocsr()
+        deg = np.asarray(A.sum(axis=1)).ravel() + 1e-9
+        Dinv = diags(1.0 / np.sqrt(deg))
+        A = (Dinv @ A @ Dinv).tocsr()                       # symmetric-normalized
+        kdim = min(dim, n - 1)
+        svd = TruncatedSVD(n_components=kdim, random_state=seed, algorithm="randomized")
+        emb = svd.fit_transform(A)
+        km = KMeans(n_clusters=min(k_clusters, n), random_state=seed, n_init=10)
+        labels = km.fit_predict(emb)
+        mask = nodes["is_cex"].values.astype(bool)
+        homo = (homogeneity_score(nodes["cex_name"].fillna("unknown").values[mask],
+                                  labels[mask]) if mask.sum() > 2 else float("nan"))
+        return {"embedded": True, "n": n, "dim": int(kdim),
+                "k_clusters": int(km.n_clusters),
+                "cex_cluster_homogeneity": float(homo)}
+    except Exception as e:  # noqa: BLE001 - embedding is a robustness extra
+        return {"embedded": False, "reason": f"{type(e).__name__}: {e}", "n": n}
 
 
 def run_resolution_validation(token: str, start, end) -> dict:

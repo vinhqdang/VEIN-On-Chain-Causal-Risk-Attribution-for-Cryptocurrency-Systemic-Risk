@@ -247,9 +247,11 @@ def write_report(out: dict):
           f"{erv['n_cex_labeled']:,} carry a Dune CEX label spanning "
           f"{erv['n_distinct_cex']} distinct exchanges.")
         if t1.get("trained"):
-            A(f"- **Tier-1 supervised classifier** (held-out): precision "
-              f"{t1['test_precision']:.2f}, recall {t1['test_recall']:.2f}, "
-              f"F1 {t1['test_f1']:.2f}, AUC {t1['test_auc']:.2f}. "
+            A(f"- **Tier-1 supervised classifier** (held-out, base rate "
+              f"{t1['base_rate']*100:.1f}% CEX): ROC-AUC {t1['test_auc']:.2f}, "
+              f"PR-AUC {t1['test_avg_precision']:.2f}; at the F1-optimal threshold "
+              f"precision {t1['precision_at_bestF1']:.2f} / recall "
+              f"{t1['recall_at_bestF1']:.2f} (F1 {t1['best_f1']:.2f}). "
               f"Top features: {', '.join(t1['top_features'])}.")
         if t2.get("embedded"):
             A(f"- **Tier-2 graph embedding** ({t2['dim']}-dim SVD, "
