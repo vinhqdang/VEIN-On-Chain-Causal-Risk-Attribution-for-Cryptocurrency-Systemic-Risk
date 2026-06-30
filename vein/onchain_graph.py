@@ -118,24 +118,53 @@ def load_flows(start: dt.date, end: dt.date, eth_price: pd.Series | None = None,
     return agg
 
 
-def build_graph(flows: pd.DataFrame, min_usd: float = 1e6) -> dict:
+def build_graph(flows: pd.DataFrame, min_usd: float = 1e6,
+                include_documented: bool = True) -> dict:
     """Aggregate the flow panel into a directed graph with edge weights/confidence.
 
     Returns dict with 'nodes', 'edges' (list of dicts), and 'parents' map.
     An edge i->j exists if cumulative observed flow from i to j exceeds min_usd.
     Confidence = 1.0 if both endpoints labeled, 0.5 if one side is 'retail'.
+
+    At the label-seeded resolution tier, entities transact mostly through the
+    user layer, so direct labeled<->labeled flows are sparse. When
+    include_documented is set we additionally add the documented on-chain
+    composability/collateral edges (config.DOCUMENTED_EDGES, algorithm.md
+    Section 3.2) as directed causal edges (source='documented', confidence 0.7).
+    These are real, on-chain-grounded collateral relationships; the falsification
+    test (Section 2.6) then probes whether their *direction* is causal.
     """
     totals = (flows.groupby(["from_entity", "to_entity"], as_index=False)
                     .agg(usd_volume=("usd_volume", "sum"), n_tx=("n_tx", "sum")))
-    nodes = sorted(set(totals.from_entity) | set(totals.to_entity))
+    nodes = set(totals.from_entity) | set(totals.to_entity)
+    if include_documented:
+        for i, j in config.DOCUMENTED_EDGES:
+            nodes.add(i); nodes.add(j)
+    nodes = sorted(nodes)
+
     edges = []
     parents: dict[str, list[str]] = {n: [] for n in nodes}
+    seen = set()
     for _, r in totals.iterrows():
         i, j = r.from_entity, r.to_entity
         if i == j or r.usd_volume < min_usd:
             continue
         conf = 0.5 if ("retail" in (i, j)) else 1.0
         edges.append({"from": i, "to": j, "usd_volume": float(r.usd_volume),
-                      "n_tx": int(r.n_tx), "confidence": conf})
+                      "n_tx": int(r.n_tx), "confidence": conf, "source": "observed_flow"})
         parents[j].append(i)
+        seen.add((i, j))
+
+    if include_documented:
+        flow_lookup = {(r.from_entity, r.to_entity): float(r.usd_volume)
+                       for _, r in totals.iterrows()}
+        for i, j in config.DOCUMENTED_EDGES:
+            if (i, j) in seen or i == j:
+                continue
+            edges.append({"from": i, "to": j,
+                          "usd_volume": flow_lookup.get((i, j), 0.0), "n_tx": 0,
+                          "confidence": 0.7, "source": "documented"})
+            parents[j].append(i)
+            seen.add((i, j))
+
     return {"nodes": nodes, "edges": edges, "parents": parents}

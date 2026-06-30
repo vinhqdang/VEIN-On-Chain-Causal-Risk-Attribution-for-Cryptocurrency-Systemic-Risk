@@ -69,14 +69,26 @@ def main():
 
     # ---- 2. on-chain flows (real, Dune) --------------------------------------
     print("[3/8] Fetching on-chain inter-entity flows (Dune SQL) ...")
-    flows = og.load_flows(FLOW_START, FLOW_END, eth_price=eth_px,
-                          tokens=og.CORE_TOKENS)
-    print(f"      flow rows {len(flows)}; days {flows.day.nunique()}")
+    flows_core = og.load_flows(FLOW_START, FLOW_END, eth_price=eth_px,
+                               tokens=og.CORE_TOKENS)
+    # Enrich the event-window graph with the dominant inter-entity settlement
+    # assets (USDC/USDT/WETH) over a tight 3-week window. These move *between*
+    # labeled entities (Binance<->Ethena/Aave/Lido) and expose the directed
+    # inter-entity structure the systemic-core tokens alone miss. Tight window
+    # keeps the (large) USDC/USDT scan within Dune free-tier credits.
+    flows_extra = og.load_flows(dt.date(2025, 10, 1), dt.date(2025, 10, 22),
+                                eth_price=eth_px, tokens=["USDC", "USDT", "WETH"])
+    flows = pd.concat([flows_core, flows_extra], ignore_index=True)
+    flows = (flows.groupby(["day", "from_entity", "to_entity"], as_index=False)
+                  .agg(usd_volume=("usd_volume", "sum"), n_tx=("n_tx", "sum")))
+    print(f"      flow rows {len(flows)} (core {len(flows_core)} + extra {len(flows_extra)});"
+          f" days {flows.day.nunique()}")
 
     # ---- 3. graph + stress ---------------------------------------------------
     graph = og.build_graph(flows, min_usd=1e6)
     out["graph"] = {"nodes": graph["nodes"],
-                    "edges": [(e["from"], e["to"], round(e["usd_volume"], 0), e["confidence"])
+                    "edges": [(e["from"], e["to"], round(e["usd_volume"], 0),
+                               e["confidence"], e.get("source", "observed_flow"))
                               for e in graph["edges"]],
                     "parents": graph["parents"]}
     print(f"      graph: {len(graph['nodes'])} nodes, {len(graph['edges'])} edges")
@@ -184,11 +196,12 @@ def write_report(out: dict):
 
     A("## 1. Observed on-chain graph G\n")
     A(f"- Nodes ({len(out['graph']['nodes'])}): {', '.join(out['graph']['nodes'])}")
-    A(f"- Directed flow edges (≥ $1M cumulative): {len(out['graph']['edges'])}\n")
-    A("| from | to | cum. USD volume | confidence |")
-    A("|---|---|--:|--:|")
-    for f_, t_, v, c in sorted(out["graph"]["edges"], key=lambda x: -x[2])[:15]:
-        A(f"| {f_} | {t_} | {v:,.0f} | {c} |")
+    A(f"- Directed edges: {len(out['graph']['edges'])} "
+      "(observed-flow ≥ $1M cumulative + documented composability/collateral)\n")
+    A("| from | to | cum. USD volume | confidence | source |")
+    A("|---|---|--:|--:|---|")
+    for f_, t_, v, c, src in sorted(out["graph"]["edges"], key=lambda x: -x[2])[:20]:
+        A(f"| {f_} | {t_} | {v:,.0f} | {c} | {src} |")
     A("")
 
     A("## 2. OC-CoVaR systemic ranking (H3)\n")
