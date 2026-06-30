@@ -66,11 +66,14 @@ def seed_values_cte() -> str:
     return ",\n        ".join(rows)
 
 
-def resolved_flow_sql(start, end, tokens: list[str], min_addr_volume: float = 5e6) -> str:
-    """Daily directed inter-entity flows with Tier-3 label resolution on BOTH sides.
+def resolved_flow_sql(start, end, tokens: list[str], min_addr_volume: float = 5e6,
+                      bucket: str = "day") -> str:
+    """Directed inter-entity flows with Tier-3 label resolution on BOTH sides.
 
-    Resolution priority per address: seed entity > Dune CEX label > 'retail'.
-    Deduplicates multi-row CEX labels by picking one name per address.
+    bucket — time granularity ('day' or 'hour'); 'hour' gives the intraday
+    resolution needed to test A3 with real statistical power on the Oct-2025
+    cascade. Resolution priority per address: seed entity > Dune CEX label >
+    'retail'. Deduplicates multi-row CEX labels by picking one name per address.
     """
     tok_rows = ",\n        ".join(
         f"({config.TOKENS[tk]}, '{tk}', {_decimals(tk)})" for tk in tokens)
@@ -90,7 +93,7 @@ cex AS (   -- dedupe Dune CEX labels to one name per address
 ),
 xfer AS (
     SELECT
-        date_trunc('day', t.evt_block_time) AS day,
+        date_trunc('{bucket}', t.evt_block_time) AS day,
         tok.sym AS token,
         COALESCE(sf.name, cf.name, 'retail') AS from_entity,
         COALESCE(st.name, ct.name, 'retail') AS to_entity,
@@ -123,14 +126,20 @@ def _decimals(tk: str) -> int:
     return {"USDe": 18, "sUSDe": 18, "USDC": 6, "USDT": 6, "wBETH": 18, "WETH": 18}[tk]
 
 
-def load_resolved_flows(start, end, tokens, eth_price=None) -> pd.DataFrame:
-    """Resolved daily inter-entity flows in approximate USD."""
-    rows = run_sql(resolved_flow_sql(start, end, tokens), name="vein_resolved_flows")
+def load_resolved_flows(start, end, tokens, eth_price=None, bucket="day",
+                        min_addr_volume: float = 5e6) -> pd.DataFrame:
+    """Resolved inter-entity flows in approximate USD at the given time bucket."""
+    rows = run_sql(resolved_flow_sql(start, end, tokens, min_addr_volume, bucket),
+                   name="vein_resolved_flows")
     if not rows:
         return pd.DataFrame(columns=["day", "from_entity", "to_entity",
                                      "from_src", "to_src", "usd_volume", "n_tx"])
     df = pd.DataFrame(rows)
-    df["day"] = pd.to_datetime(df["day"]).dt.tz_localize(None).dt.normalize()
+    # tz-strip but DO NOT normalize: normalize() would floor hourly buckets to
+    # midnight and silently collapse intraday resolution back to daily.
+    df["day"] = pd.to_datetime(df["day"]).dt.tz_localize(None)
+    if bucket == "day":
+        df["day"] = df["day"].dt.normalize()
     df["volume"] = pd.to_numeric(df["volume"], errors="coerce").fillna(0.0)
     df["n_tx"] = pd.to_numeric(df["n_tx"], errors="coerce").fillna(0).astype(int)
     eth_tokens = {"wBETH", "WETH"}
