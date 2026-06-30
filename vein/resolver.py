@@ -95,6 +95,8 @@ def build_node_table(edges: pd.DataFrame) -> pd.DataFrame:
 FEATURES = ["out_vol", "out_tx", "out_deg", "in_vol", "in_tx", "in_deg",
             "sweep_ratio", "tot_vol", "tot_tx", "deg", "in_out_ratio"]
 
+NULL_ADDR = "0x0000000000000000000000000000000000000000"
+
 
 def train_classifier(nodes: pd.DataFrame, seed: int = 0) -> dict:
     """Tier-1: GBM predicting is_cex; held-out precision/recall/AUC."""
@@ -114,20 +116,32 @@ def train_classifier(nodes: pd.DataFrame, seed: int = 0) -> dict:
     auc = roc_auc_score(yte, proba) if len(set(yte)) > 1 else float("nan")
     ap = average_precision_score(yte, proba) if yte.sum() else float("nan")
     # report at the F1-maximizing threshold (0.5 is meaningless at 0.5% base rate)
-    best = {"f1": -1, "precision": 0.0, "recall": 0.0, "threshold": 0.5}
+    _, Xte_idx = train_test_split(np.arange(len(y)), test_size=0.3, random_state=seed,
+                                  stratify=y)
+    vol_te = df["tot_vol"].values[Xte_idx]
+    best = {"f1": -1, "precision": 0.0, "recall": 0.0, "threshold": 0.5,
+            "vol_weighted_precision": 0.0, "vol_weighted_recall": 0.0}
     for thr in np.unique(proba):
         pred = (proba >= thr).astype(int)
         p, r, f, _ = precision_recall_fscore_support(yte, pred, average="binary",
                                                      zero_division=0)
         if f > best["f1"]:
+            tp_vol = float(vol_te[(pred == 1) & (yte == 1)].sum())
+            fp_vol = float(vol_te[(pred == 1) & (yte == 0)].sum())
+            fn_vol = float(vol_te[(pred == 0) & (yte == 1)].sum())
+            vwp = tp_vol / (tp_vol + fp_vol) if (tp_vol + fp_vol) > 0 else 0.0
+            vwr = tp_vol / (tp_vol + fn_vol) if (tp_vol + fn_vol) > 0 else 0.0
             best = {"f1": float(f), "precision": float(p), "recall": float(r),
-                    "threshold": float(thr)}
+                    "threshold": float(thr),
+                    "vol_weighted_precision": vwp, "vol_weighted_recall": vwr}
     imp = dict(sorted(zip(FEATURES, clf.feature_importances_), key=lambda kv: -kv[1]))
     return {"trained": True, "n": int(len(y)), "n_cex": int(y.sum()),
             "test_auc": float(auc), "test_avg_precision": float(ap),
             "base_rate": float(y.mean()),
             "best_f1": best["f1"], "precision_at_bestF1": best["precision"],
             "recall_at_bestF1": best["recall"],
+            "vol_weighted_precision_at_bestF1": best["vol_weighted_precision"],
+            "vol_weighted_recall_at_bestF1": best["vol_weighted_recall"],
             "top_features": {k: round(float(v), 3) for k, v in list(imp.items())[:5]}}
 
 
@@ -176,8 +190,11 @@ def run_resolution_validation(token: str, start, end) -> dict:
     edges = fetch_labeled_edges(token, start, end)
     if edges.empty:
         return {"ok": False, "reason": "no edges"}
+    n_addr_before = len(set(edges.from_addr) | set(edges.to_addr))
+    edges = edges[(edges.from_addr != NULL_ADDR) & (edges.to_addr != NULL_ADDR)]
     nodes = build_node_table(edges)
     out = {"ok": True, "token": token, "window": [str(start), str(end)],
+           "n_addresses_incl_sentinel": int(n_addr_before),
            "n_addresses": int(len(nodes)),
            "n_cex_labeled": int(nodes["is_cex"].sum()),
            "n_distinct_cex": int(nodes["cex_name"].nunique()),

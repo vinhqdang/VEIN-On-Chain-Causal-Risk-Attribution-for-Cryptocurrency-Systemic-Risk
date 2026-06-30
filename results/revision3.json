@@ -1,0 +1,61 @@
+{
+  "generated": "2026-06-30",
+  "base_top5": [
+    "retail",
+    "Binance",
+    "Coinbase",
+    "Bitfinex",
+    "Gate.io"
+  ],
+  "n_edges_with_rv": 15,
+  "drop_low_rv": {
+    "n_total_edges": 39,
+    "n_dropped": 9,
+    "dropped": [
+      "HTX->retail",
+      "Copper->retail",
+      "Ceffu->retail",
+      "Bullish->retail",
+      "FalconX->Binance",
+      "Ethena->Aave",
+      "Bitfinex->Bybit",
+      "Ethena->retail",
+      "Lido->Aave"
+    ],
+    "ranking_spearman_vs_base": 0.9389949031033126,
+    "top5_after_drop": [
+      "retail",
+      "Binance",
+      "Coinbase",
+      "Bitfinex",
+      "Gate.io"
+    ],
+    "top3_overlap": 1.0
+  },
+  "latent_shock": {
+    "moderate": {
+      "strength": 0.3,
+      "ranking_spearman_vs_base": 0.8427026864483486,
+      "top5": [
+        "retail",
+        "Binance",
+        "Coinbase",
+        "Bitfinex",
+        "Gate.io"
+      ],
+      "top3_overlap": 1.0
+    },
+    "strong": {
+      "strength": 0.6,
+      "ranking_spearman_vs_base": 0.8056879271607197,
+      "top5": [
+        "retail",
+        "Binance",
+        "Coinbase",
+        "Bitfinex",
+        "FalconX"
+      ],
+      "top3_overlap": 1.0
+    }
+  }
+}

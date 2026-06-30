@@ -44,44 +44,51 @@ Attribution for Cryptocurrency Systemic Risk}
 \author*[1]{\fnm{Quang-Vinh} \sur{Dang}}\email{vinh.dq4@buv.edu.vn}
 \affil*[1]{\orgname{British University Vietnam}, \orgaddress{\city{Hung Yen}, \country{Vietnam}}}
 
-\abstract{Existing causal measures of systemic risk in cryptocurrency markets
-infer the contagion graph \emph{statistically} from price returns, using
-constraint-based structure learning or directed-information estimation. We
-propose VEIN (Verifiable Entity-resolved Interventional/counterfactual Network
-risk), a framework that instead treats the \emph{observed} on-chain transaction
-graph as the structural backbone of a Pearl-style structural causal model
-(SCM): the causal parent set of each economic entity is read off the ledger
-rather than estimated from correlations. On this graph VEIN defines an
-interventional risk measure (On-Chain Causal CoVaR) through the do-operator and,
-to our knowledge, the first on-chain counterfactual (Pearl Level-3)
-systemic-risk attribution measure for crypto markets, which decomposes a
-realised loss into the portion attributable to a specific upstream entity's
-distress. We implement the
-complete pipeline---a four-tier entity-resolution layer over Dune Analytics'
-decoded Ethereum tables, the SCM, and the risk measures---and evaluate it on
-real on-chain data around the October~2025 cascading liquidation event, one of
-the largest documented deleveraging episodes in crypto markets, with generality checks on the
-FTX (2022) and USDC/SVB (2023) stress episodes. The primary contribution is the
-counterfactual attribution measure, which yields an exact, order-robust (Shapley)
-decomposition of realised losses into upstream entities and produces
-systemic-importance rankings that diverge from $\Delta$CoVaR and MES (Spearman
-$\rho=0.52$), survive removing the retail hub, and are stable under coefficient
-perturbation (Spearman $0.88$). Prediction is a secondary, graph-source
-ablation: at the cascade's hourly timescale the observed graph is competitive
-with a price-estimated Granger graph (better in $71\%$ of paired bootstrap
-resamples) but the edge is not decisive---it does not survive a strict
-lagged-flow forecast or a price-based stress target---so we report H1 as
-suggestive rather than established. Flow-direction's causal content is event- and
-target-conditional but real: edge reversal degrades one-step prediction in the
-FTX and USDC/SVB episodes and, crucially, by $\approx9\%$ on a leakage-free
-non-flow stress target, confirming the directional signal is not an artefact of
-flow-defined stress; it washes out only in the custodial-flow-dominated
-October-2025 cascade. We therefore qualify the directional reading to the edge
-types and events where it is identified. A causal-validity battery
-(placebo/negative controls, unobserved-confounding robustness values, resolution
-robustness, and external validity against the documented narrative) supports
-these components while delimiting the off-chain-CEX and entity-resolution limits. We discuss the implications for regulators and the limits imposed
-by centralised-exchange opacity. JEL classification: G01, G17, G18, C58.}
+\abstract{Return-based causal measures of cryptocurrency systemic risk infer
+the contagion graph \emph{statistically}, from price co-movement, using
+constraint-based structure learning or directed-information estimation; the
+mechanism of transmission---which entity actually moved funds into
+distress---stays unobserved. We propose VEIN (Verifiable Entity-resolved
+Interventional/counterfactual Network risk), a framework that instead treats
+the resolved on-chain transaction ledger as an \emph{auditable candidate
+structural skeleton}: under explicit edge-type and timing assumptions, the
+in-neighbours of an entity in this entity-resolved graph specify the parent
+set of a Pearl-style structural causal model (SCM), rather than a parent set
+inferred from correlations. On this skeleton VEIN defines an interventional
+risk measure (On-Chain Causal CoVaR) through the do-operator and, to our
+knowledge, the first on-chain counterfactual (Pearl Level-3) systemic-risk
+\emph{attribution} measure proposed for crypto markets, which decomposes a
+realised loss into the Shapley-exact share attributable to each upstream
+entity's distress. We implement the complete pipeline---a four-tier
+entity-resolution layer over Dune Analytics' decoded Ethereum tables, the SCM,
+and the risk measures---and evaluate it on real on-chain data around the
+October~2025 cascading liquidation event, one of the largest documented
+deleveraging episodes in crypto markets, with generality checks on the FTX
+(2022) and USDC/SVB (2023) stress episodes. The primary contribution is this
+attribution measure: it yields an exact, order-robust decomposition of
+realised losses into upstream entities, and produces systemic-importance
+rankings that diverge from $\Delta$CoVaR and MES (Spearman $\rho=0.52$),
+survive removing the retail aggregate, and are stable under coefficient
+perturbation (Spearman $0.88$). One-step prediction is a secondary,
+graph-source ablation under common VEIN equations, not a replication of
+TV-DIG or Causal-NECO VaR: at the cascade's hourly timescale the observed
+graph is competitive with a price-estimated Granger graph (better in $71\%$
+of paired bootstrap resamples) but the edge is not decisive---it does not
+survive a strict lagged-flow forecast or a price-based stress target---so we
+report this comparison as suggestive rather than established. The directional
+content of flow edges is event- and edge-type-conditional: reversal degrades
+one-step prediction in the FTX and USDC/SVB episodes and, on a leakage-free
+non-flow stress target built from prices and pegs alone, by $\approx9\%$,
+confirming the signal is not an artefact of flow-defined stress; it washes
+out into near-symmetry only in the custodial-settlement-dominated
+October-2025 cascade, where connectivity rather than direction appears to
+carry the systemic content. A validity and falsification battery
+(placebo/negative controls, unobserved-confounding robustness values,
+resolution robustness, and external validity against the documented
+narrative) supports these components while delimiting the off-chain-CEX and
+entity-resolution limits that any ledger-only analysis inherits. We discuss
+the implications for regulators and the limits imposed by centralised-exchange
+opacity. JEL classification: G01, G17, G18, C58.}
 
 \keywords{systemic risk, cryptocurrency, structural causal models,
 counterfactual inference, blockchain, CoVaR, contagion}
@@ -169,11 +176,13 @@ observed-graph SCM for crypto systemic risk, extended to the counterfactual
 level. This paper occupies it.
 
 We make three contributions. First, we propose VEIN, which treats the
-entity-resolved on-chain transaction graph as the structural backbone of a Pearl
-SCM, so that the causal parent set $\pa(i)$ of each entity is \emph{read off the
-ledger} rather than inferred from price correlations; the temporal precedence of
-on-chain transactions, guaranteed by block timestamps, supplies an
-identification advantage unavailable to price-based methods. Second, we define
+entity-resolved on-chain transaction graph as an \emph{auditable candidate
+structural skeleton} for a Pearl SCM: under explicit edge-type and timing
+assumptions (A1--A3, Section~\ref{sec:method}), the in-neighbour set $\pa(i)$
+of each entity is \emph{specified from the resolved ledger} rather than
+inferred from price correlations; block timestamps make the temporal ordering
+of on-chain transactions observable, reducing---though not eliminating---the
+timing ambiguity that price-based methods must instead assume away. Second, we define
 On-Chain Causal CoVaR, an interventional (Level-2) measure via the do-operator,
 together with a counterfactual (Level-3) attribution measure that decomposes a
 realised loss into the share attributable to a specific upstream entity through
@@ -339,11 +348,16 @@ S_{i,t} \;=\; f_i\!\Big(S_{\pa(i),\,t-1},\; F_{\pa(i)\to i,\,t},\; U_{i,t}\Big),
 \qquad
 \pa(i) \;=\; \{\,p\in V : (p\to i)\in E\,\},
 \end{equation}
-where the parent set $\pa(i)$ is \emph{read directly from the resolved ledger}.
-This is the central structural move of the paper: in contrast to
-\cite{rigana2024neco,etesami2023tvdig}, $\pa(i)$ is observed, not estimated from
-data, so the only component requiring statistical estimation is the
-stress-propagation function $f_i$. We adopt a ridge-regularised linear
+The resolved ledger supplies an observed candidate propagation skeleton: under
+the edge-type and timing assumptions A1--A3 below, the in-neighbours of $i$ in
+$G$ are used to \emph{specify} the model parent set $\pa(i)$ of the SCM. This
+is the central structural move of the paper: in contrast to
+\cite{rigana2024neco,etesami2023tvdig}, $\pa(i)$ is specified from the ledger
+rather than estimated from price correlations, so the only component requiring
+statistical estimation is the stress-propagation function $f_i$; $\pa(i)$
+carries a causal interpretation only insofar as A1--A3 hold for the edge types
+and events under study, a claim we subject to direct falsification in
+Section~\ref{subsec:h2valid}. We adopt a ridge-regularised linear
 specification,
 \begin{equation}
 \label{eq:fi}
@@ -367,7 +381,7 @@ furnish an empirical distribution of exogenous shocks used by the risk measures.
 \textbf{Symbol} & \textbf{Meaning}\\
 \midrule
 $G=(V,E)$ & resolved entity graph (nodes, directed flow edges)\\
-$\pa(i)$ & causal parents of $i$ (in-neighbours in $G$)\\
+$\pa(i)$ & model parent set of $i$, specified from in-neighbours in $G$\\
 $S_{i,t}$ & stress state of entity $i$ at time $t$ ($z$-scored)\\
 $F_{p\to i,t}$ & observed USD flow from $p$ to $i$ in period $t$\\
 $U_{i,t}$ & exogenous shock to $i$ at $t$\\
@@ -401,21 +415,28 @@ available at $t\!-\!1$. Induction on $t$ gives existence and uniqueness.
 
 Time, supplied by the ledger, breaks the simultaneity that would otherwise
 require an equilibrium fixed-point computation for cyclic graphs such as
-Binance$\leftrightarrow$retail. Identification rests on three assumptions, of
-which the first two are properties of the data source and the third is the
-substantive, falsifiable claim. \emph{Temporal precedence} (A1)---that a flow
-$F_{i\to j,t}$ strictly precedes any effect on $j$ at $t'>t$---is supplied for
-free by blockchain immutability and timestamping, and need not be assumed or
-tested, unlike Granger-style precedence on price series. \emph{No unobserved
-common cause for flow edges} (A2)---that, conditional on the transaction graph
-up to $t$, an edge $i\to j$ reflects $i$'s direct economic action on $j$---is
-defensible because a public ledger captures every fund movement in the flow
-mechanism itself; its principal threat is off-chain activity, most acutely
-CEX-internal pricing engines, which we bound through the sensitivity analysis of
-Section~\ref{subsec:design}. \emph{Monotone propagation along flow direction}
-(A3)---that distress at $i$ affects $j$ only through realised flow paths from $i$
-to $j$---is the assumption that does the empirical work and is tested directly
-(H2) by the edge-reversal experiment. The contrast with price-based causal
+Binance$\leftrightarrow$retail. Identification rests on three assumptions,
+stated here as honestly as we can manage rather than as conveniences.
+\emph{Temporal precedence} (A1)---that a flow $F_{i\to j,t}$ strictly
+precedes any effect on $j$ at $t'>t$---is made \emph{observable} by blockchain
+immutability and block timestamping, which reduces, but does not eliminate,
+the timing ambiguity that Granger-style precedence on price series must
+instead assume away: a transfer's on-chain timestamp does not by itself
+establish that the transfer is the operative cause of subsequent stress, only
+that it could not be its effect. \emph{No unobserved common cause for flow
+edges} (A2)---that, conditional on the transaction graph up to $t$, an edge
+$i\to j$ reflects $i$'s direct economic action on $j$---is a strong
+identifying assumption, not a property of the data we can simply assert away:
+the ledger captures on-chain fund movements, but not the off-chain decision
+processes that may generate them, so a CEX-internal pricing engine, an oracle
+update, a market-wide price shock, a liquidator bot, or coordinated user
+panic can each drive both the observed flow and the downstream stress without
+the flow being the cause of the stress. We bound this threat through the
+sensitivity analysis of Section~\ref{subsec:design}, but it is not eliminated.
+\emph{Monotone propagation along flow direction} (A3)---that distress at $i$
+affects $j$ only through realised flow paths from $i$ to $j$---is the
+assumption that does the empirical work and is tested directly (H2) by the
+edge-reversal experiment. The contrast with price-based causal
 discovery, where both the graph and the equations must be estimated and their
 errors compound, is the framework's principal identification advantage.
 
@@ -551,7 +572,8 @@ Algorithm~\ref{alg:vein} collects the end-to-end procedure.
 
 \subsection{Data, entity universe, and stress states}
 \label{subsec:data}
-All data are real and obtained from public or keyed APIs (Table~\ref{tab:data}).
+The empirical analysis uses public on-chain and market data, obtained from
+public or keyed APIs (Table~\ref{tab:data}).
 On-chain flows are queried with SQL over Dune Analytics' decoded
 \texttt{erc20\_ethereum.evt\_Transfer} table and its maintained
 \texttt{labels.cex\_ethereum} entity labels; prices and protocol
@@ -685,28 +707,46 @@ many-addresses-to-one-agent clustering step that turns the undifferentiated
 retail blob into named exchanges and thereby yields genuine inter-entity
 (CEX$\leftrightarrow$CEX) edges. Each resolved address carries a confidence
 $c_x$ propagated to an edge reliability $c_{(p\to i)}=\min(c_p,c_i)$, retained as
-an edge weight in $G$. The supervised layer is validated against held-out Dune
-labels---the Tier-3 reconciliation the design requires: on $7\,843$
-event-window addresses with a CEX base rate of $0.5\%$, the Tier-1 classifier
-attains a held-out ROC-AUC of $0.99$ and an average precision of $0.23$
-(Table~\ref{tab:resval}), with the in/out volume ratio and total volume as the
-top features, consistent with the intuition that exchanges intermediate
-asymmetric, high-volume flows.
+an edge weight in $G$. We drop the ERC-20 mint/burn sentinel address
+($\texttt{0x0\ldots0}$) before any of this: it is not an economic agent, but
+its single-counterparty, maximally asymmetric mint/burn volume would otherwise
+dominate every volume-weighted statistic below. The supervised layer is
+validated against held-out Dune labels---the Tier-3 reconciliation the design
+requires: on $7\,841$ event-window addresses (after the sentinel exclusion)
+with a CEX base rate of $0.5\%$, the Tier-1 classifier attains a held-out
+ROC-AUC of $0.98$ and an average precision of $0.24$ (Table~\ref{tab:resval}),
+with the in/out volume ratio and total volume as the top features, consistent
+with the intuition that exchanges intermediate asymmetric, high-volume flows.
+By address count the classifier recovers a third of CEX-labelled addresses at
+its $F_1$-maximising threshold (precision $0.27$, recall $0.33$); weighting the
+same confusion matrix by each address's USD volume rather than by count tells
+a less flattering story (Table~\ref{tab:resval}): volume-weighted precision is
+$0.21$, but volume-weighted recall is only $0.001$, because the few addresses
+the classifier misses at this threshold include the single largest CEX hot
+wallet in the held-out set (\$1.6~billion of the window's flow, $89\%$ of the
+missed CEX volume). The address-count metrics therefore overstate how much
+\emph{economically material} flow the Tier-1 classifier alone would resolve;
+this is precisely why Tier~3---direct matching against Dune's curated label
+table rather than statistical classification---is the primary path the main
+pipeline relies on, and Tier-1/2 are reported as a transparent robustness
+extra rather than as the production resolver.
 
 \begin{table}[t]
 \centering
 \small
-\caption{Entity-resolution validation (Tier-1/2 against held-out Dune labels).}
+\caption{Entity-resolution validation (Tier-1/2 against held-out Dune labels;
+mint/burn sentinel excluded).}
 \label{tab:resval}
 \begin{tabular}{@{}lc@{}}
 \toprule
 \textbf{Metric} & \textbf{Value}\\
 \midrule
-Addresses (USDe event window) & $7\,843$\\
+Addresses (USDe event window) & $7\,841$\\
 CEX-labelled (base rate) & $40$ ($0.5\%$)\\
-Tier-1 ROC-AUC (held out) & $0.99$\\
-Tier-1 average precision & $0.23$\\
-Tier-1 best-$F_1$ precision / recall & $0.31$ / $0.33$\\
+Tier-1 ROC-AUC (held out) & $0.98$\\
+Tier-1 average precision & $0.24$\\
+Tier-1 best-$F_1$ precision / recall (by address count) & $0.27$ / $0.33$\\
+Tier-1 precision / recall at the same threshold (by USD volume) & $0.21$ / $0.001$\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -730,6 +770,22 @@ resolution layer. Edge width is proportional to cumulative USD flow.}
 
 \subsection{Does the observed graph beat the estimated graph? (H1)}
 \label{subsec:h1}
+We distinguish three evaluation modes throughout this section, since
+conflating them is a common source of overclaiming in this literature.
+\emph{Contemporaneous-flow nowcasting} uses the within-period flow
+$F_{p\to i,t}$ to predict $S_{i,t}$, so it is informative about
+same-period structure but not a genuine forecast. \emph{Lagged-flow
+forecasting} restricts the flow feature to $F_{p\to i,t-1}$, so the
+prediction at $t$ uses nothing observed after $t-1$ and is a real one-step
+forecast, at the cost of discarding same-period information a real-time
+risk desk would have. \emph{Retrospective counterfactual attribution}
+(Section~\ref{subsec:h345}) is neither: it uses the entire observed event
+path to abduct $\widehat U$ and asks a structural ``what would $L_j$ have
+been had $S_i$ stayed pre-crisis'' question, which is well posed only after
+the event and is not a prediction exercise at all. H1 below is evaluated in
+both flow modes; the paper's primary contribution, the attribution measure,
+relies on neither.
+
 The head-to-head (Table~\ref{tab:h1}, Figure~\ref{fig:h1}) is the central test
 against the estimated-graph state of the art. At \emph{daily} resolution the
 price-estimated Granger graph clearly predicts the cascade better than the
@@ -932,7 +988,7 @@ sole positive contributor.}
 \label{fig:shapley}
 \end{figure}
 
-\subsection{Falsification and the causal-validity battery (H2)}
+\subsection{Falsification and the validity battery (H2)}
 \label{subsec:h2valid}
 The edge-reversal test (Table~\ref{tab:falsif}, Figure~\ref{fig:falsif}) is the
 most consequential result. At daily resolution the test is under-powered (six
@@ -963,26 +1019,42 @@ are symmetric custodial settlement---a sharper and more defensible statement tha
 either a blanket assertion or a blanket rejection, and one the falsification
 machinery delivered rather than assumed.
 
-Because observational causal claims cannot be proven, we subject them to four
+Because observational causal claims cannot be proven, we subject them to five
 further checks (Table~\ref{tab:valid}). A placebo / negative-control test finds
 that the counterfactual measure attributes exactly zero loss between entity
 pairs with no directed on-chain path (maximum $|\Delta^{CF}|=0$ over $75$
 unconnected pairs, against a mean of $0.26$ over $197$ connected pairs), so the
 method does not fabricate causation. The confounding-sensitivity analysis shows
-that the strongest edges carry substantial robustness values---for example
+that the strongest edges carry moderate robustness values---for example
 retail$\,\to\,$Coinbase has $RV=0.226$ (Figure~\ref{fig:rv})---meaning a hidden
 confounder would need to explain over a fifth of the residual variance in both
-endpoints to nullify them. The ranking is stable between the seed-only (Tier-0)
-and fully resolved (Tier-3) graphs (Spearman $0.81$, $p=0.05$), so it is not an
-artefact of the resolution tier. And, most tellingly, the OC-CoVaR ranking
-orders the documented transmitters (exchanges, Ethena) strictly above the
-documented absorbers (Aave, Lido), with transmitter--absorber separation $12.87$
-and pairwise concordance $1.00$, independently reproducing the conclusion of the
-forensic post-mortems \cite{ali2025anatomy,lim2026cascade}.
+endpoints to nullify that single coefficient; this is a coefficient-level bound,
+however, and does not by itself establish that the downstream \emph{ranking} or
+\emph{attribution} is robust, so we test that directly. Dropping the quartile of
+structural edges with the lowest robustness value and recomputing the
+exported-risk ranking leaves it essentially unchanged (Spearman $0.94$ against
+the full-graph ranking, top-3 identical); injecting a synthetic latent AR(1)
+confounder shared by every entity---a stand-in for an unobserved CEX-engine-like
+common shock---and refitting the SCM on the contaminated series still leaves the
+ranking highly correlated with the uncontaminated one (Spearman $0.84$ at a
+moderate shock strength and $0.81$ at a strength twice the typical
+idiosyncratic stress volatility; top-3 identical in both cases). The ranking is
+also stable between the seed-only (Tier-0) and fully resolved (Tier-3) graphs
+(Spearman $0.81$, $p=0.05$), so it is not an artefact of the resolution tier.
+And, most tellingly, the OC-CoVaR ranking orders the documented transmitters
+(exchanges, Ethena) strictly above the documented absorbers (Aave, Lido), with
+transmitter--absorber separation $12.87$ and pairwise concordance $1.00$,
+independently reproducing the conclusion of the forensic post-mortems
+\cite{ali2025anatomy,lim2026cascade}.
 
 Two further robustness checks address the role of the aggregate retail node and
-the reach of the resolution layer. Re-running the systemic ranking with the
-retail node \emph{removed} does not collapse the result: Binance remains the top
+the reach of the resolution layer. \emph{Retail is a residual
+unresolved-address aggregator, not a single causal actor}: it absorbs every
+counterparty our Tier-0/1/2 heuristics fail to attach to a named entity---long-tail
+wallets, bots, and, plausibly, some unlabelled institutional flow---so its node
+in $G$ should be read as ``everything we could not yet resolve,'' not as a
+behaviourally coherent agent. Re-running the systemic ranking with this node
+\emph{removed} does not collapse the result: Binance remains the top
 transmitter by a wide margin ($16.0$), now followed by the custodian FalconX
 ($2.4$) and the protocol Ethena ($2.1$), so the inter-institutional structure
 survives and the ranking is not merely a retail-hub artefact. The resolution
@@ -992,6 +1064,20 @@ only about $1\%$ moves directly between two named entities, the remainder being
 exchange$\leftrightarrow$retail settlement---which is precisely why the
 counterfactual inter-institutional channels, though real, are sparse, and why
 extending Tier-0/1/2 recall is the most valuable next step on the data side.
+The Tier-1 classifier itself (Table~\ref{tab:resval}, Section~\ref{sec:data})
+makes the same point more sharply once the confusion matrix is weighted by
+USD volume rather than by address count: address-count recall ($0.33$) looks
+moderate, but volume-weighted recall is only $0.001$, because the addresses
+the classifier misses at its $F_1$-optimal threshold include the single
+largest CEX hot wallet in the held-out sample. The resolved graph is therefore
+high-precision at the entity level (we only assign a label we are confident
+in) but recall-bounded in a way that is concentrated, not diffuse: a handful
+of very high-volume addresses---exactly the ones that matter most for a
+dollar-denominated systemic-risk measure---are the hardest for a purely
+statistical classifier to catch, which is the central reason the main
+pipeline relies on Tier-3 direct label-matching rather than the Tier-1
+classifier, and is exactly the limitation the retail-removal and
+Tier-0-vs-Tier-3 checks above are designed to bound rather than to deny.
 Finally, we propagate robustness to the \emph{final output}, not merely the
 coefficients: under $\pm15\%$ Gaussian perturbation of every structural
 coefficient, the exported-risk ranking is stable (mean Spearman $0.88$ against
@@ -1026,7 +1112,7 @@ hourly resolution.}
 \begin{table}[t]
 \centering
 \small
-\caption{Causal-validity battery (hourly).}
+\caption{Validity and falsification battery (hourly).}
 \label{tab:valid}
 \begin{tabular}{@{}p{0.33\linewidth}p{0.42\linewidth}c@{}}
 \toprule
@@ -1035,7 +1121,9 @@ hourly resolution.}
 Placebo / negative control & max $|\Delta^{CF}|$ off-path $=0$; connected mean $0.26$ & pass\\
 Resolution robustness & Spearman $0.81$ (Tier-0 vs Tier-3) & pass\\
 External validity & separation $12.87$, concordance $1.00$ & pass\\
-Confounding (top edge) & $RV=0.226$ & robust\\
+Confounding (top edge, coefficient-level) & $RV=0.226$ & robust\\
+Confounding (ranking-level, drop low-$RV$ quartile) & Spearman $0.94$ vs.\ full graph; top-3 unchanged & robust\\
+Confounding (ranking-level, latent AR(1) shock) & Spearman $0.84$ (moderate), $0.81$ (strong); top-3 unchanged & robust\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1188,11 +1276,14 @@ direction is causal; a fuller Tier-1/2 entity-resolution sweep to convert
 retail-mediated edges into entity-to-entity edges; and an instrumented treatment
 of the CEX engine (for instance, exploiting exogenous oracle-update timing) to
 relax A2. In sum, VEIN demonstrates that the blockchain ledger can serve as an
-observed causal graph for systemic-risk measurement, enabling interventional and
-counterfactual analyses out of reach for price-based methods, while being candid
-that its empirical edge over the estimated-graph baseline is real but
-resolution-dependent and modest on the single event studied---an edge we expect
-to widen with intraday data, fuller entity resolution, and more events.
+\emph{auditable candidate structural skeleton} for interventional and
+counterfactual systemic-risk attribution, enabling analyses out of reach for
+price-based methods, while being candid that its empirical edge over the
+estimated-graph baseline on the primary October-2025 event study---with
+additional checks on the two earlier stress episodes---is real but
+resolution-dependent and not decisive. Whether that edge widens with intraday
+data, fuller entity resolution, and more events is a question for future work
+to answer, not a result this paper claims.
 
 \backmatter
 
@@ -1227,7 +1318,15 @@ shocks) is preserved rather than destroyed. With $M=400$ paths the Monte-Carlo
 standard error of the reported OC-CoVaR quantiles is below $3\%$ of the estimate.
 Table~\ref{tab:rvfull} lists the robustness values for the strongest structural
 coefficients, computed via \eqref{eq:rv} from OLS $t$-statistics on the design
-of \eqref{eq:fi}.
+of \eqref{eq:fi}. The headline attribution numbers in Table~\ref{tab:cf}
+(Section~\ref{subsec:h345}) are single-entity-removal counterfactuals,
+computed for every reported upstream/downstream pair; the Shapley
+decomposition of Figure~\ref{fig:shapley} is computed for one illustrative
+target (Bybit's event-window distress, over its three candidate on-chain
+sources) to demonstrate exactness and order-invariance against the
+single-removal numbers, not recomputed for every channel in the paper---the
+two are complementary, not interchangeable, and we report results from each
+under its own name throughout.
 
 \medskip\noindent\textbf{Reproducibility.} Every result traces to cached
 artefacts in the project repository. On-chain flows are computed from Dune's

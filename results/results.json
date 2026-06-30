@@ -30,33 +30,36 @@
       "2025-10-08",
       "2025-10-14"
     ],
-    "n_addresses": 7843,
+    "n_addresses_incl_sentinel": 7843,
+    "n_addresses": 7841,
     "n_cex_labeled": 40,
     "n_distinct_cex": 40,
     "tier1_classifier": {
       "trained": true,
-      "n": 7843,
+      "n": 7841,
       "n_cex": 40,
-      "test_auc": 0.9873985476292184,
-      "test_avg_precision": 0.22847177700071,
-      "base_rate": 0.005100089251561903,
-      "best_f1": 0.32,
-      "precision_at_bestF1": 0.3076923076923077,
+      "test_auc": 0.9770041292894773,
+      "test_avg_precision": 0.24433509571389336,
+      "base_rate": 0.0051013901288101005,
+      "best_f1": 0.2962962962962963,
+      "precision_at_bestF1": 0.26666666666666666,
       "recall_at_bestF1": 0.3333333333333333,
+      "vol_weighted_precision_at_bestF1": 0.20731463940092593,
+      "vol_weighted_recall_at_bestF1": 0.001070342602024608,
       "top_features": {
-        "in_out_ratio": 0.35,
-        "tot_vol": 0.342,
-        "out_vol": 0.137,
-        "tot_tx": 0.072,
-        "in_vol": 0.049
+        "in_out_ratio": 0.336,
+        "tot_vol": 0.282,
+        "out_vol": 0.191,
+        "tot_tx": 0.067,
+        "in_vol": 0.062
       }
     },
     "tier2_embedding": {
       "embedded": true,
-      "n": 7843,
+      "n": 7841,
       "dim": 16,
       "k_clusters": 20,
-      "cex_cluster_homogeneity": 0.06320960206867955
+      "cex_cluster_homogeneity": 0.09454914134671975
     }
   },
   "graph": {
