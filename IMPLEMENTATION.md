@@ -23,18 +23,44 @@ directly in the raw pulls (e.g. USDe on-chain transfer volume spikes from
 
 ```
 vein/
-  config.py         # entity universe, real mainnet addresses, time windows
-  dune.py           # cached Dune SQL client (results cached by SQL hash)
-  market_data.py    # DefiLlama prices + TVL loaders (cached)
-  onchain_graph.py  # build observed flow graph G  (Sections 2.2–2.3)
-  stress.py         # stress-state operationalization S_{i,t}  (Section 3.3)
-  scm.py            # structural equations f_i, forward simulation, abduction
-  risk.py           # OC-CoVaR (do-operator) + counterfactual attribution (2.5)
-  falsification.py  # edge-reversal test for A3  (Section 2.6)
-  benchmarks.py     # Δ-CoVaR (Adrian–Brunnermeier) + correlation graph (4.1)
-  backtest.py       # Kupiec / Christoffersen VaR tests  (Section 4.2)
-run_evaluation.py   # end-to-end pipeline → results/results.json + EVALUATION.md
+  config.py            # entity universe, real mainnet addresses, time windows
+  dune.py              # cached Dune SQL client (results cached by SQL hash)
+  market_data.py       # DefiLlama prices + TVL loaders (cached)
+  entity_resolution.py # Tier 0/3 resolution: cex_ethereum + seed label join,
+                       #   sub-wallet -> exchange-root collapse, deposit-sweep,
+                       #   top-K entity selection  (Section 2.2)
+  resolver.py          # Tier 1 GBM is-CEX classifier + Tier 2 SVD embedding,
+                       #   validated vs held-out Dune labels (Tier-3 reconcile)
+  onchain_graph.py     # build observed flow graph G  (Sections 2.2–2.3)
+  stress.py            # stress-state operationalization S_{i,t}  (Section 3.3)
+  scm.py               # structural equations f_i, forward simulation, abduction
+  risk.py              # OC-CoVaR (do-operator) + counterfactual attribution (2.5)
+  falsification.py     # edge-reversal test for A3  (Section 2.6)
+  benchmarks.py        # Δ-CoVaR (Adrian–Brunnermeier) + correlation graph (4.1)
+  backtest.py          # Kupiec / Christoffersen VaR tests  (Section 4.2)
+run_evaluation.py      # end-to-end pipeline → results/results.json + EVALUATION.md
+                       #   ("--report-only" regenerates the report from cache)
 ```
+
+## Entity resolution (the load-bearing layer, Section 2.2)
+
+Resolution error directly corrupts pa(i), so this is implemented as a real
+tiered pipeline rather than assumed:
+
+- **Tier 3 (primary):** every transfer endpoint is resolved against our
+  high-precision seed addresses and Dune's maintained `labels.cex_ethereum`
+  (CEX hot-wallet + per-user deposit-address labels). Sub-wallet labels
+  ("OKX 210", "Bitfinex Tether Treasury") collapse to the exchange root
+  ("OKX", "Bitfinex") — the many-addresses→one-agent clustering step. This turns
+  the undifferentiated `retail` blob into ~15 named exchanges and produces real
+  entity↔entity (CEX↔CEX) causal edges.
+- **Tier 0:** `detect_deposit_sweeps` finds receive-then-sweep-to-hot-wallet
+  deposit addresses (implemented; gated off by default — the `ethereum.traces`
+  scan is credit-heavy).
+- **Tier 1/2:** `resolver.py` trains a gradient-boosted is-CEX classifier on
+  per-address features and builds an SVD graph embedding, both validated against
+  held-out Dune labels — the Tier-3 reconciliation precision/recall the algorithm
+  requires (latest run: ROC-AUC ≈ 0.99 at a 0.5% CEX base rate).
 
 ## How the algorithm maps to code
 

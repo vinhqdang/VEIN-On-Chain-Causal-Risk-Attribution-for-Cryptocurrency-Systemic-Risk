@@ -4,40 +4,295 @@
     "2025-01-01",
     "2026-06-30"
   ],
+  "entity_types": {
+    "Ethena": "STABLECOIN_ISSUER",
+    "Aave": "LENDING",
+    "OKX": "CEX",
+    "MakerSky": "STABLECOIN_ISSUER",
+    "Binance": "CEX",
+    "Bitget": "CEX",
+    "HTX": "CEX",
+    "Bitfinex": "CEX",
+    "Ceffu": "CEX",
+    "Copper": "CEX",
+    "retail": "RETAIL",
+    "Bybit": "CEX",
+    "Crypto.com": "CEX",
+    "FalconX": "CEX",
+    "Coinbase": "CEX",
+    "Bullish": "CEX",
+    "Lido": "LST"
+  },
+  "entity_resolution_validation": {
+    "ok": true,
+    "token": "USDe",
+    "window": [
+      "2025-10-08",
+      "2025-10-14"
+    ],
+    "n_addresses": 7843,
+    "n_cex_labeled": 40,
+    "n_distinct_cex": 40,
+    "tier1_classifier": {
+      "trained": true,
+      "n": 7843,
+      "n_cex": 40,
+      "test_auc": 0.9873985476292184,
+      "test_avg_precision": 0.22847177700071,
+      "base_rate": 0.005100089251561903,
+      "best_f1": 0.32,
+      "precision_at_bestF1": 0.3076923076923077,
+      "recall_at_bestF1": 0.3333333333333333,
+      "top_features": {
+        "in_out_ratio": 0.35,
+        "tot_vol": 0.342,
+        "out_vol": 0.137,
+        "tot_tx": 0.072,
+        "in_vol": 0.049
+      }
+    },
+    "tier2_embedding": {
+      "embedded": true,
+      "n": 7843,
+      "dim": 16,
+      "k_clusters": 20,
+      "cex_cluster_homogeneity": 0.06320960206867955
+    }
+  },
   "graph": {
     "nodes": [
       "Aave",
       "Binance",
+      "Bitfinex",
+      "Bitget",
+      "Bullish",
+      "Bybit",
+      "Ceffu",
+      "Coinbase",
+      "Copper",
+      "Crypto.com",
       "Ethena",
+      "FalconX",
+      "HTX",
       "Lido",
+      "OKX",
       "retail"
     ],
     "edges": [
       [
         "Binance",
+        "Bitfinex",
+        89901570.0,
+        1.0,
+        "observed_flow"
+      ],
+      [
+        "Binance",
+        "Bybit",
+        124999987.0,
+        1.0,
+        "observed_flow"
+      ],
+      [
+        "Binance",
+        "Crypto.com",
+        8000000.0,
+        1.0,
+        "observed_flow"
+      ],
+      [
+        "Binance",
         "retail",
-        33053138143.0,
+        27945062860.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "Bitfinex",
+        "retail",
+        10328723636.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "Bitget",
+        "retail",
+        1430143778.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "Bullish",
+        "retail",
+        1515554173.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "Bybit",
+        "retail",
+        20526707932.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "Ceffu",
+        "retail",
+        2376837931.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "Coinbase",
+        "retail",
+        43444836545.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "Copper",
+        "OKX",
+        244179580.0,
+        1.0,
+        "observed_flow"
+      ],
+      [
+        "Copper",
+        "retail",
+        3450904529.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "Crypto.com",
+        "retail",
+        2196089234.0,
         0.5,
         "observed_flow"
       ],
       [
         "Ethena",
         "retail",
-        313916606.0,
+        11086053.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "FalconX",
+        "retail",
+        2417564003.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "HTX",
+        "Bitfinex",
+        1000000100.0,
+        1.0,
+        "observed_flow"
+      ],
+      [
+        "HTX",
+        "retail",
+        4150181909.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "OKX",
+        "retail",
+        10312193644.0,
         0.5,
         "observed_flow"
       ],
       [
         "retail",
         "Binance",
-        38898941115.0,
+        33102654800.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "Bitfinex",
+        2995757660.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "Bitget",
+        1338199672.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "Bullish",
+        1510066134.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "Bybit",
+        20376971944.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "Ceffu",
+        2682378008.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "Coinbase",
+        43504245781.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "Copper",
+        2877063650.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "Crypto.com",
+        2130318714.0,
         0.5,
         "observed_flow"
       ],
       [
         "retail",
         "Ethena",
-        312478538.0,
+        151679089.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "FalconX",
+        2445463906.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "HTX",
+        5211314089.0,
+        0.5,
+        "observed_flow"
+      ],
+      [
+        "retail",
+        "OKX",
+        10154811062.0,
         0.5,
         "observed_flow"
       ],
@@ -79,56 +334,101 @@
         "retail",
         "Ethena"
       ],
+      "Bitfinex": [
+        "Binance",
+        "HTX",
+        "retail"
+      ],
+      "Bitget": [
+        "retail"
+      ],
+      "Bullish": [
+        "retail"
+      ],
+      "Bybit": [
+        "Binance",
+        "retail"
+      ],
+      "Ceffu": [
+        "retail"
+      ],
+      "Coinbase": [
+        "retail"
+      ],
+      "Copper": [
+        "retail"
+      ],
+      "Crypto.com": [
+        "Binance",
+        "retail"
+      ],
       "Ethena": [
         "retail",
         "Binance"
       ],
+      "FalconX": [
+        "retail"
+      ],
+      "HTX": [
+        "retail"
+      ],
       "Lido": [],
+      "OKX": [
+        "Copper",
+        "retail"
+      ],
       "retail": [
         "Binance",
-        "Ethena"
+        "Bitfinex",
+        "Bitget",
+        "Bullish",
+        "Bybit",
+        "Ceffu",
+        "Coinbase",
+        "Copper",
+        "Crypto.com",
+        "Ethena",
+        "FalconX",
+        "HTX",
+        "OKX"
       ]
     }
   },
   "n_event_days": 7,
   "scm_residual_std": {
-    "Binance": 0.9959611346342542,
-    "Ethena": 0.6859587012223989,
-    "Aave": 0.46123940663148977,
-    "Lido": 1.7546197784253066,
-    "MakerSky": 0.6558217379001593,
-    "retail": 1.1135873327670198
+    "Ethena": 0.5746888685904953,
+    "Aave": 0.44363026751763235,
+    "OKX": 0.0,
+    "MakerSky": 0.6419382815331228,
+    "Binance": 0.376120955342153,
+    "Bitget": 0.2673201695191167,
+    "HTX": 0.0,
+    "Bitfinex": 0.0,
+    "Ceffu": 0.0,
+    "Copper": 0.37985493025795025,
+    "Bybit": 0.9180228235135953,
+    "Crypto.com": 0.0,
+    "FalconX": 0.040058974683602984,
+    "Coinbase": 0.0,
+    "Bullish": 0.0,
+    "Lido": 1.7288750220263551,
+    "retail": 1.155586067904504
   },
   "scm_coefficients": {
-    "Binance": {
-      "parents": [
-        "retail",
-        "Ethena"
-      ],
-      "w_stress": [
-        0.0536,
-        0.0856
-      ],
-      "w_flow": [
-        -0.095682,
-        0.0
-      ],
-      "intercept": 1.0966
-    },
     "Ethena": {
       "parents": [
         "retail",
         "Binance"
       ],
       "w_stress": [
-        -0.1755,
-        -0.0001
+        -0.1206,
+        -0.1258
       ],
       "w_flow": [
-        -0.059306,
+        0.001978,
         0.0
       ],
-      "intercept": 0.1713
+      "intercept": -0.0115
     },
     "Aave": {
       "parents": [
@@ -136,66 +436,305 @@
         "Lido"
       ],
       "w_stress": [
-        -0.0753,
-        0.2096
+        -0.0687,
+        0.2276
       ],
       "w_flow": [
         0.0,
         0.0
       ],
-      "intercept": 0.0252
+      "intercept": 0.0293
     },
-    "Lido": {
-      "parents": [],
-      "w_stress": [],
-      "w_flow": [],
-      "intercept": 0.2981
+    "OKX": {
+      "parents": [
+        "Copper",
+        "retail"
+      ],
+      "w_stress": [
+        0.0,
+        0.0
+      ],
+      "w_flow": [
+        0.0,
+        0.0
+      ],
+      "intercept": 0.0
     },
     "MakerSky": {
       "parents": [],
       "w_stress": [],
       "w_flow": [],
-      "intercept": 0.044
+      "intercept": 0.0464
+    },
+    "Binance": {
+      "parents": [
+        "retail",
+        "Ethena"
+      ],
+      "w_stress": [
+        0.0079,
+        0.0754
+      ],
+      "w_flow": [
+        -0.034186,
+        0.0
+      ],
+      "intercept": 0.0041
+    },
+    "Bitget": {
+      "parents": [
+        "retail"
+      ],
+      "w_stress": [
+        0.0192
+      ],
+      "w_flow": [
+        -0.161944
+      ],
+      "intercept": 0.0012
+    },
+    "HTX": {
+      "parents": [
+        "retail"
+      ],
+      "w_stress": [
+        0.0
+      ],
+      "w_flow": [
+        0.0
+      ],
+      "intercept": 0.0
+    },
+    "Bitfinex": {
+      "parents": [
+        "Binance",
+        "HTX",
+        "retail"
+      ],
+      "w_stress": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "w_flow": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "intercept": 0.0
+    },
+    "Ceffu": {
+      "parents": [
+        "retail"
+      ],
+      "w_stress": [
+        0.0
+      ],
+      "w_flow": [
+        0.0
+      ],
+      "intercept": 0.0
+    },
+    "Copper": {
+      "parents": [
+        "retail"
+      ],
+      "w_stress": [
+        0.0387
+      ],
+      "w_flow": [
+        -0.127554
+      ],
+      "intercept": 0.008
+    },
+    "Bybit": {
+      "parents": [
+        "Binance",
+        "retail"
+      ],
+      "w_stress": [
+        -0.3161,
+        0.0053
+      ],
+      "w_flow": [
+        0.0,
+        -0.051348
+      ],
+      "intercept": 0.713
+    },
+    "Crypto.com": {
+      "parents": [
+        "Binance",
+        "retail"
+      ],
+      "w_stress": [
+        0.0,
+        0.0
+      ],
+      "w_flow": [
+        0.0,
+        0.0
+      ],
+      "intercept": 0.0
+    },
+    "FalconX": {
+      "parents": [
+        "retail"
+      ],
+      "w_stress": [
+        -0.0036
+      ],
+      "w_flow": [
+        0.327511
+      ],
+      "intercept": -0.0086
+    },
+    "Coinbase": {
+      "parents": [
+        "retail"
+      ],
+      "w_stress": [
+        0.0
+      ],
+      "w_flow": [
+        0.0
+      ],
+      "intercept": 0.0
+    },
+    "Bullish": {
+      "parents": [
+        "retail"
+      ],
+      "w_stress": [
+        0.0
+      ],
+      "w_flow": [
+        0.0
+      ],
+      "intercept": 0.0
+    },
+    "Lido": {
+      "parents": [],
+      "w_stress": [],
+      "w_flow": [],
+      "intercept": 0.2965
     },
     "retail": {
       "parents": [
         "Binance",
-        "Ethena"
+        "Bitfinex",
+        "Bitget",
+        "Bullish",
+        "Bybit",
+        "Ceffu",
+        "Coinbase",
+        "Copper",
+        "Crypto.com",
+        "Ethena",
+        "FalconX",
+        "HTX",
+        "OKX"
       ],
       "w_stress": [
-        0.0575,
-        -0.4652
+        -0.2421,
+        0.0,
+        0.3584,
+        0.0,
+        0.1062,
+        0.0,
+        0.0,
+        0.2263,
+        0.0,
+        -0.4647,
+        -0.1487,
+        0.0,
+        0.0
       ],
       "w_flow": [
-        0.002351,
-        0.820186
+        0.02301,
+        0.0,
+        -0.023402,
+        0.0,
+        -0.020484,
+        0.0,
+        0.0,
+        0.053476,
+        0.0,
+        0.0,
+        -0.042069,
+        0.0,
+        0.0
       ],
-      "intercept": -10.7073
+      "intercept": 0.4312
     }
   },
   "oc_covar_ranking": [
     {
       "entity": "Lido",
-      "exported_risk": 3.563029905678361
+      "exported_risk": 4.059614790293216
     },
     {
-      "entity": "Binance",
-      "exported_risk": 0.4778344111544146
+      "entity": "Bitget",
+      "exported_risk": 0.18060474307487207
     },
     {
       "entity": "retail",
-      "exported_risk": 0.20283612010448282
+      "exported_risk": 0.11061080261894982
     },
     {
       "entity": "Ethena",
-      "exported_risk": 0.08358266359104505
+      "exported_risk": 0.08627659046671599
+    },
+    {
+      "entity": "Bybit",
+      "exported_risk": 0.06956340084037338
+    },
+    {
+      "entity": "Copper",
+      "exported_risk": 0.04297095487347535
+    },
+    {
+      "entity": "Binance",
+      "exported_risk": 0.03253876281640178
+    },
+    {
+      "entity": "FalconX",
+      "exported_risk": 0.007669849793329575
+    },
+    {
+      "entity": "OKX",
+      "exported_risk": 0.0
+    },
+    {
+      "entity": "Ceffu",
+      "exported_risk": 0.0
+    },
+    {
+      "entity": "Bitfinex",
+      "exported_risk": 0.0
+    },
+    {
+      "entity": "HTX",
+      "exported_risk": 0.0
+    },
+    {
+      "entity": "MakerSky",
+      "exported_risk": 0.0
     },
     {
       "entity": "Aave",
       "exported_risk": 0.0
     },
     {
-      "entity": "MakerSky",
+      "entity": "Crypto.com",
+      "exported_risk": 0.0
+    },
+    {
+      "entity": "Bullish",
+      "exported_risk": 0.0
+    },
+    {
+      "entity": "Coinbase",
       "exported_risk": 0.0
     }
   ],
@@ -251,44 +790,52 @@
     "p_value": 0.28475697986529386,
     "entities": [
       "Lido",
-      "Binance",
       "retail",
       "Ethena",
+      "Binance",
       "Aave"
     ]
   },
   "counterfactual_attribution": [
     {
       "i": "Ethena",
-      "j": "retail",
-      "L_observed": 6.114947409649226,
-      "L_counterfactual": 5.2937129766770035,
-      "attribution": 0.8212344329722221,
-      "attribution_share": 0.13429950872125831
+      "j": "Aave",
+      "L_observed": 0.6101117277335143,
+      "L_counterfactual": 0.541151763732525,
+      "attribution": 0.06895996400098925,
+      "attribution_share": 0.11302841900313332
+    },
+    {
+      "i": "Binance",
+      "j": "Aave",
+      "L_observed": 0.5218211087566939,
+      "L_counterfactual": 0.5001310012573422,
+      "attribution": 0.02169010749935163,
+      "attribution_share": 0.04156617495032179
+    },
+    {
+      "i": "Binance",
+      "j": "FalconX",
+      "L_observed": 42.81442264958834,
+      "L_counterfactual": 42.81189712430185,
+      "attribution": 0.0025255252864866407,
+      "attribution_share": 5.898772259891548e-05
     },
     {
       "i": "Ethena",
-      "j": "Aave",
-      "L_observed": 0.6599382115664115,
-      "L_counterfactual": 0.5262597879279908,
-      "attribution": 0.13367842363842075,
-      "attribution_share": 0.20256202974082263
+      "j": "OKX",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
     },
     {
-      "i": "Binance",
-      "j": "retail",
-      "L_observed": 6.035397086761055,
-      "L_counterfactual": 5.907508427854967,
-      "attribution": 0.12788865890608747,
-      "attribution_share": 0.02118976714665844
-    },
-    {
-      "i": "Binance",
-      "j": "Aave",
-      "L_observed": 0.5625868520804964,
-      "L_counterfactual": 0.5616231979189295,
-      "attribution": 0.0009636541615669625,
-      "attribution_share": 0.0017128984760366925
+      "i": "Ethena",
+      "j": "MakerSky",
+      "L_observed": 0.3247461200422656,
+      "L_counterfactual": 0.3247461200422656,
+      "attribution": 0.0,
+      "attribution_share": 0.0
     },
     {
       "i": "Ethena",
@@ -300,63 +847,231 @@
     },
     {
       "i": "Ethena",
-      "j": "Lido",
-      "L_observed": 2.0865630643442907,
-      "L_counterfactual": 2.0865630643442907,
+      "j": "Bitget",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
       "attribution": 0.0,
       "attribution_share": 0.0
     },
     {
       "i": "Ethena",
+      "j": "HTX",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Ethena",
+      "j": "Bitfinex",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Ethena",
+      "j": "Ceffu",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Ethena",
+      "j": "Copper",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Ethena",
+      "j": "Bybit",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Ethena",
+      "j": "Crypto.com",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Ethena",
+      "j": "Coinbase",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Ethena",
+      "j": "Bullish",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Ethena",
+      "j": "Lido",
+      "L_observed": 2.075606492342487,
+      "L_counterfactual": 2.075606492342487,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Ethena",
+      "j": "retail",
+      "L_observed": 0.5552189874870427,
+      "L_counterfactual": 0.5552189874870427,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "OKX",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
       "j": "MakerSky",
-      "L_observed": 0.3077885456159002,
-      "L_counterfactual": 0.3077885456159002,
+      "L_observed": 0.3247461200422656,
+      "L_counterfactual": 0.3247461200422656,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "Bitget",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "HTX",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "Bitfinex",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "Ceffu",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "Copper",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "Bybit",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "Crypto.com",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "Coinbase",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
+      "attribution": 0.0,
+      "attribution_share": 0.0
+    },
+    {
+      "i": "Binance",
+      "j": "Bullish",
+      "L_observed": 0.0,
+      "L_counterfactual": 0.0,
       "attribution": 0.0,
       "attribution_share": 0.0
     },
     {
       "i": "Binance",
       "j": "Lido",
-      "L_observed": 2.0865630643442907,
-      "L_counterfactual": 2.0865630643442907,
+      "L_observed": 2.075606492342487,
+      "L_counterfactual": 2.075606492342487,
       "attribution": 0.0,
       "attribution_share": 0.0
     },
     {
       "i": "Binance",
-      "j": "MakerSky",
-      "L_observed": 0.3077885456159002,
-      "L_counterfactual": 0.3077885456159002,
+      "j": "retail",
+      "L_observed": 0.5552189874870427,
+      "L_counterfactual": 0.5552189874870427,
       "attribution": 0.0,
       "attribution_share": 0.0
+    },
+    {
+      "i": "Ethena",
+      "j": "FalconX",
+      "L_observed": 42.80682307685026,
+      "L_counterfactual": 42.80771472812054,
+      "attribution": -0.0008916512702796808,
+      "attribution_share": -2.082965298963945e-05
     },
     {
       "i": "Binance",
       "j": "Ethena",
-      "L_observed": 0.6923847289722329,
-      "L_counterfactual": 0.7029865928933001,
-      "attribution": -0.010601863921067212,
-      "attribution_share": -0.015312099584871671
+      "L_observed": 1.1668305668859051,
+      "L_counterfactual": 1.4805675689545663,
+      "attribution": -0.3137370020686612,
+      "attribution_share": -0.2688796565434328
     }
   ],
   "falsification": [
     {
       "model": "true_direction",
-      "rmse": 1.9315165687680376,
-      "corr": -0.058676025065230716,
-      "n": 42
+      "rmse": 2.1894561059118267,
+      "corr": -0.011790828408342863,
+      "n": 119
     },
     {
       "model": "reversed_edges",
-      "rmse": 1.1587678510260413,
-      "corr": 0.4161471733682977,
-      "n": 42
+      "rmse": 1.9213060743243628,
+      "corr": 0.09858970609227913,
+      "n": 119
     },
     {
       "model": "symmetric",
-      "rmse": 1.1798341590599715,
-      "corr": 0.40877557457309155,
-      "n": 42
+      "rmse": 1.9357241219832542,
+      "corr": 0.09829610476397857,
+      "n": 119
     }
   ],
   "backtests": {
