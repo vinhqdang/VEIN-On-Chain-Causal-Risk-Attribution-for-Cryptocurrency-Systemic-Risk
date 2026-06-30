@@ -232,3 +232,6 @@ manuscript/*.out
 manuscript/*.toc
 manuscript/*.bbl
 manuscript/*.blg
+
+# Springer template package (vendored extract, not needed in repo)
+manuscript/sntemplate/
