@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# VEIN local secrets (never commit)
+secrets.env
+*.secrets.env
+vein_secrets.env
+
+# VEIN data cache (regenerable, may be large / rate-limited)
+data_cache/
