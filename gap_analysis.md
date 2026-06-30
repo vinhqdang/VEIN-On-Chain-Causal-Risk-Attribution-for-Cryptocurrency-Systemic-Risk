@@ -84,3 +84,22 @@ A rich and rapidly growing literature, none combining on-chain data with Pearl c
 - The DeFi/crypto systemic-risk literature is moving very fast — several of the most relevant items (ASRI, DeXposure-FM, USDC-depeg tracing, the DeFi-TVL fragility paper) are 2026 preprints not yet peer-reviewed — so the gap could narrow before publication. Verify immediately pre-submission and treat preprint claims as provisional.
 - "Causal" is used loosely across this literature: Granger causality, directed information, and Pearl SCMs are mathematically distinct. Your contribution's novelty rests on deploying a genuine Pearl-style SCM (with do-operator/counterfactual semantics) on on-chain data — which sharpens the gap but concentrates the methodological burden on credible causal identification.
 - The Journal of Risk Finance audience leans applied/managerial; ensure the SCM machinery is matched by clear practitioner-facing interpretation (e.g., which wallets/protocols "export" vs. "import" systemic risk, and what a counterfactual intervention would imply for regulators), since the nearest precedents (Causal-NECO, TV-DIG) target more econometric venues.
+
+## Verification Log (2026-06-30)
+
+An independent literature re-check was run to verify that VEIN (see `algorithm.md`) is plausibly the *first* algorithm of its kind. Both load-bearing "No" claims survived deliberate falsification attempts. Summary of the verification pass:
+
+| Claim under test | Result | Evidence reviewed |
+|---|---|---|
+| Nearest methodological precedent **Causal-NECO VaR** is real & correctly characterized | **Confirmed** | Rigana, Wit & Cook 2024, arXiv:2402.06032 — SCM-based causal VaR via PC-stable, Forex, Pearl Levels 1–2, no on-chain data, no counterfactual layer. |
+| Nearest crypto-application precedent **TV-DIG** is real & correctly characterized | **Confirmed** | Etesami, Habibnia & Kiyavash 2023, arXiv:2312.16707 — directed information (generalized Granger), includes crypto but on returns not on-chain, no VaR/CoVaR. |
+| No **counterfactual VaR/CoVaR** (Pearl Level-3) exists | **No counter-evidence found** | Searches surfaced only correlation/copula CoVaR (Adrian–Brunnermeier lineage) and Pearl counterfactuals in ML/CV — never the two combined in a tail-risk measure. |
+| No **on-chain transaction graph as a Pearl SCM** for systemic risk exists | **No counter-evidence found** | On-chain graph work remains predictive/forensic (chainlets, AML) or balance-sheet/correlation/graph-ML (BIS 1062, ASRI, DeXposure). The one causal on-chain paper (MIT Sloan endogenous-security) uses instrumental variables on PoW security, not a transaction-graph SCM. |
+| Near-miss: "causality structures in composite stress networks" (IOPscience, 2025/26) | **Not a competitor** | Granger causality on Iran's financial markets — not crypto, not on-chain, not Pearl. Reinforces the gap. |
+
+**Two qualifications recorded for honesty:**
+
+1. **"First" is framing-dependent, not a vacant field.** Every individual building block exists; VEIN's novelty is *how the graph is obtained* (read off the ledger as the structural backbone vs. statistically inferred) plus the counterfactual layer and entity-resolution machinery. A skeptical reviewer can frame VEIN as "Causal-NECO VaR with an observed graph." The defensible claim is the precise one: *first to use the observed on-chain transaction graph as the structural causal model for a crypto systemic-risk measure, and first counterfactual systemic-risk measure* — citing Causal-NECO VaR and TV-DIG as nearest prior art.
+2. **These are "no evidence of," not "proof of absence."** Coverage is bounded by web/arXiv search as of June 2026, and several nearest items (ASRI, DeXposure-FM, USDC-depeg tracing) are un-peer-reviewed 2026 preprints. The targeted searches must be re-run immediately before submission.
+
+`algorithm.md` and this document are internally consistent: the two confirmed-open gaps map directly onto VEIN's two headline claims (algorithm.md §1.2).
