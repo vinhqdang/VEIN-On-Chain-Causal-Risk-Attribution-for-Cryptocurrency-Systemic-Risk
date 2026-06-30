@@ -46,8 +46,8 @@ def _req(method: str, url: str, body: dict | None = None, retries: int = 5) -> d
     raise RuntimeError(f"Dune request failed after {retries} tries: {last}")
 
 
-def run_sql(sql: str, name: str = "vein_query", poll_s: float = 4.0,
-            max_polls: int = 60, refresh: bool = False) -> list[dict]:
+def run_sql(sql: str, name: str = "vein_query", poll_s: float = 5.0,
+            max_polls: int = 180, refresh: bool = False) -> list[dict]:
     """Execute SQL against Dune and return rows. Cached by SQL hash."""
     h = hashlib.sha1(sql.encode()).hexdigest()[:16]
     cache = CACHE_DIR / f"dune_{h}.json"

@@ -77,9 +77,20 @@ def coingecko_prices(coin_id: str, start: dt.date, end: dt.date) -> pd.Series:
 
 
 def defillama_tvl(slug: str) -> pd.Series:
-    """Daily total USD TVL series for a DefiLlama protocol slug."""
+    """Daily total USD TVL series for a DefiLlama protocol slug.
+
+    Some protocol payloads are very large (Aave ~18MB) and occasionally truncate;
+    on failure we cache an empty series so subsequent runs don't re-download it
+    (the stress layer falls back to a price-drawdown proxy)."""
     url = f"https://api.llama.fi/protocol/{slug}"
-    d = _get(url, f"llama_{slug}.json")
+    empty_cache = CACHE_DIR / f"llama_{slug}_EMPTY.json"
+    if empty_cache.exists():
+        return pd.Series(dtype=float, name=slug)
+    try:
+        d = _get(url, f"llama_{slug}.json")
+    except Exception:  # noqa: BLE001
+        empty_cache.write_text("{}")
+        return pd.Series(dtype=float, name=slug)
     tvl = d.get("tvl", [])
     if not tvl:
         return pd.Series(dtype=float, name=slug)

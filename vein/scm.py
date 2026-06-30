@@ -95,12 +95,22 @@ class StructuralCausalModel:
         return val
 
     def set_flows(self, flows: pd.DataFrame):
-        """Repoint the flow lookup (e.g. to full-window flows for event sim)."""
+        """Repoint the flow lookup (e.g. to full-window flows for event sim).
+
+        Builds an O(1) dict {(from,to,day): usd_volume} — simulate() queries this
+        millions of times in the Monte Carlo, so a dict beats per-call filtering.
+        """
         self._flows_pivot = {(i, j): g.set_index("day").usd_volume
                              for (i, j), g in flows.groupby(["from_entity", "to_entity"])}
+        agg = flows.groupby(["from_entity", "to_entity", "day"]).usd_volume.sum()
+        self._flow_map = {(i, j, pd.Timestamp(d)): float(v)
+                          for (i, j, d), v in agg.items()}
         return self
 
     def flow_on(self, parent, child, day) -> float:
+        fm = getattr(self, "_flow_map", None)
+        if fm is not None:
+            return fm.get((parent, child, pd.Timestamp(day)), 0.0)
         s = self._flows_pivot.get((parent, child))
         if s is None:
             return 0.0
