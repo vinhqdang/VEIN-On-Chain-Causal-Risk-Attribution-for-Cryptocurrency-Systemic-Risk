@@ -1,6 +1,6 @@
 %% VEIN manuscript --- Springer Nature article class (sn-jnl).
-%% Numbered reference style (sn-mathphys-num); referee option = double spacing.
-\documentclass[referee,pdflatex,sn-mathphys-num]{sn-jnl}
+%% Author-year reference style (sn-mathphys-ay); referee option = double spacing.
+\documentclass[referee,pdflatex,sn-mathphys-ay]{sn-jnl}
 
 \usepackage{graphicx}%
 \usepackage{multirow}%
@@ -105,7 +105,7 @@ hours.\footnote{For event overviews and the minute-level liquidation mechanics,
 see CoinDesk Research, \url{https://www.coindesk.com/research/market-spotlight-the-19-billion-liquidation-that-shook-crypto};
 CoinGecko, \url{https://www.coingecko.com/learn/october-10-crypto-crash-explained};
 and FTI Consulting, \url{https://www.fticonsulting.com/insights/articles/crypto-crash-october-2025-leverage-met-liquidity}.}
-Early scholarly post-mortems of the episode \cite{ali2025anatomy,lim2026cascade}
+Early scholarly post-mortems of the episode \citep{ali2025anatomy,lim2026cascade}
 document a striking feature that sets it apart from the 2022 episodes
 (Terra/Luna, Celsius, FTX): whereas those were rooted in fundamental
 insolvency, the October~2025 cascade was largely \emph{mechanical}. A mispricing
@@ -136,40 +136,42 @@ exchange in/out-flows are all recorded, timestamped to the block, in a public
 ledger.
 
 Such episodes expose a structural weakness in how systemic risk is measured for
-crypto markets. The dominant tools---$\Delta$CoVaR \cite{adrian2016covar},
-marginal expected shortfall and SRISK \cite{acharya2017measuring}, and
+crypto markets. The dominant tools---the change in Value-at-Risk conditional on
+distress ($\Delta$CoVaR, for Conditional Value-at-Risk) \citep{adrian2016covar},
+marginal expected shortfall (MES) and SRISK \citep{acharya2017measuring}, and
 variance-decomposition connectedness
-\cite{diebold2014network,billio2012econometric}---are \emph{associational}:
+\citep{diebold2014network,billio2012econometric}---are \emph{associational}:
 they quantify co-movement in returns and, as their own authors note, capture an
 institution's contribution to system risk ``in a non-causal sense''
-\cite{adrian2016covar}. A recent and comprehensive survey of causal inference in
-finance \cite{kumar2025causalreview} confirms the pattern at the level of the
+\citep{adrian2016covar}. A recent and comprehensive survey of causal inference in
+finance \citep{kumar2025causalreview} confirms the pattern at the level of the
 whole field: applications around SRISK, MES and CoVaR remain confined to
 association and Granger causality, with no counterfactual systemic-risk measure.
 Where causality has been injected, the graph is still \emph{estimated from
-prices}. Causal-NECO VaR \cite{rigana2024neco,rigana2023new} learns a contagion
+prices}. Causal-NECO VaR \citep{rigana2024neco,rigana2023new} learns a contagion
 graph from foreign-exchange returns using the order-independent PC-stable
-algorithm \cite{colombo2014order,spirtes2000causation} and computes a
+algorithm (a constraint-based causal-structure-discovery algorithm)
+\citep{colombo2014order,spirtes2000causation} and computes a
 value-at-risk from the resulting SCM; the time-varying directed-information
-graph (TV-DIG) of Etesami et al.\ \cite{etesami2023tvdig} builds directed
+graph (TV-DIG) of Etesami et al.\ \citeyearpar{etesami2023tvdig} builds directed
 networks---an information-theoretic generalisation of Granger causality
-\cite{granger1969}---across financial sectors including cryptocurrencies; and
-correlation-network models such as CoRisk \cite{giudici2018corisk} decompose
+\citep{granger1969}---across financial sectors including cryptocurrencies; and
+correlation-network models such as CoRisk \citep{giudici2018corisk} decompose
 systemic risk into idiosyncratic and contagion components. The crypto-specific
 literature has grown rapidly in 2025--2026, from composite indices such as ASRI
-\cite{farzulla2026asri} to network-fragility and TradFi--DeFi
-``crosstagion'' mappings \cite{aufiero2025mapping}; yet all of this work either
+\citep{farzulla2026asri} to network-fragility and TradFi--DeFi
+``crosstagion'' mappings \citep{aufiero2025mapping}; yet all of this work either
 estimates the network from returns or treats the on-chain graph descriptively.
 No published method exploits the one data source where the contagion mechanism
 is \emph{directly observed}---the blockchain ledger---as a causal structure.
 
 On-chain transaction graphs have, separately, been used for prediction and
 forensics---``chainlets'' that forecast Bitcoin price and volatility
-\cite{akcora2018bitcoin}, and address-clustering for anti-money-laundering
-\cite{meiklejohn2013fistful,weber2019antimoney}---but always observationally,
+\citep{akcora2018bitcoin}, and address-clustering for anti-money-laundering
+\citep{meiklejohn2013fistful,weber2019antimoney}---but always observationally,
 explicitly disclaiming a causal-structural interpretation, and never as the
 backbone of a systemic-risk measure. And although Pearl's causal hierarchy
-\cite{pearl2009causality,pearl2019seven} places counterfactuals (Level~3) above
+\citep{pearl2009causality,pearl2019seven} places counterfactuals (Level~3) above
 interventions (Level~2) above association (Level~1), no systemic-risk measure in
 finance operates above Level~2. There is, in short, an open intersection: an
 observed-graph SCM for crypto systemic risk, extended to the counterfactual
@@ -183,8 +185,9 @@ of each entity is \emph{specified from the resolved ledger} rather than
 inferred from price correlations; block timestamps make the temporal ordering
 of on-chain transactions observable, reducing---though not eliminating---the
 timing ambiguity that price-based methods must instead assume away. Second, we define
-On-Chain Causal CoVaR, an interventional (Level-2) measure via the do-operator,
-together with a counterfactual (Level-3) attribution measure that decomposes a
+On-Chain Causal CoVaR (OC-CoVaR), an interventional (Level-2) measure via the
+do-operator, together with a counterfactual (Level-3) attribution measure that
+decomposes a
 realised loss into the share attributable to a specific upstream entity through
 the standard abduction--action--prediction procedure. Third, we implement the
 full pipeline---including a four-tier entity-resolution layer over real decoded
@@ -226,45 +229,45 @@ conclusions. An appendix collects implementation details and additional tables.
 \label{sec:related}
 
 The systemic-risk literature begins with associational, return-based measures.
-The canonical conditional measure is $\Delta$CoVaR \cite{adrian2016covar}, the
+The canonical conditional measure is $\Delta$CoVaR \citep{adrian2016covar}, the
 change in the value-at-risk of the financial system conditional on an
 institution being in distress relative to its median state; the
-systemic-expected-shortfall family \cite{acharya2017measuring} adds marginal
+systemic-expected-shortfall family \citep{acharya2017measuring} adds marginal
 expected shortfall (MES) and the leverage-adjusted SRISK; and connectedness
 measures built from forecast-error-variance decompositions
-\cite{diebold2014network} or Granger-causal and correlation networks
-\cite{billio2012econometric} quantify spillovers. These are, by construction,
+\citep{diebold2014network} or Granger-causal and correlation networks
+\citep{billio2012econometric} quantify spillovers. These are, by construction,
 descriptions of co-movement rather than of mechanism, and a recent survey of the
-whole field \cite{kumar2025causalreview} confirms that even where the word
+whole field \citep{kumar2025causalreview} confirms that even where the word
 ``causal'' appears, applications around CoVaR, MES and SRISK remain
 associational or Granger-based.
 
 The closest methodological precedent that genuinely estimates causal structure
-is Causal-NECO VaR \cite{rigana2024neco}, which decomposes asset log-returns
+is Causal-NECO VaR \citep{rigana2024neco}, which decomposes asset log-returns
 into an autoregressive part and an instantaneous contagion part, learns the
-causal graph with PC-stable \cite{colombo2014order}, and computes a Gaussian or
+causal graph with PC-stable \citep{colombo2014order}, and computes a Gaussian or
 Gaussian-copula VaR. It operates at Pearl Levels~1--2 on foreign-exchange data,
 assumes no unmeasured confounders, and---decisively for our purposes---obtains
 its graph by estimation rather than observation; its foundational lineage
-\cite{rigana2023new} combines causal networks with a structural vector
-autoregression in Pearl's framework \cite{spirtes2000causation}. The nearest
+\citep{rigana2023new} combines causal networks with a structural vector
+autoregression in Pearl's framework \citep{spirtes2000causation}. The nearest
 crypto application is the time-varying directed-information graph TV-DIG
-\cite{etesami2023tvdig}, a nonparametric directed network that detects
+\citep{etesami2023tvdig}, a nonparametric directed network that detects
 heightened crypto-to-sector influence around the 2022 stress events; directed
-information generalises Granger causality \cite{granger1969} but is not a Pearl
+information generalises Granger causality \citep{granger1969} but is not a Pearl
 SCM with do-operator and counterfactual semantics, and it too is built from
 returns. The 2025--2026 crypto-specific wave---composite indices such as ASRI
-\cite{farzulla2026asri} and comparative TradFi--DeFi systemic-risk mappings that
-formalise composability-driven ``crosstagion'' \cite{aufiero2025mapping}---
+\citep{farzulla2026asri} and comparative TradFi--DeFi systemic-risk mappings that
+formalise composability-driven ``crosstagion'' \citep{aufiero2025mapping}---
 sharpens the motivation but does not change the picture: the network is either
 estimated from prices or treated descriptively.
 
 On-chain transaction graphs themselves have been mined predictively, through
 chainlet subgraphs that forecast Bitcoin price and volatility
-\cite{akcora2018bitcoin}, and for forensics and address clustering, from the
+\citep{akcora2018bitcoin}, and for forensics and address clustering, from the
 multi-input/co-spend heuristics of \cite{meiklejohn2013fistful} to
 graph-convolutional anti-money-laundering classifiers on the Elliptic dataset
-\cite{weber2019antimoney}. We reuse this resolution machinery, but no prior work
+\citep{weber2019antimoney}. We reuse this resolution machinery, but no prior work
 treats the resulting graph as a causal structure for a systemic-risk measure.
 
 Taken together, the literature leaves two specific capabilities unfilled, and a
@@ -274,27 +277,27 @@ organise the evidence around the two sub-claims.
 
 \emph{On the on-chain-graph-as-SCM claim.} The 2026 crypto systemic-risk
 literature uses the on-chain graph descriptively or builds the network from
-prices, never as a Pearl SCM. Sankaewtong \cite{sankaewtong2026tracing} traces
+prices, never as a Pearl SCM. Sankaewtong \citeyearpar{sankaewtong2026tracing} traces
 the USDC depeg contagion through high-granularity on-chain transactions, but
 observationally, with no interventional or counterfactual semantics; Zhang et
-al.\ \cite{zhang2026defi} measure DeFi systemic fragility from the
+al.\ \citeyearpar{zhang2026defi} measure DeFi systemic fragility from the
 \emph{correlation} structure of total-value-locked dynamics; ASRI
-\cite{farzulla2026asri} is an associational composite of weighted sub-indices;
+\citep{farzulla2026asri} is an associational composite of weighted sub-indices;
 and the comparative TradFi--DeFi ``crosstagion'' mapping of Aufiero et al.\
-\cite{aufiero2025mapping} is conceptual. The detailed forensic reconstructions
-of the very event we study---Lim's minute-level analysis \cite{lim2026cascade}
-and Ali's anatomy \cite{ali2025anatomy}---characterise the mechanism but build
+\citeyearpar{aufiero2025mapping} is conceptual. The detailed forensic reconstructions
+of the very event we study---Lim's minute-level analysis \citeyearpar{lim2026cascade}
+and Ali's anatomy \citeyearpar{ali2025anatomy}---characterise the mechanism but build
 no causal risk measure. None reads the causal parent set off the ledger.
 
 \emph{On the counterfactual-systemic-risk claim.} Counterfactual reasoning has
-reached finance, but not systemic-risk measurement. Xu \cite{xu2025counterfactual}
+reached finance, but not systemic-risk measurement. Xu \citeyearpar{xu2025counterfactual}
 applies counterfactual analysis to credit-portfolio losses, not to a networked
 tail-risk measure; and the comprehensive 2025 survey of causal inference across
-banking, finance and insurance by Kumar et al.\ \cite{kumar2025causalreview},
+banking, finance and insurance by Kumar et al.\ \citeyearpar{kumar2025causalreview},
 covering decades of work, documents only association and Granger usage around
 SRISK, MES and CoVaR, with no counterfactual systemic-risk measure. The nearest
-causal precedents---Causal-NECO VaR \cite{rigana2024neco} and TV-DIG
-\cite{etesami2023tvdig}---stop at Pearl Level~2.
+causal precedents---Causal-NECO VaR \citep{rigana2024neco} and TV-DIG
+\citep{etesami2023tvdig}---stop at Pearl Level~2.
 
 Against this 2026 state of the art, \emph{to the best of our knowledge VEIN is
 the first framework to (i) use an observed on-chain transaction graph as a Pearl
@@ -318,12 +321,12 @@ head-to-head baseline for H1.
 \toprule
 \textbf{Method} & \textbf{Graph source} & \textbf{Causal level} & \textbf{Domain} & \textbf{Counterfactual}\\
 \midrule
-$\Delta$CoVaR \cite{adrian2016covar}     & none (returns)     & assoc.\ (L1) & general & no\\
-MES/SRISK \cite{acharya2017measuring}    & none (returns)     & assoc.\ (L1) & general & no\\
-CoRisk \cite{giudici2018corisk}          & corr.\ network     & assoc.\ (L1) & credit  & no\\
-ASRI \cite{farzulla2026asri}             & composite index    & assoc.\ (L1) & crypto  & no\\
-TV-DIG \cite{etesami2023tvdig}           & estimated (DI)     & Granger     & incl.\ crypto & no\\
-Causal-NECO VaR \cite{rigana2024neco}    & estimated (PC)     & SCM (L1--2) & FX      & no\\
+$\Delta$CoVaR \citep{adrian2016covar}     & none (returns)     & assoc.\ (L1) & general & no\\
+MES/SRISK \citep{acharya2017measuring}    & none (returns)     & assoc.\ (L1) & general & no\\
+CoRisk \citep{giudici2018corisk}          & corr.\ network     & assoc.\ (L1) & credit  & no\\
+ASRI \citep{farzulla2026asri}             & composite index    & assoc.\ (L1) & crypto  & no\\
+TV-DIG \citep{etesami2023tvdig}           & estimated (DI)     & Granger     & incl.\ crypto & no\\
+Causal-NECO VaR \citep{rigana2024neco}    & estimated (PC)     & SCM (L1--2) & FX      & no\\
 \textbf{VEIN (this paper)}               & \textbf{observed} & \textbf{SCM (L1--3)} & \textbf{crypto} & \textbf{yes}\\
 \bottomrule
 \end{tabular}
@@ -352,7 +355,7 @@ The resolved ledger supplies an observed candidate propagation skeleton: under
 the edge-type and timing assumptions A1--A3 below, the in-neighbours of $i$ in
 $G$ are used to \emph{specify} the model parent set $\pa(i)$ of the SCM. This
 is the central structural move of the paper: in contrast to
-\cite{rigana2024neco,etesami2023tvdig}, $\pa(i)$ is specified from the ledger
+\citep{rigana2024neco,etesami2023tvdig}, $\pa(i)$ is specified from the ledger
 rather than estimated from price correlations, so the only component requiring
 statistical estimation is the stress-propagation function $f_i$; $\pa(i)$
 carries a causal interpretation only insofar as A1--A3 hold for the edge types
@@ -471,7 +474,7 @@ the median ($0$ after standardisation); we rank entities by their total
 \emph{exported} tail risk
 $\mathcal{E}(i)=\sum_{j\ne i}\max(\Delta\OCCoVaR_q(j\,|\,i),0)$. Equation
 \eqref{eq:deltaoccovar} is the network-causal analogue of $\Delta$CoVaR
-\cite{adrian2016covar}: both contrast a distressed against a median conditioning
+\citep{adrian2016covar}: both contrast a distressed against a median conditioning
 state, but $\Delta$CoVaR conditions on a statistical event and reads off a
 conditional quantile of returns, whereas $\Delta$OC-CoVaR conditions on an
 \emph{intervention} that severs $i$'s parents and propagates the shock through
@@ -482,7 +485,7 @@ mirroring the slope $\beta_i$ in $\Delta$CoVaR; the network generalisation sums
 over all directed paths from $i$ to $j$.
 
 The counterfactual measure goes one level higher in Pearl's hierarchy. Following
-the abduction--action--prediction procedure \cite{pearl2009causality,pearl2019seven},
+the abduction--action--prediction procedure \citep{pearl2009causality,pearl2019seven},
 we (i) \emph{abduct} the realised exogenous shocks
 $\widehat U_{i,t}=S_{i,t}-f_i(\cdot;\hat\theta_i)$ from observed data; (ii) take
 the \emph{action} of replacing $i$'s realised trajectory by its pre-crisis
@@ -512,7 +515,7 @@ variants of $G$---the true-direction graph, a reversed graph $G^{\mathrm{rev}}$
 (every edge flipped), and a symmetric/undirected graph $G^{\mathrm{sym}}$---fit
 \eqref{eq:fi} on each over the estimation window, and compare one-step-ahead
 prediction of event-window stress through the stress-weighted root-mean-square
-error
+error (RMSE)
 \begin{equation}
 \label{eq:rmse}
 \mathrm{RMSE} \;=\;
@@ -523,7 +526,7 @@ If the true-direction model attains the lowest RMSE this is empirical evidence
 for A3; if not, A3 must be qualified to specific edge types. Because A2 is not
 directly testable, we additionally quantify how strong a hidden confounder
 (e.g.\ a CEX-internal pricing engine) would have to be to overturn each edge,
-using the robustness value of Cinelli and Hazlett \cite{cinelli2020sensitivity}:
+using the robustness value of Cinelli and Hazlett \citeyearpar{cinelli2020sensitivity}:
 for a coefficient with $t$-statistic $t$ and $d$ degrees of freedom, with
 $f=|t|/\sqrt{d}$,
 \begin{equation}
@@ -533,14 +536,14 @@ RV \;=\; \tfrac{1}{2}\Big(\sqrt{f^4+4f^2}-f^2\Big)\in[0,1]
 is the share of residual variance an unobserved confounder must explain in
 \emph{both} the parent and the child to drive the coefficient to zero; larger
 $RV$ means a finding is harder to explain away. Finally, we benchmark against
-$\Delta$CoVaR \cite{adrian2016covar}, estimated by the quantile regression
+$\Delta$CoVaR \citep{adrian2016covar}, estimated by the quantile regression
 $r^{\mathrm{sys}}_t=\alpha_i+\beta_i r_{i,t}+\varepsilon_t$ with
 $\Delta\text{CoVaR}_i=\beta_i(\VaR_q(r_i)-\VaR_{0.5}(r_i))$; against MES
-\cite{acharya2017measuring},
+\citep{acharya2017measuring},
 $\text{MES}_i=\E[r_i\mid r^{\mathrm{sys}}\le\VaR_q(r^{\mathrm{sys}})]$; and,
 for the central H1 comparison, against the estimated-graph school reproduced on
-our data---a Granger graph \cite{granger1969} and a partial-correlation graph
-\cite{giudici2018corisk} over the same entity node set, fed through the
+our data---a Granger graph \citep{granger1969} and a partial-correlation graph
+\citep{giudici2018corisk} over the same entity node set, fed through the
 \emph{same} VEIN machinery so that only the graph source differs.
 Algorithm~\ref{alg:vein} collects the end-to-end procedure.
 
@@ -690,7 +693,7 @@ Raw addresses are not economic agents, and resolution error directly corrupts
 $\pa(i)$ in \eqref{eq:scm}: unlike in price-based methods, a clustering mistake
 fabricates or severs a causal edge. We therefore implement a four-tier pipeline
 that builds on the established forensics literature
-\cite{meiklejohn2013fistful,weber2019antimoney}. Tier~0 applies the classical
+\citep{meiklejohn2013fistful,weber2019antimoney}. Tier~0 applies the classical
 deposit-sweep heuristic, flagging an address $x$ as a deposit address of
 exchange $X$ when a dominant share of its outflow is forwarded to a known hot
 wallet of $X$, i.e.\ $\sum_t F_{x\to\mathrm{hot}(X),t}/\sum_t\text{out}_x\ge\tau$
@@ -698,8 +701,8 @@ with $\tau=0.8$. Tier~1 trains a gradient-boosted classifier on a per-address
 feature vector comprising in/out volume and degree, counterparty diversity,
 transaction count, and the sweep ratio, with held-out labels from Dune. Tier~2
 forms the symmetric normalised adjacency $\tilde A=D^{-1/2}AD^{-1/2}$ of the
-address graph, computes a truncated singular-value-decomposition embedding, and
-clusters the resulting representations. Tier~3, the primary path, resolves both
+address graph, computes a truncated singular-value-decomposition (SVD)
+embedding, and clusters the resulting representations. Tier~3, the primary path, resolves both
 endpoints of every transfer against curated seed labels and Dune's
 \texttt{labels.cex\_ethereum}, collapsing sub-wallet labels (``OKX~210'',
 ``Bitfinex Tether Treasury'') to their exchange root---the
@@ -714,7 +717,8 @@ dominate every volume-weighted statistic below. The supervised layer is
 validated against held-out Dune labels---the Tier-3 reconciliation the design
 requires: on $7\,841$ event-window addresses (after the sentinel exclusion)
 with a CEX base rate of $0.5\%$, the Tier-1 classifier attains a held-out
-ROC-AUC of $0.98$ and an average precision of $0.24$ (Table~\ref{tab:resval}),
+area under the receiver-operating-characteristic curve (ROC-AUC) of $0.98$ and
+an average precision of $0.24$ (Table~\ref{tab:resval}),
 with the in/out volume ratio and total volume as the top features, consistent
 with the intuition that exchanges intermediate asymmetric, high-volume flows.
 By address count the classifier recovers a third of CEX-labelled addresses at
@@ -805,8 +809,8 @@ precisely what matters in a cascade that propagated in minutes.
 We quantify this margin rather than assert it (Table~\ref{tab:h1ci}). A paired
 block-bootstrap of the per-observation weighted errors ($2{,}000$ resamples over
 the $288$ event-window predictions on the common node set) puts the
-observed-minus-Granger advantage at a small positive mean with a $95\%$ interval
-of $[-0.012,+0.016]$ that straddles zero; the observed graph is better in $71\%$
+observed-minus-Granger advantage at a small positive mean with a $95\%$
+confidence interval (CI) of $[-0.012,+0.016]$ that straddles zero; the observed graph is better in $71\%$
 of resamples. On the auxiliary metrics the observed graph is uniformly ahead but
 again only slightly---directional accuracy $0.771$ vs.\ $0.767$, mean absolute
 error $0.245$ vs.\ $0.248$. The honest summary is therefore that the observed
@@ -1045,7 +1049,7 @@ And, most tellingly, the OC-CoVaR ranking orders the documented transmitters
 (exchanges, Ethena) strictly above the documented absorbers (Aave, Lido), with
 transmitter--absorber separation $12.87$ and pairwise concordance $1.00$,
 independently reproducing the conclusion of the forensic post-mortems
-\cite{ali2025anatomy,lim2026cascade}.
+\citep{ali2025anatomy,lim2026cascade}.
 
 Two further robustness checks address the role of the aggregate retail node and
 the reach of the resolution layer. \emph{Retail is a residual
@@ -1183,9 +1187,9 @@ when true clearly beats reversed.}
 \label{subsec:summary}
 As a standard validity check on the risk machinery we backtest a rolling
 historical VaR on the asset returns. Kupiec unconditional-coverage
-\cite{kupiec1995techniques} $p$-values are $0.24$ (BTC) and $0.58$ (ETH) at
+\citeyearpar{kupiec1995techniques} $p$-values are $0.24$ (BTC) and $0.58$ (ETH) at
 daily resolution; the Christoffersen conditional-coverage test
-\cite{christoffersen1998evaluating} passes for BTC ($p=0.11$) and flags
+\citeyearpar{christoffersen1998evaluating} passes for BTC ($p=0.11$) and flags
 violation clustering for ETH ($p=0.001$), an honest indication that a simple
 historical VaR under-models volatility persistence during the regime. Four
 threats to validity bound the conclusions. Construct validity is addressed by
@@ -1247,7 +1251,7 @@ October-2025 cascade, which is dominated by symmetric custodial exchange flows
 on which direction has little to bite. VEIN should therefore claim directed
 causal content where the mechanism is genuinely directional---the collateral and
 composability links emphasised in the recent TradFi--DeFi crosstagion literature
-\cite{aufiero2025mapping}, and the outward propagation from a stressed
+\citep{aufiero2025mapping}, and the outward propagation from a stressed
 hub---and fall back to connectivity-level claims for symmetric settlement flows.
 This conditional reading, delivered by the falsification machinery rather than
 assumed, is both sharper and more defensible than a blanket directional claim.
@@ -1285,39 +1289,50 @@ resolution-dependent and not decisive. Whether that edge widens with intraday
 data, fuller entity resolution, and more events is a question for future work
 to answer, not a result this paper claims.
 
+\section*{List of abbreviations}
+\begin{description}
+\item[AR] Autoregressive
+\item[API] Application programming interface
+\item[ASRI] Aggregated Systemic Risk Index \citep{farzulla2026asri}
+\item[BTC] Bitcoin
+\item[CEX] Centralised exchange
+\item[CF] Counterfactual (as in $\Delta_i^{CF}$)
+\item[CI] Confidence interval
+\item[CoVaR] Conditional Value-at-Risk
+\item[DeFi] Decentralised finance
+\item[ERC-20] Ethereum token standard (Ethereum Request for Comments 20)
+\item[ETH] Ether, the native asset of the Ethereum blockchain
+\item[FX] Foreign exchange
+\item[JEL] Journal of Economic Literature (classification codes)
+\item[MES] Marginal expected shortfall
+\item[NECO VaR] Network-contagion Value-at-Risk method of \citet{rigana2024neco}
+\item[OC-CoVaR] On-Chain Causal CoVaR (this paper's interventional risk measure)
+\item[OLS] Ordinary least squares
+\item[PC-stable] Order-independent variant of the PC constraint-based causal-structure-discovery algorithm \citep{colombo2014order}
+\item[RMSE] Root-mean-square error
+\item[ROC-AUC] Area under the receiver-operating-characteristic curve
+\item[RV] Robustness value \citep{cinelli2020sensitivity}
+\item[SCM] Structural causal model
+\item[SQL] Structured Query Language
+\item[SRISK] Systemic risk capital-shortfall measure of \citet{acharya2017measuring}
+\item[SVB] Silicon Valley Bank
+\item[SVD] Singular-value decomposition
+\item[TVL] Total value locked
+\item[TV-DIG] Time-varying directed-information graph \citep{etesami2023tvdig}
+\item[USDC] USD Coin (a fiat-backed stablecoin)
+\item[USDe] Ethena's synthetic dollar
+\item[USDT] Tether (a fiat-backed stablecoin)
+\item[VaR] Value-at-Risk
+\item[wBETH] Wrapped Beacon ETH, a Binance liquid-staking token
+\item[WETH] Wrapped Ether
+\end{description}
+
 \backmatter
 
-\bmhead{Data availability}
-The complete implementation, the real-data evaluation pipeline, and all result
-artefacts underlying every number, table, and figure in this paper will be
-made available in a public repository upon publication; the repository link
-has been withheld from this version to preserve the review process and has
-been provided to the editor separately. All underlying blockchain and market
-data are public and were obtained from Dune Analytics
-(\url{https://dune.com}), DefiLlama (\url{https://defillama.com}), and
-Etherscan (\url{https://etherscan.io}), as detailed in Section~\ref{sec:data};
-no restricted or proprietary data were used.
-
-\bmhead{Declarations}
-
-\noindent\textbf{Ethics approval and consent to participate.} Not applicable:
-this study uses only public, aggregated on-chain and market data and involves
-no human subjects, human data, or animals.
-
-\noindent\textbf{Consent for publication.} Not applicable.
-
-\noindent\textbf{Availability of data and materials.} See the Data
-availability statement above.
-
-\noindent\textbf{Competing interests.} The author declares no competing
-interests.
-
-\noindent\textbf{Funding.} No external funding supported this work.
-
-\noindent\textbf{Authors' contributions.} Author information withheld for
-peer review.
-
-\noindent\textbf{Acknowledgements.} Not applicable.
+\textit{Declarations (Ethics approval, Consent, Availability of supporting
+data, Competing interests, Funding, Authors' contributions, and
+Acknowledgements) have been moved to the title-page/cover-letter file in
+accordance with the journal's blinded-manuscript policy.}
 
 \begin{appendices}
 
