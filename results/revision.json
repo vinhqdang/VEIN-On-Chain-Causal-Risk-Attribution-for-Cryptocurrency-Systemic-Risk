@@ -1,38 +1,45 @@
 {
-  "generated": "2026-06-30",
+  "generated": "2026-10-12",
+  "data_backend": "bigquery",
   "H1": {
     "observed": {
-      "wrmse": 1.2529294293142177,
-      "rmse": 0.518746519151086,
-      "mae": 0.24532061040089662,
-      "dir_acc": 0.7708333333333334,
+      "wrmse": 1.1646871888912926,
+      "rmse": 0.510541885838841,
+      "mae": 0.24747812995256474,
+      "dir_acc": 0.7743055555555556,
       "n": 288
     },
     "granger": {
-      "wrmse": 1.2568370633891581,
-      "rmse": 0.5235550157218049,
-      "mae": 0.24822918852040596,
-      "dir_acc": 0.7673611111111112,
+      "wrmse": 1.1821762761171515,
+      "rmse": 0.519262165685162,
+      "mae": 0.2511433905387918,
+      "dir_acc": 0.7638888888888888,
       "n": 288
     },
-    "mean_werr_diff_granger_minus_observed": 0.003489769073468588,
+    "mean_werr_diff_granger_minus_observed": 0.01471103184162426,
     "boot_ci95_diff": [
-      -0.011776398043447711,
-      0.01622222012971849
+      -0.005263823640728036,
+      0.05179662766941671
     ],
-    "prob_observed_better": 0.713
+    "prob_observed_better": 0.915,
+    "bootstrap": {
+      "scheme": "paired_moving_block",
+      "block_len": 8,
+      "block_unit": "hours (whole time steps, all entities)",
+      "replicates": 2000
+    }
   },
   "lagged_flow": {
-    "observed_wrmse": 1.258136193494444,
-    "granger_wrmse": 1.2471690100654942,
-    "observed_dir_acc": 0.7673611111111112
+    "observed_wrmse": 1.1640868843500067,
+    "granger_wrmse": 1.177961676951333,
+    "observed_dir_acc": 0.78125
   },
   "edge_type_falsification": {
-    "true": 1.6630030689587931,
-    "reverse_composability": 1.6630030689587931,
-    "reverse_custodial": 1.6747972466101857,
+    "true": 1.724579177454591,
+    "reverse_composability": 1.724579177454591,
+    "reverse_custodial": 1.7036781805806434,
     "n_composability_edges": 4,
-    "n_custodial_edges": 35
+    "n_custodial_edges": 96
   },
   "shapley": {
     "target": "Bybit",
@@ -42,19 +49,19 @@
       "Bitfinex"
     ],
     "shapley_values": {
-      "Binance": 3.414832272689519,
-      "Coinbase": 0.0,
-      "Bitfinex": -0.13869913908449832
+      "Binance": 1.354597116224942,
+      "Coinbase": 0.0661946759994952,
+      "Bitfinex": -0.3990547828190489
     },
-    "sum_shapley": 3.2761331336050206,
-    "total_effect": 3.276133133605021,
-    "additive_residual": 4.440892098500626e-16
+    "sum_shapley": 1.0217370094053884,
+    "total_effect": 1.0217370094053884,
+    "additive_residual": 0.0
   },
   "attribution_sensitivity": {
     "Binance->Bybit": {
-      "base_share": 0.9813053445286813,
-      "mean": 0.9783357627241317,
-      "sd": 0.010857620288806396,
+      "base_share": 0.06709608139620084,
+      "mean": 0.06605726176793576,
+      "sd": 0.004634398295185704,
       "frac_positive": 1.0
     },
     "Ethena->Aave": {
@@ -67,32 +74,32 @@
   "no_retail_ranking": [
     {
       "entity": "Binance",
-      "exported_risk": 16.016490454241918
+      "exported_risk": 21.284446252697172
     },
     {
-      "entity": "FalconX",
-      "exported_risk": 2.4473931463281318
+      "entity": "Kraken",
+      "exported_risk": 20.962781896965975
     },
     {
-      "entity": "Ethena",
-      "exported_risk": 2.051495443342647
+      "entity": "Crypto.com",
+      "exported_risk": 19.108300277616312
     },
     {
-      "entity": "HTX",
-      "exported_risk": 0.6769810562078149
+      "entity": "Coinbase",
+      "exported_risk": 16.738415106187762
     },
     {
-      "entity": "Bybit",
-      "exported_risk": 0.0
+      "entity": "Bitfinex",
+      "exported_risk": 15.06642063639828
     },
     {
-      "entity": "Aave",
-      "exported_risk": 0.0
+      "entity": "Bullish",
+      "exported_risk": 12.19426806332892
     }
   ],
   "resolution_coverage": {
-    "total_usd": 438279472080.3119,
-    "frac_volume_named_both_sides": 0.009363219529929159,
+    "total_usd": 449692816967.1178,
+    "frac_volume_named_both_sides": 0.01629376405392614,
     "frac_volume_touching_named": 1.0,
     "n_named_entities": 15
   }

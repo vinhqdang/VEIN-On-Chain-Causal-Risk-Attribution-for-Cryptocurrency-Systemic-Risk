@@ -6,15 +6,15 @@ _Hourly resolution, Oct 2025 cascade. Fit on 216 pre-event hours, tested on 48 e
 
 | model | weighted RMSE | timing corr | n |
 |---|--:|--:|--:|
-| true_direction | 1.8010 | 0.1061 | 816 |
-| reversed_edges | 1.7902 | 0.1444 | 816 |
-| symmetric | 1.7971 | 0.1223 | 816 |
+| true_direction | 1.8405 | 0.0794 | 816 |
+| reversed_edges | 1.8229 | 0.0889 | 816 |
+| symmetric | 1.8479 | 0.0563 | 816 |
 
-true RMSE 1.801 (corr +0.106) vs reversed RMSE 1.790 (corr +0.144).
+true RMSE 1.841 (corr +0.079) vs reversed RMSE 1.823 (corr +0.089).
 
 ## Verdict
 
-**Near-tie — flow direction is not the carrier of causal information at this aggregation level.** True / reversed / symmetric land within 0.6% RMSE of each other across 816 predictions. So the apparent 'reversed wins' at daily resolution was low-power noise — **a dataset/power artifact, now resolved.** But the deeper finding is methodological: at the entity-aggregate hourly level it is the graph's *connectivity structure*, not edge *direction*, that carries the predictive signal. A3 should therefore be stated as a qualified claim (direction matters for specific collateral/composability channels, not custodial CEX flows — testable per §5.2.3), rather than a blanket directional assumption.
+**Near-tie — flow direction is not the carrier of causal information at this aggregation level.** True / reversed / symmetric land within 1.0% RMSE of each other across 816 predictions. So the apparent 'reversed wins' at daily resolution was low-power noise — **a dataset/power artifact, now resolved.** But the deeper finding is methodological: at the entity-aggregate hourly level it is the graph's *connectivity structure*, not edge *direction*, that carries the predictive signal. A3 should therefore be stated as a qualified claim (direction matters for specific collateral/composability channels, not custodial CEX flows — testable per §5.2.3), rather than a blanket directional assumption.
 
 ## Why this is the decisive test
 

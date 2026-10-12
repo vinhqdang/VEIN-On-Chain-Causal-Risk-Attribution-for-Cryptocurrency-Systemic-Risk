@@ -1,5 +1,6 @@
 {
-  "generated": "2026-06-30",
+  "generated": "2026-10-12",
+  "data_backend": "bigquery",
   "events": [
     {
       "event": "FTX_Nov2022",
@@ -7,50 +8,50 @@
       "n_entities": 11,
       "n_pre_days": 7,
       "n_event_days": 4,
-      "n_edges": 36,
+      "n_edges": 44,
       "oc_ranking": [
         {
-          "entity": "Binance",
-          "exported_risk": 1.9152927153016945
-        },
-        {
-          "entity": "Coinbase",
-          "exported_risk": 0.9712477064143116
-        },
-        {
-          "entity": "Crypto.com",
-          "exported_risk": 0.5480573751252529
-        },
-        {
-          "entity": "Bybit",
-          "exported_risk": 0.386304997326107
-        },
-        {
-          "entity": "Kraken",
-          "exported_risk": 0.21364944638216055
+          "entity": "retail",
+          "exported_risk": 1.5575017729364182
         },
         {
           "entity": "FTX",
-          "exported_risk": 0.20224695407355853
+          "exported_risk": 0.6172991341786009
+        },
+        {
+          "entity": "Binance",
+          "exported_risk": 0.241527852922633
+        },
+        {
+          "entity": "Coinbase",
+          "exported_risk": 0.1975804884107486
+        },
+        {
+          "entity": "Bybit",
+          "exported_risk": 0.15308666775653545
+        },
+        {
+          "entity": "OKX",
+          "exported_risk": 0.10365509090793568
         }
       ],
       "falsification": [
         {
           "model": "true_direction",
-          "rmse": 1.4552132151556616,
-          "corr": 0.17960129684723056,
+          "rmse": 1.7065011419137732,
+          "corr": 0.014610503667045723,
           "n": 44
         },
         {
           "model": "reversed_edges",
-          "rmse": 1.5431560215514042,
-          "corr": -0.04995217232823418,
+          "rmse": 1.4023875140470299,
+          "corr": 0.04546134314597929,
           "n": 44
         },
         {
           "model": "symmetric",
-          "rmse": 1.4764999049440237,
-          "corr": -0.05804894821990526,
+          "rmse": 1.8034293917978461,
+          "corr": -0.027653161505686513,
           "n": 44
         }
       ]
@@ -61,50 +62,50 @@
       "n_entities": 12,
       "n_pre_days": 9,
       "n_event_days": 4,
-      "n_edges": 32,
+      "n_edges": 45,
       "oc_ranking": [
         {
           "entity": "retail",
-          "exported_risk": 3.3378239794167444
-        },
-        {
-          "entity": "Bybit",
-          "exported_risk": 2.1915018922464995
-        },
-        {
-          "entity": "Binance",
-          "exported_risk": 2.145559830620302
+          "exported_risk": 1.7554137421087153
         },
         {
           "entity": "OKX",
-          "exported_risk": 1.376717432840851
+          "exported_risk": 0.997354666195672
         },
         {
-          "entity": "Bitfinex",
-          "exported_risk": 0.8837206667673576
+          "entity": "Kraken",
+          "exported_risk": 0.904665136647356
         },
         {
           "entity": "Coinbase",
-          "exported_risk": 0.840981650451318
+          "exported_risk": 0.8594055901411988
+        },
+        {
+          "entity": "Crypto.com",
+          "exported_risk": 0.7294656054410826
+        },
+        {
+          "entity": "Bybit",
+          "exported_risk": 0.6985597647609514
         }
       ],
       "falsification": [
         {
           "model": "true_direction",
-          "rmse": 1.5673994166125056,
-          "corr": 0.08131903663758293,
+          "rmse": 1.293586552350375,
+          "corr": 0.06654196479214401,
           "n": 48
         },
         {
           "model": "reversed_edges",
-          "rmse": 1.6103164960436966,
-          "corr": 0.09124272446587939,
+          "rmse": 1.2963959439103083,
+          "corr": 0.07021963202151976,
           "n": 48
         },
         {
           "model": "symmetric",
-          "rmse": 1.56446527706993,
-          "corr": 0.13678778740859246,
+          "rmse": 1.2844801306016755,
+          "corr": 0.07293728314419183,
           "n": 48
         }
       ]
