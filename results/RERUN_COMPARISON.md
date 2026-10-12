@@ -22,9 +22,17 @@ Flags: >25% change 7, MANUSCRIPT_STALE 6
 
 ## Entity set
 
-- Old: ['Aave', 'Binance', 'Bitfinex', 'Bitget', 'Bullish', 'Bybit', 'Ceffu', 'Coinbase', 'Copper', 'Crypto.com', 'Ethena', 'FalconX', 'HTX', 'Lido', 'MakerSky', 'OKX', 'retail']
-- New: ['Aave', 'Binance', 'Bitfinex', 'Bybit', 'Ceffu', 'Coinbase', 'Copper', 'Ethena', 'FalconX', 'HTX', 'Kraken', 'Lido', 'MakerSky', 'OKX', 'retail']
+**Daily run (`results.json: entity_types`)**
+- Old (17): ['Aave', 'Binance', 'Bitfinex', 'Bitget', 'Bullish', 'Bybit', 'Ceffu', 'Coinbase', 'Copper', 'Crypto.com', 'Ethena', 'FalconX', 'HTX', 'Lido', 'MakerSky', 'OKX', 'retail']
+- New (15): ['Aave', 'Binance', 'Bitfinex', 'Bybit', 'Ceffu', 'Coinbase', 'Copper', 'Ethena', 'FalconX', 'HTX', 'Kraken', 'Lido', 'MakerSky', 'OKX', 'retail']
 - Added: ['Kraken']; removed: ['Bitget', 'Bullish', 'Crypto.com']
+
+**Hourly run (`final_results.json: oc_covar_ranking`, the entities of the main hourly results)**
+- Old (17): ['Aave', 'Binance', 'Bitfinex', 'Bullish', 'Bybit', 'Ceffu', 'Coinbase', 'Copper', 'Crypto.com', 'Ethena', 'FalconX', 'Gate.io', 'HTX', 'Lido', 'MakerSky', 'OKX', 'retail']
+- New (15): ['Aave', 'Binance', 'Bitfinex', 'Bybit', 'Ceffu', 'Coinbase', 'Copper', 'Crypto.com', 'Ethena', 'HTX', 'Kraken', 'Lido', 'MakerSky', 'OKX', 'retail']
+- Added: ['Kraken']; removed: ['Bullish', 'FalconX', 'Gate.io']
+
+The daily and hourly runs select their top-k entities separately, so the new sets differ: only in daily ['FalconX']; only in hourly ['Crypto.com'].
 
 ## Coverage
 
@@ -44,27 +52,27 @@ Flags: >25% change 7, MANUSCRIPT_STALE 6
 | N_FIT_HOURS | 600 | 600 | 600 | yes |  | final_results.json ["n_fit_hours"] |
 | N_EVENT_HOURS | 48 | 48 | 48 | yes |  | final_results.json ["n_event_hours"] |
 | GRAPH_EDGES | 39 | 39 | 90 | no | >25% change; MANUSCRIPT_STALE | final_results.json ["graph_edges"] |
-| H3_SPEARMAN_DELTACOVAR | 0.52 | 0.5161 | 0.2571 | no | >25% change; MANUSCRIPT_STALE | final_results.json ["ranking_agreement", "spearman_oc_vs_deltacovar"] |
-| OC_RETAIL | - | 57.36 | 44.97 | - |  | final_results.json ["oc_covar_ranking", {"entity": "retail"}, "exported_risk"] |
-| OC_COINBASE | - | 17.35 | 26.37 | - | >25% change | final_results.json ["oc_covar_ranking", {"entity": "Coinbase"}, "exported_risk"] |
-| OC_BINANCE | - | 24.52 | 22.54 | - |  | final_results.json ["oc_covar_ranking", {"entity": "Binance"}, "exported_risk"] |
-| OC_BITFINEX | - | 11.42 | 25.73 | - | >25% change | final_results.json ["oc_covar_ranking", {"entity": "Bitfinex"}, "exported_risk"] |
-| OC_OKX | - | 4.817 | 19.05 | - | >25% change | final_results.json ["oc_covar_ranking", {"entity": "OKX"}, "exported_risk"] |
+| H3_SPEARMAN_DELTACOVAR | 0.52 | 0.5161 | 0.3714 | no | >25% change; MANUSCRIPT_STALE | final_results.json ["ranking_agreement", "spearman_oc_vs_deltacovar"] |
+| OC_RETAIL | - | 57.36 | 44.98 | - |  | final_results.json ["oc_covar_ranking", {"entity": "retail"}, "exported_risk"] |
+| OC_COINBASE | - | 17.35 | 26.08 | - | >25% change | final_results.json ["oc_covar_ranking", {"entity": "Coinbase"}, "exported_risk"] |
+| OC_BINANCE | - | 24.52 | 22.35 | - |  | final_results.json ["oc_covar_ranking", {"entity": "Binance"}, "exported_risk"] |
+| OC_BITFINEX | - | 11.42 | 26.2 | - | >25% change | final_results.json ["oc_covar_ranking", {"entity": "Bitfinex"}, "exported_risk"] |
+| OC_OKX | - | 4.817 | 19.51 | - | >25% change | final_results.json ["oc_covar_ranking", {"entity": "OKX"}, "exported_risk"] |
 | FALS_TRUE_DIRECTION_RMSE | 1.663 | 1.663 | 1.784 | no | MANUSCRIPT_STALE | final_results.json ["falsification", {"model": "true_direction"}, "rmse"] |
 | FALS_REVERSED_EDGES_RMSE | 1.675 | 1.675 | 1.787 | no | MANUSCRIPT_STALE | final_results.json ["falsification", {"model": "reversed_edges"}, "rmse"] |
 | FALS_SYMMETRIC_RMSE | 1.667 | 1.667 | 1.786 | no | MANUSCRIPT_STALE | final_results.json ["falsification", {"model": "symmetric"}, "rmse"] |
 | H1_RMSE_OBSERVED_ONCHAIN | - | 1.253 | 1.555 | - |  | final_results.json ["H1", "scores", {"model": "observed_onchain"}, "rmse"] |
 | H1_RMSE_ESTIMATED_GRANGER | - | 1.257 | 1.559 | - |  | final_results.json ["H1", "scores", {"model": "estimated_granger"}, "rmse"] |
 | H1_RMSE_ESTIMATED_PARTIAL_CORR | - | 1.255 | 1.56 | - |  | final_results.json ["H1", "scores", {"model": "estimated_partial_corr"}, "rmse"] |
-| H1_BOOT_GRANGER_CI_LO | - | - | -0.01501 | - |  | final_results.json ["H1", "bootstrap", "granger", "ci95", "lo"] |
-| H1_BOOT_GRANGER_CI_HI | - | - | -0.003862 | - |  | final_results.json ["H1", "bootstrap", "granger", "ci95", "hi"] |
+| H1_BOOT_GRANGER_CI_LO | - | - | -0.01288 | - |  | final_results.json ["H1", "bootstrap", "granger", "ci95", "lo"] |
+| H1_BOOT_GRANGER_CI_HI | - | - | 0.002118 | - |  | final_results.json ["H1", "bootstrap", "granger", "ci95", "hi"] |
 | PLACEBO_TIME_SHIFT_P | - | - | 0.009901 | - |  | final_results.json ["placebo", "time_shift", "p_value"] |
 | UNC_RANK_BINANCE_LO | - | - | 2 | - |  | uncertainty.json ["ranking", "by_entity", "Binance", "rank_ci95", "lo"] |
 | UNC_RANK_BINANCE_HI | - | - | 9 | - |  | uncertainty.json ["ranking", "by_entity", "Binance", "rank_ci95", "hi"] |
 | UNC_RANK_RETAIL_LO | - | - | 1 | - |  | uncertainty.json ["ranking", "by_entity", "retail", "rank_ci95", "lo"] |
-| UNC_RANK_RETAIL_HI | - | - | 4 | - |  | uncertainty.json ["ranking", "by_entity", "retail", "rank_ci95", "hi"] |
+| UNC_RANK_RETAIL_HI | - | - | 3 | - |  | uncertainty.json ["ranking", "by_entity", "retail", "rank_ci95", "hi"] |
 | UNC_CHANNEL_BINANCE_BYBIT_SHARE | - | 0.9813 | 0.06326 | - | >25% change | uncertainty.json ["attribution", "channels", {"i": "Binance", "j": "Bybit"}, "share"] |
-| UNC_CHANNEL_BINANCE_BYBIT_SHARE_LO | - | - | 0.03593 | - |  | uncertainty.json ["attribution", "channels", {"i": "Binance", "j": "Bybit"}, "share_ci95", "lo"] |
+| UNC_CHANNEL_BINANCE_BYBIT_SHARE_LO | - | - | 0.02704 | - |  | uncertainty.json ["attribution", "channels", {"i": "Binance", "j": "Bybit"}, "share_ci95", "lo"] |
 | REV_NAMED_BOTH_SIDES | - | 0.009363 | 0.02843 | - | >25% change | revision.json ["resolution_coverage", "frac_volume_named_both_sides"] |
 | MULTIEVENT_FTX_FIT_ROWS | - | - | 912 | - |  | multievent.json ["events", {"event": "FTX_Nov2022"}, "n_fit_rows"] |
 | COVERAGE_OCT25_NAMED_DISTINCT | - | - | 0.03009 | - |  | coverage.json ["oct25_hourly", "panel_tokens", "named_distinct_share_of_touching"] |

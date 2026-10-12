@@ -286,10 +286,10 @@
       },
       {
         "entity": "Aave",
-        "seed": 2,
+        "seed": 10,
         "open_wallet": 0,
         "open_deposit": 0,
-        "base_rows": 2
+        "base_rows": 10
       },
       {
         "entity": "Ethena",
@@ -307,14 +307,14 @@
       },
       {
         "entity": "MakerSky",
-        "seed": 1,
+        "seed": 6,
         "open_wallet": 0,
         "open_deposit": 0,
-        "base_rows": 1
+        "base_rows": 6
       }
     ],
-    "base_rows": 3471,
-    "base_fingerprint": "5d2705754343"
+    "base_rows": 3484,
+    "base_fingerprint": "9a306b377e0e"
   },
   "generated": "2026-10-12",
   "data_backend": "bigquery",

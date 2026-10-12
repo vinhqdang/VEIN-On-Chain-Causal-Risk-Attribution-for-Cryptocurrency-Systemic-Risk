@@ -18,10 +18,10 @@
     },
     "mean_werr_diff_granger_minus_observed": 0.010438634713998156,
     "boot_ci95_diff": [
-      -0.0019921434809247575,
-      0.04337884549768822
+      -0.016606353724447277,
+      0.03955394198269311
     ],
-    "prob_observed_better": 0.9585,
+    "prob_observed_better": 0.7655,
     "bootstrap": {
       "scheme": "paired_moving_block",
       "block_len": 8,
@@ -74,27 +74,27 @@
   "no_retail_ranking": [
     {
       "entity": "Binance",
-      "exported_risk": 17.944190954839204
+      "exported_risk": 17.665082132167434
     },
     {
       "entity": "Crypto.com",
-      "exported_risk": 15.571733327584202
+      "exported_risk": 14.807234436173896
     },
     {
       "entity": "Kraken",
-      "exported_risk": 14.926278724089599
+      "exported_risk": 14.327807209400873
     },
     {
       "entity": "Coinbase",
-      "exported_risk": 11.353741456625478
-    },
-    {
-      "entity": "OKX",
-      "exported_risk": 10.120574402647435
+      "exported_risk": 11.523932118077767
     },
     {
       "entity": "Bitfinex",
-      "exported_risk": 9.947846341468384
+      "exported_risk": 10.133196197203091
+    },
+    {
+      "entity": "OKX",
+      "exported_risk": 9.16649158276634
     }
   ],
   "resolution_coverage": {

@@ -6,7 +6,7 @@ _Real Ethereum data. Four validity checks + the H1 head-to-head vs a price-estim
 
 Same VEIN SCM machinery, different graph source. The causal precedents (Causal-NECO VaR, TV-DIG) *estimate* the graph from returns; VEIN *observes* it on-chain. Lower RMSE = better cascade prediction.
 
-Comparison nodes: Aave, MakerSky, Lido, Binance, Ethena, retail. Edge counts: {'granger': 20, 'partial_corr': 10, 'observed': 12}.
+Comparison nodes: Aave, Binance, MakerSky, Ethena, Lido, retail. Edge counts: {'granger': 20, 'partial_corr': 10, 'observed': 12}.
 
 | graph source | weighted RMSE | timing corr | n |
 |---|--:|--:|--:|
@@ -20,9 +20,9 @@ Comparison nodes: Aave, MakerSky, Lido, Binance, Ethena, retail. Edge counts: {'
 
 Documented transmitters {'Ethena', 'Binance'} should out-rank absorbers {'Aave', 'Lido'} in exported risk.
 
-- transmitter scores: {'Ethena': 0.07620891519551076, 'Binance': 0.0007235461888295269}
-- absorber scores: {'Aave': 5.9157610324705345, 'Lido': 6.1852968378292115}
-- separation (transmitters − absorbers): -6.012; pairwise concordance: 0.00
+- transmitter scores: {'Ethena': 0.04073836160752542, 'Binance': 0.0012728716529109008}
+- absorber scores: {'Aave': 6.456698135864283, 'Lido': 6.678017217259387}
+- separation (transmitters − absorbers): -6.546; pairwise concordance: 0.00
 
 ## 2. Placebo / negative controls
 
@@ -48,9 +48,11 @@ RV = share of residual variance a hidden confounder (e.g. Binance's off-chain pr
 
 ## 4. Resolution robustness (Tier-0 seed-only vs Tier-3 resolved)
 
-Spearman of exported-risk ranking across 6 common entities: **0.714** (p=0.111). High = ranking is not an artifact of the resolution tier.
+Spearman of exported-risk ranking across 6 common entities: **0.771** (p=0.072). High = ranking is not an artifact of the resolution tier.
 
 ## 5. Standard baselines (non-causal) vs OC-CoVaR
+
+Daily OC-CoVaR vs price-based measures over 6 entities (retail->ETH, Lido->stETH, Aave->AAVE, MakerSky->DAI, Ethena->ENA, Binance->BNB). The Spearman reported for the same comparison in `results.json` (H3) uses 5 entities and maps Ethena to USDe and omits MakerSky, so the two values are different comparisons.
 
 Rank agreement over ['retail', 'Lido', 'Aave', 'MakerSky', 'Ethena', 'Binance']: Spearman OC-CoVaR vs Δ-CoVaR = 0.60; vs MES = 0.14. Low agreement = VEIN surfaces a different systemic ordering than price-based measures (the H3 point).
 

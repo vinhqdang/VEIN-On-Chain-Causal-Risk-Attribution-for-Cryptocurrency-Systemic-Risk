@@ -3,8 +3,24 @@
   "source": "results/results.json",
   "T": 7,
   "n_entities": 15,
-  "spectral_radius": 0.5690881341992519,
+  "spectral_radius": 0.569088134199252,
   "bounds": [
+    {
+      "entity": "FalconX",
+      "stored_E": 0.0,
+      "B_plus_per_unit": 0.05758700643666749,
+      "implied_min_s_star": 0.0,
+      "infinite_horizon_multiplier": 0.014108423027691441,
+      "status": "bounded"
+    },
+    {
+      "entity": "Binance",
+      "stored_E": 0.0012728716529109008,
+      "B_plus_per_unit": 0.004612642902083227,
+      "implied_min_s_star": 0.2759527845383454,
+      "infinite_horizon_multiplier": 0.0009323236455148516,
+      "status": "bounded"
+    },
     {
       "entity": "HTX",
       "stored_E": 0.0,
@@ -22,51 +38,11 @@
       "status": "zero_predicted_zero_observed"
     },
     {
-      "entity": "FalconX",
-      "stored_E": 0.0,
-      "B_plus_per_unit": 0.05758700643666749,
-      "implied_min_s_star": 0.0,
-      "infinite_horizon_multiplier": 0.014108423027691443,
-      "status": "bounded"
-    },
-    {
       "entity": "Aave",
-      "stored_E": 5.9157610324705345,
+      "stored_E": 6.456698135864283,
       "B_plus_per_unit": 3.906200476829818,
-      "implied_min_s_star": 1.5144540244569398,
-      "infinite_horizon_multiplier": 0.6822313448493811,
-      "status": "bounded"
-    },
-    {
-      "entity": "Kraken",
-      "stored_E": 0.0,
-      "B_plus_per_unit": 0.0,
-      "implied_min_s_star": null,
-      "infinite_horizon_multiplier": 0.0,
-      "status": "zero_predicted_zero_observed"
-    },
-    {
-      "entity": "Lido",
-      "stored_E": 6.1852968378292115,
-      "B_plus_per_unit": 3.1510772779152907,
-      "implied_min_s_star": 1.9629149945574544,
-      "infinite_horizon_multiplier": 0.6746856084464151,
-      "status": "bounded"
-    },
-    {
-      "entity": "Ethena",
-      "stored_E": 0.07620891519551076,
-      "B_plus_per_unit": 0.24281541568561818,
-      "implied_min_s_star": 0.3138553414342571,
-      "infinite_horizon_multiplier": 0.04127757331794823,
-      "status": "bounded"
-    },
-    {
-      "entity": "MakerSky",
-      "stored_E": 1.2799188479461907,
-      "B_plus_per_unit": 1.7804804122408564,
-      "implied_min_s_star": 0.7188615157722096,
-      "infinite_horizon_multiplier": 0.37275473661284064,
+      "implied_min_s_star": 1.6529356785866736,
+      "infinite_horizon_multiplier": 0.682231344849381,
       "status": "bounded"
     },
     {
@@ -78,27 +54,43 @@
       "status": "zero_predicted_zero_observed"
     },
     {
-      "entity": "Ceffu",
-      "stored_E": 0.01613795501642601,
-      "B_plus_per_unit": 0.0369064070059011,
-      "implied_min_s_star": 0.4372670310021144,
-      "infinite_horizon_multiplier": 0.009053075286621123,
+      "entity": "Lido",
+      "stored_E": 6.678017217259387,
+      "B_plus_per_unit": 3.1510772779152907,
+      "implied_min_s_star": 2.11928068666011,
+      "infinite_horizon_multiplier": 0.6746856084464151,
       "status": "bounded"
     },
     {
-      "entity": "Binance",
-      "stored_E": 0.0007235461888295269,
-      "B_plus_per_unit": 0.004612642902083226,
-      "implied_min_s_star": 0.15686152259971153,
-      "infinite_horizon_multiplier": 0.0009323236455148516,
+      "entity": "Copper",
+      "stored_E": 0.001552319622459386,
+      "B_plus_per_unit": 0.3653053941656607,
+      "implied_min_s_star": 0.004249375035933446,
+      "infinite_horizon_multiplier": 0.060874691796470586,
       "status": "bounded"
+    },
+    {
+      "entity": "MakerSky",
+      "stored_E": 1.1611443466521738,
+      "B_plus_per_unit": 1.7804804122408564,
+      "implied_min_s_star": 0.6521522723132878,
+      "infinite_horizon_multiplier": 0.37275473661284064,
+      "status": "bounded"
+    },
+    {
+      "entity": "Kraken",
+      "stored_E": 0.0,
+      "B_plus_per_unit": 0.0,
+      "implied_min_s_star": null,
+      "infinite_horizon_multiplier": 0.0,
+      "status": "zero_predicted_zero_observed"
     },
     {
       "entity": "Bybit",
-      "stored_E": 0.024988606981924733,
+      "stored_E": 0.024047023302229853,
       "B_plus_per_unit": 0.03429686072696684,
-      "implied_min_s_star": 0.7285974999535967,
-      "infinite_horizon_multiplier": 0.006810941881109326,
+      "implied_min_s_star": 0.7011435680269776,
+      "infinite_horizon_multiplier": 0.006810941881109327,
       "status": "bounded"
     },
     {
@@ -110,18 +102,26 @@
       "status": "zero_predicted_zero_observed"
     },
     {
-      "entity": "Copper",
-      "stored_E": 0.0021050282149701616,
-      "B_plus_per_unit": 0.3653053941656607,
-      "implied_min_s_star": 0.005762379227325512,
-      "infinite_horizon_multiplier": 0.060874691796470586,
+      "entity": "Ceffu",
+      "stored_E": 0.019239495197723944,
+      "B_plus_per_unit": 0.0369064070059011,
+      "implied_min_s_star": 0.5213050187911186,
+      "infinite_horizon_multiplier": 0.009053075286621125,
+      "status": "bounded"
+    },
+    {
+      "entity": "Ethena",
+      "stored_E": 0.04073836160752542,
+      "B_plus_per_unit": 0.24281541568561818,
+      "implied_min_s_star": 0.16777502158376484,
+      "infinite_horizon_multiplier": 0.04127757331794823,
       "status": "bounded"
     },
     {
       "entity": "retail",
-      "stored_E": 7.92436309145152,
+      "stored_E": 8.283584111224032,
       "B_plus_per_unit": 4.41425186509807,
-      "implied_min_s_star": 1.795176925473297,
+      "implied_min_s_star": 1.876554479530134,
       "infinite_horizon_multiplier": 0.7367495765686658,
       "status": "bounded"
     }
@@ -166,20 +166,20 @@
         "p": 4,
         "phi_closed_form": {
           "HTX": 0.0,
-          "retail": 1.479254669716661,
-          "Ethena": 0.07932338710265023,
-          "Lido": -1.1451665016967851
+          "retail": 1.4446258643131973,
+          "Ethena": -0.08358621284953605,
+          "Lido": -0.2882391061684428
         },
         "phi_subsets": {
           "HTX": 0.0,
-          "retail": 1.4792546697166609,
-          "Ethena": 0.07932338710265027,
-          "Lido": -1.1451665016967856
+          "retail": 1.4446258643131968,
+          "Ethena": -0.08358621284953606,
+          "Lido": -0.2882391061684427
         },
         "max_abs_diff_closed_vs_subsets": 4.440892098500626e-16,
-        "efficiency_residual": 1.6653345369377348e-16,
+        "efficiency_residual": 0.0,
         "max_abs_diff_subsets_vs_permutations": 2.220446049250313e-16,
-        "hinge_max_abs_diff_vs_linear": 0.11838285738609011
+        "hinge_max_abs_diff_vs_linear": 0.009797948609346505
       },
       {
         "target": "Bybit",
@@ -193,25 +193,25 @@
         ],
         "p": 6,
         "phi_closed_form": {
-          "Binance": 4.9106166039467e-05,
+          "Binance": -0.0008808498600656849,
           "Coinbase": 0.0,
-          "Copper": 0.08557084472116493,
+          "Copper": 0.13579027400766225,
           "HTX": 0.0,
           "OKX": 0.0,
-          "retail": 0.11987465181299753
+          "retail": 0.11893489741568464
         },
         "phi_subsets": {
-          "Binance": 4.910616603947e-05,
+          "Binance": -0.0008808498600656723,
           "Coinbase": 0.0,
-          "Copper": 0.08557084472116488,
+          "Copper": 0.1357902740076623,
           "HTX": 0.0,
           "OKX": 0.0,
-          "retail": 0.11987465181299752
+          "retail": 0.11893489741568465
         },
-        "max_abs_diff_closed_vs_subsets": 4.163336342344337e-17,
-        "efficiency_residual": 2.7755575615628914e-17,
-        "max_abs_diff_subsets_vs_permutations": 4.718447854656915e-16,
-        "hinge_max_abs_diff_vs_linear": 0.06970330987690453
+        "max_abs_diff_closed_vs_subsets": 5.551115123125783e-17,
+        "efficiency_residual": 0.0,
+        "max_abs_diff_subsets_vs_permutations": 9.71445146547012e-16,
+        "hinge_max_abs_diff_vs_linear": 0.02861099379512011
       },
       {
         "target": "OKX",
@@ -253,8 +253,8 @@
       }
     ],
     "walk_vs_subsets_max": 4.440892098500626e-16,
-    "subsets_vs_permutations_max": 4.718447854656915e-16,
-    "efficiency_max": 1.6653345369377348e-16
+    "subsets_vs_permutations_max": 9.71445146547012e-16,
+    "efficiency_max": 0.0
   },
   "evaluation_counts": [
     {
@@ -317,26 +317,26 @@
     "target": "retail",
     "p": 13,
     "n_evaluations": 8192,
-    "seconds": 0.2350617609999972,
+    "seconds": 0.22306021900021733,
     "machine_dependent": true,
-    "closed_vs_subsets_max": 4.440892098500626e-15
+    "closed_vs_subsets_max": 3.3861802251067274e-15
   },
   "certified_radius": {
     "Lambda": {
+      "FalconX": 0.05758700643666748,
+      "Binance": 0.004612642902083226,
       "HTX": 0.0,
       "Bitfinex": 0.0,
-      "FalconX": 0.05758700643666749,
-      "Aave": 3.9062004768298184,
-      "Kraken": 0.0,
-      "Lido": 3.151077277915291,
-      "Ethena": 0.2428154156856182,
-      "MakerSky": 1.7804804122408562,
+      "Aave": 3.906200476829818,
       "Coinbase": 0.0,
-      "Ceffu": 0.03690640700590111,
-      "Binance": 0.004612642902083226,
+      "Lido": 3.151077277915291,
+      "Copper": 0.36530539416566066,
+      "MakerSky": 1.7804804122408562,
+      "Kraken": 0.0,
       "Bybit": 0.034296860726966846,
       "OKX": 0.0,
-      "Copper": 0.36530539416566066,
+      "Ceffu": 0.0369064070059011,
+      "Ethena": 0.2428154156856182,
       "retail": 4.414251865098069
     },
     "ranking": [
@@ -352,7 +352,7 @@
           "retail",
           "Aave"
         ],
-        "gap": 0.5080513882682505,
+        "gap": 0.5080513882682509,
         "eps_star": 0.047482805767256824,
         "at_least_one": false
       },
@@ -361,7 +361,7 @@
           "Aave",
           "Lido"
         ],
-        "gap": 0.7551231989145273,
+        "gap": 0.7551231989145268,
         "eps_star": 0.06430951208351164,
         "at_least_one": false
       },

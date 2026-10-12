@@ -146,7 +146,7 @@
       "oc_ranking": [
         {
           "entity": "FTX",
-          "exported_risk": 82.84447520724714,
+          "exported_risk": 83.71011097551022,
           "rank_point": 1,
           "rank_ci95": [
             1.0,
@@ -156,53 +156,53 @@
         },
         {
           "entity": "retail",
-          "exported_risk": 73.04840466088463,
+          "exported_risk": 74.04357137963736,
           "rank_point": 2,
           "rank_ci95": [
             1.0,
             3.0
           ],
-          "p_top3": 0.99
+          "p_top3": 0.985
         },
         {
           "entity": "Binance",
-          "exported_risk": 49.02049664895658,
+          "exported_risk": 50.12158781950477,
           "rank_point": 3,
           "rank_ci95": [
-            1.0,
+            2.0,
             6.0
           ],
-          "p_top3": 0.62
+          "p_top3": 0.635
         },
         {
           "entity": "KuCoin",
-          "exported_risk": 36.688948207101944,
+          "exported_risk": 37.89122978751912,
           "rank_point": 4,
           "rank_ci95": [
-            2.0,
-            7.0
+            3.0,
+            8.0
           ],
-          "p_top3": 0.24
+          "p_top3": 0.22
         },
         {
           "entity": "Coinbase",
-          "exported_risk": 32.11872601478604,
+          "exported_risk": 32.268915116233394,
           "rank_point": 5,
           "rank_ci95": [
             3.0,
             9.0
           ],
-          "p_top3": 0.11
+          "p_top3": 0.125
         },
         {
-          "entity": "OKX",
-          "exported_risk": 23.653041125439756,
+          "entity": "Kraken",
+          "exported_risk": 24.847471319959492,
           "rank_point": 6,
           "rank_ci95": [
-            5.0,
-            10.0
+            3.0,
+            9.0
           ],
-          "p_top3": 0.005
+          "p_top3": 0.03
         }
       ],
       "oc_ranking_settings": {
@@ -238,10 +238,13 @@
         "reversed_minus_true": {
           "mean_diff": -0.00047794499146597123,
           "ci95": [
-            -0.0029057209577383314,
-            0.001133297301171557
+            -0.0025237040511260824,
+            0.0013970641262107566
           ],
-          "prob_observed_better": 0.18,
+          "boot_mean": -0.0005323621946172599,
+          "ci_contains_mean": true,
+          "bootstrap": "circular_block",
+          "prob_observed_better": 0.316,
           "status": "inconclusive",
           "block_len": 24,
           "replicates": 500
@@ -249,10 +252,13 @@
         "symmetric_minus_true": {
           "mean_diff": -0.0006678567164020991,
           "ci95": [
-            -0.0038025049628381048,
-            0.0011762744129888418
+            -0.003697382287682629,
+            0.0021029015478725233
           ],
-          "prob_observed_better": 0.112,
+          "boot_mean": -0.000607856370197582,
+          "ci_contains_mean": true,
+          "bootstrap": "circular_block",
+          "prob_observed_better": 0.342,
           "status": "inconclusive",
           "block_len": 24,
           "replicates": 500
@@ -593,7 +599,7 @@
       "oc_ranking": [
         {
           "entity": "retail",
-          "exported_risk": 94.08259857671084,
+          "exported_risk": 97.25241268820946,
           "rank_point": 1,
           "rank_ci95": [
             1.0,
@@ -603,53 +609,53 @@
         },
         {
           "entity": "Binance",
-          "exported_risk": 58.97231273549602,
+          "exported_risk": 61.36143719905321,
           "rank_point": 2,
           "rank_ci95": [
             1.0,
             5.0
           ],
-          "p_top3": 0.875
+          "p_top3": 0.855
         },
         {
           "entity": "Coinbase",
-          "exported_risk": 47.44989939349538,
+          "exported_risk": 48.51482541600658,
           "rank_point": 3,
           "rank_ci95": [
             2.0,
-            8.0
+            7.0
           ],
-          "p_top3": 0.56
+          "p_top3": 0.525
         },
         {
           "entity": "OKX",
-          "exported_risk": 44.4004010916321,
+          "exported_risk": 45.75543116820575,
           "rank_point": 4,
           "rank_ci95": [
             2.0,
             7.0
           ],
-          "p_top3": 0.41
+          "p_top3": 0.405
         },
         {
           "entity": "Bybit",
-          "exported_risk": 34.68959743118185,
+          "exported_risk": 35.46210342126067,
           "rank_point": 5,
           "rank_ci95": [
-            3.0,
-            10.0
+            2.0,
+            11.0
           ],
-          "p_top3": 0.095
+          "p_top3": 0.12
         },
         {
           "entity": "KuCoin",
-          "exported_risk": 29.31974492019518,
+          "exported_risk": 30.39009314863004,
           "rank_point": 6,
           "rank_ci95": [
             3.0,
             10.0
           ],
-          "p_top3": 0.05
+          "p_top3": 0.08
         }
       ],
       "oc_ranking_settings": {
@@ -685,10 +691,13 @@
         "reversed_minus_true": {
           "mean_diff": 0.0032529380712853066,
           "ci95": [
-            -0.003004971481970547,
-            0.008456005413004465
+            -0.0025540231620579967,
+            0.01128757669398604
           ],
-          "prob_observed_better": 0.608,
+          "boot_mean": 0.003353360480628054,
+          "ci_contains_mean": true,
+          "bootstrap": "circular_block",
+          "prob_observed_better": 0.79,
           "status": "inconclusive",
           "block_len": 24,
           "replicates": 500
@@ -696,10 +705,13 @@
         "symmetric_minus_true": {
           "mean_diff": 0.0024048686078709824,
           "ci95": [
-            -0.0013664171628915568,
-            0.004820199220068894
+            -0.0011315880013569276,
+            0.006414281404159219
           ],
-          "prob_observed_better": 0.732,
+          "boot_mean": 0.0024520490773727536,
+          "ci_contains_mean": true,
+          "bootstrap": "circular_block",
+          "prob_observed_better": 0.89,
           "status": "inconclusive",
           "block_len": 24,
           "replicates": 500

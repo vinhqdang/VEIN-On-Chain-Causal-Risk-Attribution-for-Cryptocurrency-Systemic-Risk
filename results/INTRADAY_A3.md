@@ -14,10 +14,11 @@ true RMSE 1.802 (corr +0.081) vs reversed RMSE 1.804 (corr +0.064).
 
 ## Verdict
 
-**Near-tie — flow direction is not the carrier of causal information at this aggregation level.** True / reversed / symmetric land within 0.1% RMSE of each other across 720 predictions. So the apparent 'reversed wins' at daily resolution was low-power noise — **a dataset/power artifact, now resolved.** But the deeper finding is methodological: at the entity-aggregate hourly level it is the graph's *connectivity structure*, not edge *direction*, that carries the predictive signal. A3 should therefore be stated as a qualified claim (direction matters for specific collateral/composability channels, not custodial CEX flows — testable per §5.2.3), rather than a blanket directional assumption.
+**No direction effect detected**: the RMSE gap is within the tie threshold or the paired CI includes 0. This is a statement about these data and this test only; it does not identify why the daily result differed, and it does not show that connectivity rather than direction carries the signal. RMSE true 1.8022, reversed 1.8036, symmetric 1.8097 over 720 predictions; relative RMSE gap reversed vs true +0.08% (tie threshold 2%). Paired squared-error difference, reversed minus true +0.0066, 95% CI [-0.0035, +0.0166]; symmetric minus true +0.0127, 95% CI [+0.0003, +0.0250] (circular blocks of 24 h over 48 event hours).
 
 ## Why this is the decisive test
 
-- Daily test: ~6 points → no power to resolve propagation timing.
-- Hourly test: 48 event points + 216 fitting points → enough to detect lead/lag direction.
-- Same real on-chain data, finer time bucket — isolates whether the daily A3 failure was data (resolution) or method (direction assumption).
+## Design
+
+- Daily test: ~6 event points. Hourly test: 48 event hours x 15 entities = 720 cells, fitted on 216 pre-event hours.
+- Same on-chain data at a finer time bucket. The 48 event hours form two 24-hour blocks, so bootstrap intervals are indicative.

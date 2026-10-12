@@ -6,21 +6,21 @@
     "2026-06-30"
   ],
   "entity_types": {
+    "FalconX": "CEX",
+    "Binance": "CEX",
     "HTX": "CEX",
     "Bitfinex": "CEX",
-    "FalconX": "CEX",
     "Aave": "LENDING",
-    "Kraken": "CEX",
-    "Lido": "LST",
-    "Ethena": "STABLECOIN_ISSUER",
-    "MakerSky": "STABLECOIN_ISSUER",
     "Coinbase": "CEX",
-    "retail": "RETAIL",
-    "Ceffu": "CEX",
-    "Binance": "CEX",
+    "Lido": "LST",
+    "Copper": "CEX",
+    "MakerSky": "STABLECOIN_ISSUER",
+    "Kraken": "CEX",
     "Bybit": "CEX",
+    "retail": "RETAIL",
     "OKX": "CEX",
-    "Copper": "CEX"
+    "Ceffu": "CEX",
+    "Ethena": "STABLECOIN_ISSUER"
   },
   "entity_resolution_validation": {
     "ok": true,
@@ -547,23 +547,62 @@
   },
   "n_event_days": 7,
   "scm_residual_std": {
+    "FalconX": 0.03776000899573638,
+    "Binance": 0.7803296717066595,
     "HTX": 0.0,
     "Bitfinex": 0.0,
-    "FalconX": 0.03776000899573638,
     "Aave": 1.1111107971577592,
-    "Kraken": 0.0,
-    "Lido": 1.767874726428876,
-    "Ethena": 0.598587110682124,
-    "MakerSky": 0.6383727228817719,
     "Coinbase": 0.0,
-    "Ceffu": 0.7240231256324301,
-    "Binance": 0.7803296717066595,
+    "Lido": 1.767874726428876,
+    "Copper": 0.3786217668920054,
+    "MakerSky": 0.6383727228817719,
+    "Kraken": 0.0,
     "Bybit": 0.9511459463059717,
     "OKX": 0.0,
-    "Copper": 0.3786217668920054,
+    "Ceffu": 0.7240231256324301,
+    "Ethena": 0.598587110682124,
     "retail": 0.8379068754652388
   },
   "scm_coefficients": {
+    "FalconX": {
+      "parents": [
+        "Coinbase",
+        "retail"
+      ],
+      "w_stress": [
+        0.0,
+        -0.0027
+      ],
+      "w_flow": [
+        0.0,
+        0.327461
+      ],
+      "intercept": -0.0075
+    },
+    "Binance": {
+      "parents": [
+        "Bitfinex",
+        "Bybit",
+        "Copper",
+        "retail",
+        "Ethena"
+      ],
+      "w_stress": [
+        0.0,
+        0.0034,
+        0.0063,
+        -0.0043,
+        0.0386
+      ],
+      "w_flow": [
+        0.0,
+        0.033597,
+        0.0,
+        -0.086475,
+        0.0
+      ],
+      "intercept": 0.3286
+    },
     "HTX": {
       "parents": [
         "Aave",
@@ -597,21 +636,6 @@
       ],
       "intercept": 0.0
     },
-    "FalconX": {
-      "parents": [
-        "Coinbase",
-        "retail"
-      ],
-      "w_stress": [
-        0.0,
-        -0.0027
-      ],
-      "w_flow": [
-        0.0,
-        0.327461
-      ],
-      "intercept": -0.0075
-    },
     "Aave": {
       "parents": [
         "HTX",
@@ -632,54 +656,6 @@
         0.0
       ],
       "intercept": -0.2948
-    },
-    "Kraken": {
-      "parents": [
-        "Bitfinex",
-        "retail"
-      ],
-      "w_stress": [
-        0.0,
-        0.0
-      ],
-      "w_flow": [
-        0.0,
-        0.0
-      ],
-      "intercept": 0.0
-    },
-    "Lido": {
-      "parents": [],
-      "w_stress": [],
-      "w_flow": [],
-      "intercept": 0.2921
-    },
-    "Ethena": {
-      "parents": [
-        "retail",
-        "Binance"
-      ],
-      "w_stress": [
-        -0.1068,
-        -0.0011
-      ],
-      "w_flow": [
-        0.002779,
-        0.0
-      ],
-      "intercept": -0.0097
-    },
-    "MakerSky": {
-      "parents": [
-        "retail"
-      ],
-      "w_stress": [
-        0.118
-      ],
-      "w_flow": [
-        0.0
-      ],
-      "intercept": 0.0177
     },
     "Coinbase": {
       "parents": [
@@ -708,41 +684,50 @@
       ],
       "intercept": 0.0
     },
-    "Ceffu": {
+    "Lido": {
+      "parents": [],
+      "w_stress": [],
+      "w_flow": [],
+      "intercept": 0.2921
+    },
+    "Copper": {
       "parents": [
         "retail"
       ],
       "w_stress": [
-        0.0267
+        0.0283
       ],
       "w_flow": [
-        -0.127692
+        -0.127607
       ],
-      "intercept": 0.1298
+      "intercept": 0.0082
     },
-    "Binance": {
+    "MakerSky": {
+      "parents": [
+        "retail"
+      ],
+      "w_stress": [
+        0.118
+      ],
+      "w_flow": [
+        0.0
+      ],
+      "intercept": 0.0177
+    },
+    "Kraken": {
       "parents": [
         "Bitfinex",
-        "Bybit",
-        "Copper",
-        "retail",
-        "Ethena"
+        "retail"
       ],
       "w_stress": [
         0.0,
-        0.0034,
-        0.0063,
-        -0.0043,
-        0.0386
+        0.0
       ],
       "w_flow": [
         0.0,
-        0.033597,
-        0.0,
-        -0.086475,
         0.0
       ],
-      "intercept": 0.3286
+      "intercept": 0.0
     },
     "Bybit": {
       "parents": [
@@ -798,17 +783,32 @@
       ],
       "intercept": 0.0
     },
-    "Copper": {
+    "Ceffu": {
       "parents": [
         "retail"
       ],
       "w_stress": [
-        0.0283
+        0.0267
       ],
       "w_flow": [
-        -0.127607
+        -0.127692
       ],
-      "intercept": 0.0082
+      "intercept": 0.1298
+    },
+    "Ethena": {
+      "parents": [
+        "retail",
+        "Binance"
+      ],
+      "w_stress": [
+        -0.1068,
+        -0.0011
+      ],
+      "w_flow": [
+        0.002779,
+        0.0
+      ],
+      "intercept": -0.0097
     },
     "retail": {
       "parents": [
@@ -862,50 +862,42 @@
   "oc_covar_ranking": [
     {
       "entity": "retail",
-      "exported_risk": 7.92436309145152
+      "exported_risk": 8.283584111224032
     },
     {
       "entity": "Lido",
-      "exported_risk": 6.1852968378292115
+      "exported_risk": 6.678017217259387
     },
     {
       "entity": "Aave",
-      "exported_risk": 5.9157610324705345
+      "exported_risk": 6.456698135864283
     },
     {
       "entity": "MakerSky",
-      "exported_risk": 1.2799188479461907
+      "exported_risk": 1.1611443466521738
     },
     {
       "entity": "Ethena",
-      "exported_risk": 0.07620891519551076
+      "exported_risk": 0.04073836160752542
     },
     {
       "entity": "Bybit",
-      "exported_risk": 0.024988606981924733
+      "exported_risk": 0.024047023302229853
     },
     {
       "entity": "Ceffu",
-      "exported_risk": 0.01613795501642601
+      "exported_risk": 0.019239495197723944
     },
     {
       "entity": "Copper",
-      "exported_risk": 0.0021050282149701616
+      "exported_risk": 0.001552319622459386
     },
     {
       "entity": "Binance",
-      "exported_risk": 0.0007235461888295269
-    },
-    {
-      "entity": "Bitfinex",
-      "exported_risk": 0.0
+      "exported_risk": 0.0012728716529109008
     },
     {
       "entity": "FalconX",
-      "exported_risk": 0.0
-    },
-    {
-      "entity": "Kraken",
       "exported_risk": 0.0
     },
     {
@@ -914,6 +906,14 @@
     },
     {
       "entity": "Coinbase",
+      "exported_risk": 0.0
+    },
+    {
+      "entity": "Bitfinex",
+      "exported_risk": 0.0
+    },
+    {
+      "entity": "Kraken",
       "exported_risk": 0.0
     },
     {
@@ -977,7 +977,16 @@
       "Aave",
       "Ethena",
       "Binance"
-    ]
+    ],
+    "n_entities": 5,
+    "entity_asset_map": {
+      "retail": "ETH",
+      "Lido": "stETH",
+      "Aave": "AAVE",
+      "Ethena": "USDe",
+      "Binance": "BNB"
+    },
+    "comparison": "daily OC-CoVaR exported risk vs Delta-CoVaR; 5 entities, Ethena mapped to USDe, MakerSky not mapped. run_validation.py reports the same comparison on 6 entities (Ethena -> ENA, MakerSky -> DAI) in validation.json ranking_agreement"
   },
   "counterfactual_attribution": [
     {
@@ -1070,9 +1079,9 @@
     },
     {
       "i": "Ethena",
-      "j": "Kraken",
-      "L_observed": 5.498914337003604,
-      "L_counterfactual": 5.498914337003604,
+      "j": "Coinbase",
+      "L_observed": 0.6620823833208729,
+      "L_counterfactual": 0.6620823833208729,
       "attribution": 0.0,
       "attribution_share": 0.0
     },
@@ -1086,9 +1095,9 @@
     },
     {
       "i": "Ethena",
-      "j": "Coinbase",
-      "L_observed": 0.6620823833208729,
-      "L_counterfactual": 0.6620823833208729,
+      "j": "Kraken",
+      "L_observed": 5.498914337003604,
+      "L_counterfactual": 5.498914337003604,
       "attribution": 0.0,
       "attribution_share": 0.0
     },
@@ -1118,9 +1127,9 @@
     },
     {
       "i": "Binance",
-      "j": "Kraken",
-      "L_observed": 5.498914337003604,
-      "L_counterfactual": 5.498914337003604,
+      "j": "Coinbase",
+      "L_observed": 0.6620823833208729,
+      "L_counterfactual": 0.6620823833208729,
       "attribution": 0.0,
       "attribution_share": 0.0
     },
@@ -1134,9 +1143,9 @@
     },
     {
       "i": "Binance",
-      "j": "Coinbase",
-      "L_observed": 0.6620823833208729,
-      "L_counterfactual": 0.6620823833208729,
+      "j": "Kraken",
+      "L_observed": 5.498914337003604,
+      "L_counterfactual": 5.498914337003604,
       "attribution": 0.0,
       "attribution_share": 0.0
     },
@@ -1208,8 +1217,8 @@
   "falsification": [
     {
       "model": "true_direction",
-      "rmse": 2.520658108809394,
-      "corr": 0.0439978980637425,
+      "rmse": 2.5206581088093936,
+      "corr": 0.043997898063742526,
       "n": 105
     },
     {
@@ -1221,7 +1230,7 @@
     {
       "model": "symmetric",
       "rmse": 2.3073425184645298,
-      "corr": 0.1512443732890212,
+      "corr": 0.1512443732890213,
       "n": 105
     }
   ],

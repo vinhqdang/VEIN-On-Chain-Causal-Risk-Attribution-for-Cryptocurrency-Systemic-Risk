@@ -168,78 +168,78 @@
   "oc_covar_ranking": [
     {
       "entity": "retail",
-      "exported_risk": 44.96592236698115,
-      "mc_se": 0.4358439214126146
+      "exported_risk": 44.98379395411543,
+      "mc_se": 0.4353988730989617
     },
     {
       "entity": "MakerSky",
-      "exported_risk": 37.864038843363076,
-      "mc_se": 0.3368255743353048
-    },
-    {
-      "entity": "Coinbase",
-      "exported_risk": 26.373521060241696,
-      "mc_se": 0.30034999140687485
+      "exported_risk": 37.89148248816409,
+      "mc_se": 0.28826501725594145
     },
     {
       "entity": "Bitfinex",
-      "exported_risk": 25.726058796032067,
-      "mc_se": 0.2212284943866546
+      "exported_risk": 26.203413124626938,
+      "mc_se": 0.31977571518072406
+    },
+    {
+      "entity": "Coinbase",
+      "exported_risk": 26.076220342901394,
+      "mc_se": 0.2779110638044777
     },
     {
       "entity": "Kraken",
-      "exported_risk": 23.97296275627749,
-      "mc_se": 0.2781642012598648
+      "exported_risk": 24.80063894201746,
+      "mc_se": 0.28725679880145527
     },
     {
       "entity": "Crypto.com",
-      "exported_risk": 23.796380374207686,
-      "mc_se": 0.3599066227012824
+      "exported_risk": 23.918790721280253,
+      "mc_se": 0.3067245228967647
     },
     {
       "entity": "Binance",
-      "exported_risk": 22.540353489730776,
-      "mc_se": 0.28614773565870816
+      "exported_risk": 22.35147780837866,
+      "mc_se": 0.3019727523362605
     },
     {
       "entity": "OKX",
-      "exported_risk": 19.052968790208386,
-      "mc_se": 0.28224710119555324
+      "exported_risk": 19.514055750349147,
+      "mc_se": 0.2380200192743032
     },
     {
       "entity": "HTX",
-      "exported_risk": 13.467417146263516,
-      "mc_se": 0.22239647587420114
+      "exported_risk": 13.678111981577715,
+      "mc_se": 0.2514583174286522
     },
     {
       "entity": "Bybit",
-      "exported_risk": 13.107059370440663,
-      "mc_se": 0.15363622402174199
+      "exported_risk": 13.432975898869827,
+      "mc_se": 0.20471498332347726
     },
     {
       "entity": "Copper",
-      "exported_risk": 4.398229299341441,
-      "mc_se": 0.13043330169645279
-    },
-    {
-      "entity": "Lido",
-      "exported_risk": 3.3689448184051436,
-      "mc_se": 0.11085427350107818
+      "exported_risk": 4.5043080321848254,
+      "mc_se": 0.13367665408966037
     },
     {
       "entity": "Aave",
-      "exported_risk": 2.943500684026718,
-      "mc_se": 0.1130647285797381
+      "exported_risk": 3.384125660148676,
+      "mc_se": 0.11791477854455175
+    },
+    {
+      "entity": "Lido",
+      "exported_risk": 3.3662369630896034,
+      "mc_se": 0.125329158619328
     },
     {
       "entity": "Ethena",
-      "exported_risk": 0.6911852890967971,
-      "mc_se": 0.03026721496036912
+      "exported_risk": 0.6985202053321871,
+      "mc_se": 0.03723016871019606
     },
     {
       "entity": "Ceffu",
-      "exported_risk": 0.5602187513794874,
-      "mc_se": 0.017481711719140786
+      "exported_risk": 0.55351684418914,
+      "mc_se": 0.017835080916996877
     }
   ],
   "H1": {
@@ -282,43 +282,51 @@
       "granger": {
         "mean_diff": -0.0053235701142856605,
         "ci95": [
-          -0.015006493409505797,
-          -0.0038618331882729535
+          -0.01288327365722054,
+          0.0021175023287754806
         ],
-        "prob_observed_better": 0.0015,
-        "status": "estimated_better",
+        "boot_mean": -0.005313336319357535,
+        "ci_contains_mean": true,
+        "bootstrap": "circular_block",
+        "prob_observed_better": 0.0615,
+        "status": "inconclusive",
         "block_len": 24,
         "replicates": 2000,
         "ci95_weighted": [
-          0.012349234456027525,
-          0.03566559549494504
+          -0.013988129209845287,
+          0.03501423961937816
         ],
         "ci95_block8": [
-          -0.0219656868810355,
-          0.008864938060467812
+          -0.021692338221338744,
+          0.0071098149977421345
         ],
-        "status_weighted": "observed_better",
+        "mean_diff_weighted": 0.010438634713998156,
+        "status_weighted": "inconclusive",
         "status_block8": "inconclusive"
       },
       "partial_corr": {
         "mean_diff": -0.0030757437476104463,
         "ci95": [
-          -0.017675751502598796,
-          -0.005393343072862627
+          -0.015139953124568423,
+          0.009419561230080729
         ],
-        "prob_observed_better": 0.0,
-        "status": "estimated_better",
+        "boot_mean": -0.0030711515047325685,
+        "ci_contains_mean": true,
+        "bootstrap": "circular_block",
+        "prob_observed_better": 0.289,
+        "status": "inconclusive",
         "block_len": 24,
         "replicates": 2000,
         "ci95_weighted": [
-          -0.0029743861204471547,
-          0.015877461979326424
+          0.0002579141232892742,
+          0.02286764723276599
         ],
         "ci95_block8": [
-          -0.023322861644602108,
-          0.007584116516654035
+          -0.020914202355256987,
+          0.010104652357880382
         ],
-        "status_weighted": "inconclusive",
+        "mean_diff_weighted": 0.011369426382967111,
+        "status_weighted": "observed_better",
         "status_block8": "inconclusive"
       }
     },
@@ -326,86 +334,87 @@
   },
   "counterfactual_attribution": [
     {
-      "i": "Binance",
-      "j": "Bybit",
-      "L_observed": 21.6606555252785,
-      "L_counterfactual": 20.2903051390181,
-      "attribution": 1.3703503862604016,
-      "attribution_share": 0.06326449283407744
+      "i": "MakerSky",
+      "j": "retail",
+      "L_observed": 14.409020416406182,
+      "L_counterfactual": 12.223511648790902,
+      "attribution": 2.1855087676152802,
+      "attribution_share": 0.1516764293793941
+    },
+    {
+      "i": "Kraken",
+      "j": "retail",
+      "L_observed": 14.409020416406182,
+      "L_counterfactual": 12.486937967834407,
+      "attribution": 1.922082448571775,
+      "attribution_share": 0.13339438719812502
+    },
+    {
+      "i": "MakerSky",
+      "j": "Coinbase",
+      "L_observed": 12.306787089248218,
+      "L_counterfactual": 10.962436404269615,
+      "attribution": 1.3443506849786022,
+      "attribution_share": 0.1092365273917097
+    },
+    {
+      "i": "Coinbase",
+      "j": "retail",
+      "L_observed": 14.409020416406182,
+      "L_counterfactual": 12.926392132353687,
+      "attribution": 1.4826282840524954,
+      "attribution_share": 0.10289584171623266
+    },
+    {
+      "i": "retail",
+      "j": "Coinbase",
+      "L_observed": 12.306787089248218,
+      "L_counterfactual": 11.10620921558348,
+      "attribution": 1.200577873664738,
+      "attribution_share": 0.09755412724362629
+    },
+    {
+      "i": "Bitfinex",
+      "j": "retail",
+      "L_observed": 14.409020416406182,
+      "L_counterfactual": 13.100560457442118,
+      "attribution": 1.3084599589640646,
+      "attribution_share": 0.0908083909350455
+    },
+    {
+      "i": "retail",
+      "j": "OKX",
+      "L_observed": 10.640953832002971,
+      "L_counterfactual": 9.778931553955903,
+      "attribution": 0.8620222780470677,
+      "attribution_share": 0.0810098691956083
+    },
+    {
+      "i": "Crypto.com",
+      "j": "Binance",
+      "L_observed": 18.859787433477944,
+      "L_counterfactual": 17.502581790970893,
+      "attribution": 1.3572056425070507,
+      "attribution_share": 0.07196293422151087
+    },
+    {
+      "i": "Kraken",
+      "j": "Bitfinex",
+      "L_observed": 8.973083692124987,
+      "L_counterfactual": 8.361968698377668,
+      "attribution": 0.6111149937473197,
+      "attribution_share": 0.0681053486978674
     },
     {
       "i": "Binance",
       "j": "OKX",
-      "L_observed": 10.640953832002973,
-      "L_counterfactual": 9.923211747519321,
+      "L_observed": 10.640953832002971,
+      "L_counterfactual": 9.92321174751932,
       "attribution": 0.7177420844836515,
       "attribution_share": 0.06745091613169317
-    },
-    {
-      "i": "Binance",
-      "j": "Kraken",
-      "L_observed": 18.002366831555314,
-      "L_counterfactual": 17.531651335127012,
-      "attribution": 0.47071549642830135,
-      "attribution_share": 0.026147422771277563
-    },
-    {
-      "i": "Binance",
-      "j": "Crypto.com",
-      "L_observed": 14.854138877337384,
-      "L_counterfactual": 14.389001435473315,
-      "attribution": 0.46513744186406925,
-      "attribution_share": 0.031313659156217984
-    },
-    {
-      "i": "Binance",
-      "j": "Coinbase",
-      "L_observed": 12.306787089248218,
-      "L_counterfactual": 11.885886906489642,
-      "attribution": 0.4209001827585759,
-      "attribution_share": 0.034200655273080485
-    },
-    {
-      "i": "Binance",
-      "j": "retail",
-      "L_observed": 14.409020416406182,
-      "L_counterfactual": 14.075183780787267,
-      "attribution": 0.3338366356189155,
-      "attribution_share": 0.023168586480647044
-    },
-    {
-      "i": "Binance",
-      "j": "Ethena",
-      "L_observed": 13.556958557987254,
-      "L_counterfactual": 13.373739712689424,
-      "attribution": 0.18321884529783006,
-      "attribution_share": 0.013514745546661301
-    },
-    {
-      "i": "Ethena",
-      "j": "Binance",
-      "L_observed": 18.85978743347794,
-      "L_counterfactual": 18.78160059141001,
-      "attribution": 0.07818684206792881,
-      "attribution_share": 0.004145690525076631
-    },
-    {
-      "i": "Ethena",
-      "j": "Bybit",
-      "L_observed": 21.6606555252785,
-      "L_counterfactual": 21.61984515006904,
-      "attribution": 0.0408103752094604,
-      "attribution_share": 0.0018840784925384056
-    },
-    {
-      "i": "Binance",
-      "j": "Copper",
-      "L_observed": 9.821138248366552,
-      "L_counterfactual": 9.79229523341264,
-      "attribution": 0.02884301495391206,
-      "attribution_share": 0.002936830153949744
     }
   ],
+  "counterfactual_attribution_scope": "all 15 entities as sources, 210 ordered pairs with positive realised target loss, ranked by attribution share, top 10",
   "falsification": [
     {
       "model": "true_direction",
@@ -430,42 +439,48 @@
     "reversed_minus_true": {
       "mean_diff": 0.004161285453798228,
       "ci95": [
-        0.001631767483862639,
-        0.01035650533982202
+        -0.0005938033578442224,
+        0.00932511330282683
       ],
-      "prob_observed_better": 0.9995,
-      "status": "observed_better",
+      "boot_mean": 0.004169385083386977,
+      "ci_contains_mean": true,
+      "bootstrap": "circular_block",
+      "prob_observed_better": 0.951,
+      "status": "inconclusive",
       "block_len": 24,
       "replicates": 2000
     },
     "symmetric_minus_true": {
       "mean_diff": 0.0028904863035828644,
       "ci95": [
-        0.004254467823884556,
-        0.00793363676340853
+        -0.0015915857815731746,
+        0.007518067811424947
       ],
-      "prob_observed_better": 1.0,
-      "status": "observed_better",
+      "boot_mean": 0.0029163074873693605,
+      "ci_contains_mean": true,
+      "bootstrap": "circular_block",
+      "prob_observed_better": 0.803,
+      "status": "inconclusive",
       "block_len": 24,
       "replicates": 2000
     }
   },
   "external_validity": {
     "transmitter_scores": {
-      "Binance": 22.540353489730776,
-      "Ethena": 0.6911852890967971
+      "Ethena": 0.6985202053321871,
+      "Binance": 22.35147780837866
     },
     "absorber_scores": {
-      "Aave": 2.943500684026718,
-      "Lido": 3.3689448184051436
+      "Aave": 3.384125660148676,
+      "Lido": 3.3662369630896034
     },
-    "separation": 8.459546638197857,
+    "separation": 8.149817695236283,
     "pairwise_concordance": 0.5,
     "detail": {
-      "Binance": 22.540353489730776,
-      "Ethena": 0.6911852890967971,
-      "Aave": 2.943500684026718,
-      "Lido": 3.3689448184051436
+      "Ethena": 0.6985202053321871,
+      "Aave": 3.384125660148676,
+      "Binance": 22.35147780837866,
+      "Lido": 3.3662369630896034
     },
     "nondegenerate": true,
     "vacuous": false,
@@ -725,13 +740,13 @@
       "retail",
       "MakerSky",
       "Binance",
-      "Lido",
       "Aave",
+      "Lido",
       "Ethena"
     ],
     "n_common": 6,
-    "spearman": 0.6,
-    "p_value": 0.208
+    "spearman": 0.7142857142857143,
+    "p_value": 0.11078717201166179
   },
   "baselines": {
     "delta_covar": [
@@ -816,11 +831,11 @@
       "retail",
       "MakerSky",
       "Binance",
-      "Lido",
       "Aave",
+      "Lido",
       "Ethena"
     ],
-    "spearman_oc_vs_deltacovar": 0.2571428571428572
+    "spearman_oc_vs_deltacovar": 0.3714285714285715
   },
   "backtests": {
     "BTC": {

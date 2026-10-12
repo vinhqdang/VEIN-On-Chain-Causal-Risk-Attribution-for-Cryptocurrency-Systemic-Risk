@@ -11,6 +11,37 @@
   "n_entities": 15,
   "n_predictions": 720,
   "rmse_relative_gap_true_vs_reversed": 0.0007790080541443834,
+  "tie_threshold": 0.02,
+  "paired_bootstrap": {
+    "reversed_minus_true": {
+      "mean_diff": 0.006628567920352658,
+      "ci95": [
+        -0.0034628743797608347,
+        0.016610626525576377
+      ],
+      "boot_mean": 0.006655680706320797,
+      "ci_contains_mean": true,
+      "bootstrap": "circular_block",
+      "prob_observed_better": 0.8795,
+      "status": "inconclusive",
+      "block_len": 24,
+      "replicates": 2000
+    },
+    "symmetric_minus_true": {
+      "mean_diff": 0.012674677174688844,
+      "ci95": [
+        0.0003112373043262878,
+        0.024974050983159794
+      ],
+      "boot_mean": 0.012710144730630727,
+      "ci_contains_mean": true,
+      "bootstrap": "circular_block",
+      "prob_observed_better": 0.983,
+      "status": "observed_better",
+      "block_len": 24,
+      "replicates": 2000
+    }
+  },
   "falsification": [
     {
       "model": "true_direction",
@@ -31,5 +62,5 @@
       "n": 720
     }
   ],
-  "verdict": "TIE_DIRECTION_UNINFORMATIVE"
+  "verdict": "NO_DIFFERENCE_DETECTED"
 }

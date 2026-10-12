@@ -129,55 +129,55 @@
       "oc_ranking": [
         {
           "entity": "retail",
-          "exported_risk": 33.90104530506677
+          "exported_risk": 34.22818821573738
         },
         {
           "entity": "MakerSky",
-          "exported_risk": 32.67927143908224
-        },
-        {
-          "entity": "Coinbase",
-          "exported_risk": 25.219342966149206
+          "exported_risk": 32.788414021419925
         },
         {
           "entity": "Bitfinex",
-          "exported_risk": 25.195247728610088
+          "exported_risk": 25.06876872645324
+        },
+        {
+          "entity": "Coinbase",
+          "exported_risk": 24.902981222042882
         },
         {
           "entity": "Binance",
-          "exported_risk": 20.381246592769564
+          "exported_risk": 20.424492879622367
         },
         {
           "entity": "Kraken",
-          "exported_risk": 19.83254003378617
+          "exported_risk": 20.415628701166167
         },
         {
           "entity": "OKX",
-          "exported_risk": 13.88965397410474
+          "exported_risk": 14.273238383046934
         },
         {
           "entity": "Bybit",
-          "exported_risk": 13.056209260474873
+          "exported_risk": 13.515007692661321
         },
         {
           "entity": "HTX",
-          "exported_risk": 11.299356272763976
+          "exported_risk": 11.506730096871038
         },
         {
           "entity": "Copper",
-          "exported_risk": 5.63085448901861
+          "exported_risk": 5.7649911039710915
         },
         {
           "entity": "Lido",
-          "exported_risk": 3.3419008481467927
+          "exported_risk": 3.3309200882926113
         },
         {
           "entity": "Aave",
-          "exported_risk": 2.2520809108377655
+          "exported_risk": 2.4975819128766013
         },
         {
           "entity": "Ethena",
-          "exported_risk": 0.5415034048850096
+          "exported_risk": 0.6411576845919136
         }
       ],
       "H1_rmse": {
@@ -355,63 +355,63 @@
       "oc_ranking": [
         {
           "entity": "retail",
-          "exported_risk": 44.96592236698115
+          "exported_risk": 44.98379395411543
         },
         {
           "entity": "MakerSky",
-          "exported_risk": 37.864038843363076
-        },
-        {
-          "entity": "Coinbase",
-          "exported_risk": 26.373521060241696
+          "exported_risk": 37.89148248816409
         },
         {
           "entity": "Bitfinex",
-          "exported_risk": 25.726058796032067
+          "exported_risk": 26.203413124626938
+        },
+        {
+          "entity": "Coinbase",
+          "exported_risk": 26.076220342901394
         },
         {
           "entity": "Kraken",
-          "exported_risk": 23.97296275627749
+          "exported_risk": 24.80063894201746
         },
         {
           "entity": "Crypto.com",
-          "exported_risk": 23.796380374207686
+          "exported_risk": 23.918790721280253
         },
         {
           "entity": "Binance",
-          "exported_risk": 22.540353489730776
+          "exported_risk": 22.35147780837866
         },
         {
           "entity": "OKX",
-          "exported_risk": 19.052968790208386
+          "exported_risk": 19.514055750349147
         },
         {
           "entity": "HTX",
-          "exported_risk": 13.467417146263516
+          "exported_risk": 13.678111981577715
         },
         {
           "entity": "Bybit",
-          "exported_risk": 13.107059370440663
+          "exported_risk": 13.432975898869827
         },
         {
           "entity": "Copper",
-          "exported_risk": 4.398229299341441
-        },
-        {
-          "entity": "Lido",
-          "exported_risk": 3.3689448184051436
+          "exported_risk": 4.5043080321848254
         },
         {
           "entity": "Aave",
-          "exported_risk": 2.943500684026718
+          "exported_risk": 3.384125660148676
+        },
+        {
+          "entity": "Lido",
+          "exported_risk": 3.3662369630896034
         },
         {
           "entity": "Ethena",
-          "exported_risk": 0.6911852890967971
+          "exported_risk": 0.6985202053321871
         },
         {
           "entity": "Ceffu",
-          "exported_risk": 0.5602187513794874
+          "exported_risk": 0.55351684418914
         }
       ],
       "H1_rmse": {
@@ -613,75 +613,75 @@
       "oc_ranking": [
         {
           "entity": "retail",
-          "exported_risk": 61.6147619534283
+          "exported_risk": 61.097398770679675
         },
         {
           "entity": "MakerSky",
-          "exported_risk": 44.89157304515607
+          "exported_risk": 44.88059805072716
         },
         {
           "entity": "Bitfinex",
-          "exported_risk": 34.24827637261164
-        },
-        {
-          "entity": "Coinbase",
-          "exported_risk": 32.570158035764756
+          "exported_risk": 33.615895198214304
         },
         {
           "entity": "Kraken",
-          "exported_risk": 32.08139279588755
+          "exported_risk": 32.405111009656196
+        },
+        {
+          "entity": "Coinbase",
+          "exported_risk": 31.680497962897014
         },
         {
           "entity": "Crypto.com",
-          "exported_risk": 30.864930375537732
+          "exported_risk": 30.640695325341426
         },
         {
           "entity": "Binance",
-          "exported_risk": 30.16079690312746
+          "exported_risk": 29.675127278591802
         },
         {
           "entity": "OKX",
-          "exported_risk": 21.222976516656765
+          "exported_risk": 21.32091927181309
         },
         {
           "entity": "Bullish",
-          "exported_risk": 18.510575081250543
+          "exported_risk": 18.67149827763751
         },
         {
           "entity": "FalconX",
-          "exported_risk": 17.202664699593505
+          "exported_risk": 17.3532926297807
         },
         {
           "entity": "Bitget",
-          "exported_risk": 17.00357251137768
+          "exported_risk": 16.706930045999037
         },
         {
           "entity": "Bybit",
-          "exported_risk": 16.788778197928924
+          "exported_risk": 16.551242509685583
         },
         {
           "entity": "HTX",
-          "exported_risk": 14.39201384981099
+          "exported_risk": 14.323908298337091
         },
         {
           "entity": "Aave",
-          "exported_risk": 4.760928448089061
+          "exported_risk": 4.868075427404655
         },
         {
           "entity": "Copper",
-          "exported_risk": 4.211254799122628
+          "exported_risk": 4.235496549249808
         },
         {
           "entity": "Lido",
-          "exported_risk": 3.4720581500343606
+          "exported_risk": 3.4233158496583904
         },
         {
           "entity": "Ceffu",
-          "exported_risk": 0.7785331844584142
+          "exported_risk": 0.7591197943863719
         },
         {
           "entity": "Ethena",
-          "exported_risk": 0.625548834563256
+          "exported_risk": 0.5399602819446976
         }
       ],
       "H1_rmse": {
@@ -725,15 +725,15 @@
   },
   "vs_main": {
     "10": {
-      "spearman_common": 0.989010989010989,
+      "spearman_common": 0.9835164835164836,
       "n_common": 13,
       "top3_overlap": 3,
       "top5_overlap": 4
     },
     "15": {
-      "spearman_common": 0.9785714285714284,
+      "spearman_common": 0.9857142857142854,
       "n_common": 15,
-      "top3_overlap": 2,
+      "top3_overlap": 3,
       "top5_overlap": 5
     }
   }

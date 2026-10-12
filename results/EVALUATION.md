@@ -52,20 +52,20 @@ Exported tail risk = Σ_j ΔOC-CoVaR(j | do(S_i = distress)). Higher = more syst
 
 | rank | entity | exported risk |
 |--:|---|--:|
-| 1 | retail | 7.924 |
-| 2 | Lido | 6.185 |
-| 3 | Aave | 5.916 |
-| 4 | MakerSky | 1.280 |
-| 5 | Ethena | 0.076 |
-| 6 | Bybit | 0.025 |
-| 7 | Ceffu | 0.016 |
+| 1 | retail | 8.284 |
+| 2 | Lido | 6.678 |
+| 3 | Aave | 6.457 |
+| 4 | MakerSky | 1.161 |
+| 5 | Ethena | 0.041 |
+| 6 | Bybit | 0.024 |
+| 7 | Ceffu | 0.019 |
 | 8 | Copper | 0.002 |
 | 9 | Binance | 0.001 |
-| 10 | Bitfinex | 0.000 |
-| 11 | FalconX | 0.000 |
-| 12 | Kraken | 0.000 |
-| 13 | HTX | 0.000 |
-| 14 | Coinbase | 0.000 |
+| 10 | FalconX | 0.000 |
+| 11 | HTX | 0.000 |
+| 12 | Coinbase | 0.000 |
+| 13 | Bitfinex | 0.000 |
+| 14 | Kraken | 0.000 |
 | 15 | OKX | 0.000 |
 
 **H3 divergence vs Δ-CoVaR:** Spearman ρ = 0.700 (p = 0.188) across retail, Lido, Aave, Ethena, Binance. Low/negative ρ supports H3 (on-chain causal ranking diverges from price-correlation ranking).
@@ -101,7 +101,7 @@ Exported tail risk = Σ_j ΔOC-CoVaR(j | do(S_i = distress)). Higher = more syst
 | Binance | FalconX | 2.04 | 2.04 | 0.00 | 0.0% |
 | Ethena | HTX | 0.84 | 0.84 | 0.00 | 0.0% |
 | Ethena | Bitfinex | 1.71 | 1.71 | 0.00 | 0.0% |
-| Ethena | Kraken | 5.50 | 5.50 | 0.00 | 0.0% |
+| Ethena | Coinbase | 0.66 | 0.66 | 0.00 | 0.0% |
 
 ## 5. Edge-reversal falsification test (H2 / assumption A3)
 
