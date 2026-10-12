@@ -1,0 +1,5 @@
+[
+  {"address": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "nameTag": "Huobi 10", "label": "exchange", "chainId": 1},
+  {"address": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "nameTag": "Binance 8", "label": "exchange", "chainId": 56},
+  {"address": "0xcccccccccccccccccccccccccccccccccccccccc", "nameTag": "Gate.io 1", "label": "exchange", "chainId": "1"}
+]

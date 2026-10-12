@@ -92,7 +92,11 @@ def load_flows(start: dt.date, end: dt.date, eth_price: pd.Series | None = None,
     """Return daily directed inter-entity flows in approximate USD.
 
     Columns: day, from_entity, to_entity, usd_volume, n_tx.
+    Not available under the BigQuery backend: use entity_resolution.load_resolved_flows.
     """
+    if config.DATA_BACKEND == "bigquery":
+        raise NotImplementedError("og.load_flows is Dune-only; use "
+                                  "entity_resolution.load_resolved_flows under VEIN_BACKEND=bigquery")
     tokens = tokens or FLOW_TOKENS
     rows = run_sql(build_flow_sql(start, end, tokens), name="vein_flows")
     if not rows:

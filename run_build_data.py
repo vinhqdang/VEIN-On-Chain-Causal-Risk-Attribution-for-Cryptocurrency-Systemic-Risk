@@ -1,0 +1,655 @@
+#!/usr/bin/env python3
+"""Build the BigQuery data layer for VEIN (BQ_SPEC section 9).
+
+Stages, run in this order by --all (each stops the run on failure):
+
+  --check      auth, dataset, schema, freshness and dedupe checks on crypto_ethereum
+  --budget     dry-run every stage-1 chunk and gate the planned spend
+  --selftest   synthetic extract/labels round trip: SQL result == pandas mirror
+  --labels     clone the open label repos, discover formats, build the open label table
+               and results/DATA_BUILD.md (runs without BigQuery)
+  --extract K  materialize stage-1 extracts (K = key or 'all'); checks USDe vs Dune
+  --sweeps     Tier-0 sweep detection per extract, holdout validation, epoch label tables
+  --coverage   label coverage per extract -> results/coverage.json, results/COVERAGE.md
+
+Outputs: results/data_build.json (merged across stages), results/DATA_BUILD.md.
+Every query is dry-run and billed through vein.bq, which enforces the byte caps and
+writes data_cache/bq_ledger.json.
+"""
+from __future__ import annotations
+
+import argparse
+import contextlib
+import datetime as dt
+import hashlib
+import io
+import json
+import re
+import sys
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from vein import bq, bq_flows, bq_sql, config, labels as lb, sweeps as sw
+
+ROOT = Path(__file__).resolve().parent
+RESULTS = ROOT / "results"
+RESULTS.mkdir(exist_ok=True)
+DATA_BUILD_JSON = RESULTS / "data_build.json"
+DATA_BUILD_MD = RESULTS / "DATA_BUILD.md"
+COVERAGE_JSON = RESULTS / "coverage.json"
+COVERAGE_MD = RESULTS / "COVERAGE.md"
+PLANNED_CEILING_GIB = 700.0
+CORE_KEY = "core_daily"
+EXTRACT_ORDER = ["oct25_hourly", "ftx_hourly", "svb_hourly", "core_daily"]
+# Dune USDe daily transfer volume (USD bn) for Oct 8-13 2025, from the old pipeline.
+DUNE_USDE_BN = {"2025-10-08": 1.405, "2025-10-09": 0.745, "2025-10-10": 3.090,
+                "2025-10-11": 8.828, "2025-10-12": 1.328, "2025-10-13": 0.688}
+USDE_TOL = 0.02
+USDE_ADDR = config.TOKENS["USDe"]
+STOP = 3   # exit code for a failed check that needs a human decision
+
+
+class StageFailed(RuntimeError):
+    """A check failed; the run stops here."""
+
+
+def _log(msg: str) -> None:
+    print(msg, flush=True)
+
+
+def _load_json(path: Path) -> dict:
+    return json.loads(path.read_text()) if path.exists() else {}
+
+
+def update_data_build(**kv) -> None:
+    """Merge keys into results/data_build.json (other stages' keys are kept)."""
+    d = _load_json(DATA_BUILD_JSON)
+    d.update(kv)
+    d["generated"] = dt.date.today().isoformat()
+    d["data_backend"] = config.DATA_BACKEND
+    DATA_BUILD_JSON.write_text(json.dumps(d, indent=2, default=str))
+
+
+def _ledger_summary() -> dict:
+    led = bq.load_ledger()
+    entries = led.get("entries", [])
+    return {"cumulative_billed_gib": led.get("cumulative_billed_bytes", 0) / bq.GIB,
+            "by_month_gib": {m: v / bq.GIB for m, v in led.get("by_month", {}).items()},
+            "n_entries": len(entries),
+            "n_dry_runs": sum(1 for e in entries if e.get("kind") == "dry_run"),
+            "n_queries_billed": sum(1 for e in entries if e.get("kind") in ("query", "materialize")),
+            "n_cache_hits": sum(1 for e in entries if e.get("cache_hit"))}
+
+
+# ---------------------------------------------------------------------------
+# --check
+# ---------------------------------------------------------------------------
+def stage_check() -> dict:
+    client = bq.get_client()
+    bq.ensure_dataset(client)
+    src = config.BQ_SOURCE
+    proj, ds = src.split(".")[0], src.split(".")[1]
+    cols_sql = (f"SELECT table_name, column_name, data_type, is_partitioning_column, "
+                f"clustering_ordinal_position FROM `{proj}.{ds}.INFORMATION_SCHEMA.COLUMNS` "
+                f"WHERE table_name IN ('token_transfers','tokens','transactions')")
+    cols = pd.DataFrame(bq.run_sql(cols_sql, name="check_columns", refresh=True, client=client))
+    need = {"token_address": "STRING", "from_address": "STRING", "to_address": "STRING",
+            "value": "STRING", "block_timestamp": "TIMESTAMP"}
+    tt = cols[cols.table_name == "token_transfers"].set_index("column_name")
+    schema_ok = {c: (c in tt.index and tt.loc[c, "data_type"] == t) for c, t in need.items()}
+    if not all(schema_ok.values()):
+        raise StageFailed(f"token_transfers schema mismatch: {schema_ok}")
+    part = tt[tt.is_partitioning_column.astype(str).eq("YES")].index.tolist()
+    clus = tt[tt.clustering_ordinal_position.notna()].sort_values("clustering_ordinal_position").index.tolist()
+    if "block_timestamp" not in part:
+        raise StageFailed(f"block_timestamp is not the partitioning column (got {part})")
+    _log(f"  schema ok; partitioning={part} clustering={clus}")
+
+    fresh = bq.run_sql(f"SELECT MAX(block_timestamp) AS mx FROM `{src}.token_transfers` "
+                       f"WHERE block_timestamp >= TIMESTAMP('2026-06-25 00:00:00+00')",
+                       name="check_freshness", refresh=True, client=client)
+    mx = pd.Timestamp(fresh[0]["mx"]) if fresh and fresh[0]["mx"] else None
+    if mx is None or mx < pd.Timestamp("2026-06-30", tz="UTC"):
+        raise StageFailed(f"token_transfers stops at {mx}; need >= 2026-06-30 "
+                          f"(fallback goog_blockchain_ethereum_mainnet_us.logs is not implemented)")
+    _log(f"  freshness ok: MAX(block_timestamp) = {mx}")
+
+    dd = bq.run_sql(
+        f"SELECT COUNT(*) AS n, COUNT(DISTINCT CONCAT(transaction_hash, '-', CAST(log_index AS STRING))) AS nd, "
+        f"COUNTIF(token_address != LOWER(token_address)) AS upper_n "
+        f"FROM `{src}.token_transfers` WHERE token_address = '{USDE_ADDR}' "
+        f"AND block_timestamp >= TIMESTAMP('2025-10-10 00:00:00+00') "
+        f"AND block_timestamp < TIMESTAMP('2025-10-11 00:00:00+00')",
+        name="check_dedupe", refresh=True, client=client)[0]
+    if int(dd["n"]) != int(dd["nd"]) or int(dd["upper_n"]) != 0:
+        raise StageFailed(f"USDe 2025-10-10 dedupe/case check failed: {dd}")
+    _log(f"  dedupe ok: {dd['n']} USDe transfers on 2025-10-10, all unique, all lower-case")
+    check = {"schema_ok": True, "partitioning": part, "clustering": clus,
+             "freshness_max_block_timestamp": str(mx), "dedupe": {k: int(v) for k, v in dd.items()}}
+    update_data_build(checks=check)
+    return check
+
+
+# ---------------------------------------------------------------------------
+# --budget
+# ---------------------------------------------------------------------------
+def stage_budget() -> dict:
+    client = bq.get_client()
+    plan, total = {}, 0.0
+    for key in config.BQ_EXTRACTS:
+        spec = config.BQ_EXTRACTS[key]
+        rows = []
+        for cs, ce in bq_sql.chunks(spec["start"], spec["end"], spec["chunk_days"]):
+            gib = bq.dry_run_bytes(bq_sql.extract_sql(key, cs, ce), client) / bq.GIB
+            rows.append({"chunk": f"{cs}..{ce}", "gib": round(gib, 2)})
+            total += gib
+        plan[key] = {"chunks": rows, "gib": round(sum(r["gib"] for r in rows), 2)}
+        _log(f"  {key:14s} {plan[key]['gib']:8.2f} GiB over {len(rows)} chunks")
+    cum = bq.load_ledger().get("cumulative_billed_bytes", 0) / bq.GIB
+    headroom = PLANNED_CEILING_GIB - cum
+    _log(f"  planned total {total:.2f} GiB; ceiling {PLANNED_CEILING_GIB:.0f} - billed {cum:.2f} "
+         f"= {headroom:.2f} GiB")
+    update_data_build(budget={"plan": plan, "planned_gib": round(total, 2),
+                              "headroom_gib": round(headroom, 2)})
+    if total >= headroom:
+        raise StageFailed(f"planned {total:.1f} GiB >= headroom {headroom:.1f} GiB")
+    if plan[CORE_KEY]["gib"] > 400:
+        # Contingency from BQ_SPEC section 8: needs a decision, not an automatic change.
+        raise StageFailed(f"{CORE_KEY} estimate {plan[CORE_KEY]['gib']:.0f} GiB > 400: follow the "
+                          f"clustered-column check and FLOW_START contingency in BQ_SPEC section 8")
+    return plan
+
+
+# ---------------------------------------------------------------------------
+# --selftest
+# ---------------------------------------------------------------------------
+def _selftest_frames():
+    """Synthetic extract + labels. D1 is a deposit address (2 senders, all swept to Binance
+    within hours), D2 splits 50/50 between Binance and OKX, F forwards 30%, W is funded
+    by Binance hot itself, and K is a labelled address."""
+    h = lambda n: "0x" + f"{n:040x}"            # noqa: E731
+    B_HOT, O_HOT = h(0xB1), h(0x0C)
+    D1, D2, F, W, K, S1, S2, S3 = (h(x) for x in (0xD1, 0xD2, 0xF0, 0xE0, 0xC0, 0x51, 0x52, 0x53))
+    t0 = pd.Timestamp("2025-10-08 00:00:00", tz="UTC")
+    rows = []
+
+    def tr(hour, frm, to, usd):
+        rows.append({"bucket": t0 + pd.Timedelta(hours=hour), "token": "USDe",
+                     "from_a": frm, "to_a": to, "amount": float(usd), "n_tx": 1})
+    for hr, s_ in ((0, S1), (1, S2), (3, S3)):      # D1: 3 non-hot senders, 15k in
+        tr(hr, s_, D1, 5000)
+    tr(2, D1, B_HOT, 6000); tr(9, D1, B_HOT, 6000)  # 12k out, all to Binance (accepted)
+    tr(4, S1, D2, 4000); tr(5, D2, B_HOT, 2000); tr(6, D2, O_HOT, 2000)   # 50/50 (rejected)
+    tr(3, S2, F, 4000); tr(4, F, B_HOT, 1200); tr(5, F, S3, 2800)        # 30% (rejected)
+    tr(7, S3, W, 2000); tr(8, B_HOT, W, 1000)                             # hot-funded (rejected)
+    tr(10, S1, K, 2000); tr(10, K, B_HOT, 5000)     # K is labelled: never a candidate
+    x = pd.DataFrame(rows)
+    labels = pd.DataFrame([
+        {"address": B_HOT, "entity": "Binance", "src": "label", "etype": "CEX", "raw_name": "Binance Hot", "source": "selftest"},
+        {"address": O_HOT, "entity": "OKX", "src": "label", "etype": "CEX", "raw_name": "OKX Hot", "source": "selftest"},
+        {"address": K, "entity": "Binance", "src": "label", "etype": "CEX", "raw_name": "Binance Dep", "source": "selftest"},
+    ])
+    return x, labels
+
+
+def _x_schema():
+    return [("bucket", "TIMESTAMP"), ("token", "STRING"), ("from_a", "BYTES"),
+            ("to_a", "BYTES"), ("amount", "FLOAT64"), ("n_tx", "INT64")]
+
+
+def stage_selftest() -> dict:
+    client = bq.get_client()
+    x, labels = _selftest_frames()
+    fq_x = fq_l = None
+    try:
+        xb = x.copy()
+        fq_x = bq.upload_dataframe(
+            xb.assign(from_a=[bytes.fromhex(a[2:]) for a in xb.from_a],
+                      to_a=[bytes.fromhex(a[2:]) for a in xb.to_a]),
+            "selftest_x", _x_schema(), client)
+        fq_l = bq.upload_dataframe(lb.to_bq_frame(labels), "selftest_labels", lb.BQ_LABEL_SCHEMA, client)
+        fp = lb.label_fingerprint(labels)
+        usd = {"USDe": 1.0}
+        sql = bq_sql.sweep_sql([fq_x], fq_l, fp, ["selftest"], usd, config.SWEEP_PARAMS)
+        got = pd.DataFrame(bq.run_sql(sql, name="selftest_sweeps", refresh=True, client=client))
+        want = sw.detect_sweeps_frame(x, labels, usd, config.SWEEP_PARAMS)
+        _log(f"  sweeps: SQL {len(got)} rows, pandas mirror {len(want)} rows")
+        sql_addrs = set(got["address"]) if len(got) else set()
+        if sql_addrs != set(want.address):
+            raise StageFailed(f"sweep address sets differ: SQL={sorted(sql_addrs)} "
+                              f"pandas={sorted(want.address)}")
+        if len(want):
+            g = got.sort_values("address").reset_index(drop=True)
+            w = want.sort_values("address").reset_index(drop=True)
+            for c in sw.OUT_COLS[2:]:
+                if not np.allclose(g[c].astype(float), w[c].astype(float), rtol=1e-9, atol=1e-9):
+                    raise StageFailed(f"sweep column {c} differs between SQL and pandas")
+            if not (g.entity.values == w.entity.values).all():
+                raise StageFailed("sweep entities differ between SQL and pandas")
+
+        flow = bq_sql.flow_sql([fq_x], fq_l, fp, ["selftest"], "2025-10-08", "2025-10-09",
+                               ["USDe"], "hour")
+        fr = pd.DataFrame(bq.run_sql(flow, name="selftest_flows", refresh=True, client=client))
+        ref = _flow_reference(x, labels)
+        tot_sql = float(pd.to_numeric(fr["volume"]).sum()) if len(fr) else 0.0
+        tot_ref = float(ref["volume"].sum())
+        if not np.isclose(tot_sql, tot_ref, rtol=1e-9):
+            raise StageFailed(f"flow volume SQL {tot_sql} != reference {tot_ref}")
+        _log(f"  flows: SQL {len(fr)} rows, labelled volume {tot_sql:.1f} == reference")
+        if len(want) == 0:
+            raise StageFailed("selftest fixture produced no sweep detections; check the fixture")
+        result = {"sweeps_sql_rows": int(len(got)), "sweeps_pandas_rows": int(len(want)),
+                  "flow_rows": int(len(fr)), "flow_volume_sql": tot_sql, "passed": True}
+        update_data_build(selftest=result)
+        return result
+    finally:
+        for fq in (fq_x, fq_l):
+            if fq:
+                with contextlib.suppress(Exception):
+                    client.delete_table(fq, not_found_ok=True)
+
+
+def _flow_reference(x: pd.DataFrame, labels: pd.DataFrame) -> pd.DataFrame:
+    """Pandas version of flow_sql's labelled-volume sum (one-side-labelled rows)."""
+    ent = dict(zip(labels.address, labels.entity))
+    d = x.assign(fe=x.from_a.map(ent), te=x.to_a.map(ent))
+    d = d[d.fe.notna() | d.te.notna()]
+    return d.groupby(["bucket", "token"], as_index=False)["amount"].sum().rename(columns={"amount": "volume"})
+
+
+# ---------------------------------------------------------------------------
+# --labels (runs without BigQuery)
+# ---------------------------------------------------------------------------
+def stage_labels() -> dict:
+    revs = lb.clone_label_repos()
+    repo_dirs = [lb.CACHE_DIR / "labels_src" / name for name in config.LABEL_REPOS]
+    discover_out = {}
+    for rd in repo_dirs:
+        cap = io.StringIO()
+        with contextlib.redirect_stdout(cap):
+            lb.discover(rd)
+        full = cap.getvalue().rstrip()
+        (lb.CACHE_DIR / f"labels_discover_{rd.name}.txt").parent.mkdir(parents=True, exist_ok=True)
+        (lb.CACHE_DIR / f"labels_discover_{rd.name}.txt").write_text(full + "\n")
+        lines = full.splitlines()
+        used = [ln for ln in lines if not ln.endswith("parsed=0")]
+        discover_out[rd.name] = {"used": "\n".join(used),
+                                 "n_files": len(lines) - 1, "n_used": len(used) - 1 if used else 0}
+        _log(f"[discover] {rd.name}: {len(used) - 1} files with records of {len(lines) - 1} "
+             f"({lines[-1]})")
+
+    open_df, rep = lb.build_open_label_table(repo_dirs)
+    b14 = open_df[open_df.address == "0x28c6c06298d514db089934071355e5743bf21d60"]
+    b14_ok = bool(len(b14) == 1 and b14.entity.iloc[0] == "Binance")
+    _log(f"  known-good check: Binance 14 -> {b14.entity.tolist() or 'MISSING'}")
+    if not b14_ok:
+        raise StageFailed("Binance 14 is not mapped to Binance by the open label parser")
+    cache = lb.CACHE_DIR
+    cache.mkdir(parents=True, exist_ok=True)
+    open_df.to_csv(cache / "labels_open.csv.gz", index=False, compression="gzip")
+    open_df.to_csv(RESULTS / "labels_open.csv.gz", index=False, compression="gzip")
+
+    seed = lb.seed_label_table()
+    base = lb.merge_labels(seed, lb.wallet_labels(open_df))   # deposit labels excluded
+    base.to_csv(cache / "labels_base.csv.gz", index=False, compression="gzip")
+    fp = lb.label_fingerprint(base)
+
+    licences = {name: rep["licence"].get(name) for name in config.LABEL_REPOS}
+    summary = {"revisions": revs, "licences": licences, "discover": discover_out,
+               "open_addresses": int(len(open_df)), "open_per_root": rep["addresses_per_root"],
+               "open_per_root_wallet": rep["addresses_per_root_wallet"],
+               "open_per_root_deposit": rep["addresses_per_root_deposit"],
+               "conflicts": rep["conflicts"], "conflict_examples": rep["conflict_examples"],
+               "sources": {k: {kk: vv for kk, vv in v.items() if kk != "files"}
+                           | {"files_parsed": v["files"]} for k, v in rep["sources"].items()},
+               "unmapped_exchange_names": rep["unmapped_exchange_names"],
+               "base_rows": int(len(base)), "base_fingerprint": fp,
+               "binance14_ok": b14_ok}
+    (cache / "labels_report.json").write_text(json.dumps(summary, indent=2, default=str))
+    write_labels_md(summary)
+    update_data_build(labels={"revisions": revs, "licences": licences,
+                              "open_addresses": summary["open_addresses"],
+                              "open_per_root": summary["open_per_root"],
+                              "open_per_root_wallet": summary["open_per_root_wallet"],
+                              "open_per_root_deposit": summary["open_per_root_deposit"],
+                              "conflicts": summary["conflicts"], "base_rows": summary["base_rows"],
+                              "base_fingerprint": fp})
+    _log(f"  open labels: {summary['open_addresses']} addresses, {summary['conflicts']} conflicts; "
+         f"base {summary['base_rows']} rows, fingerprint {fp}")
+    return summary
+
+
+def write_labels_md(s: dict) -> None:
+    lines = ["# VEIN data build report", "",
+             "_Status: labels stage only; BigQuery stages pending credentials._", "",
+             "Generated by `run_build_data.py --labels`. The BigQuery stages (`--check`, `--budget`, "
+             "`--selftest`, `--extract`, `--sweeps`, `--coverage`) have not been run in this "
+             "environment: there are no GCP credentials here, so no query has been billed and no "
+             "extract, sweep or coverage number has been produced yet.", "",
+             "## Label sources", "",
+             "| repo | commit | licence | records read | Ethereum records mapped to an exchange | addresses |",
+             "|---|---|---|---|---|---|"]
+    for name in config.LABEL_REPOS:
+        src = s["sources"].get(name, {})
+        lines.append(f"| {name} | `{s['revisions'].get(name)}` | {s['licences'].get(name)} | "
+                     f"{src.get('records', 0)} | {src.get('mapped_records', 0)} | "
+                     f"{src.get('mapped_addresses', 0)} |")
+    lines += ["", "Record counts are per file. eth-labels ships each account list twice (CSV and JSON) "
+              "and etherscan-labels has per-category and combined copies, so the address column is the "
+              "one to read for coverage. Both repositories are MIT-licensed. The open label table is therefore also "
+              "published as `results/labels_open.csv.gz`, with the copyright notices retained in "
+              "the licence files of the source repositories (Dawson Botsford, 2022; Brian Lee "
+              "Cheow Teng, 2022).", "",
+              "## Discovery output (`python -m vein.labels --discover <repo>`)", ""]
+    for name, info in s["discover"].items():
+        groups: dict[str, list[str]] = {}
+        for ln in info["used"].splitlines():
+            if ": " not in ln or ln.startswith("TOTAL"):
+                continue
+            fname, rest = ln.split(": ", 1)
+            sig = re.sub(r"\s*(rows|parsed)=\S+", "", rest).strip()
+            groups.setdefault(sig, []).append(fname)
+        lines += [f"### {name}", "",
+                  f"{info['n_used']} of {info['n_files']} files gave Ethereum label records; "
+                  f"files with none are left out. Full per-file output: "
+                  f"`data_cache/labels_discover_{name}.txt`.", "",
+                  "| detected format and columns | files | example |", "|---|---|---|"]
+        for sig, files in sorted(groups.items(), key=lambda kv: -len(kv[1])):
+            lines.append(f"| `{sig.replace('|', '/')}` | {len(files)} | `{files[0]}` |")
+        lines.append("")
+    lines += ["## Open label table", "",
+              f"- Addresses with one exchange root: **{s['open_addresses']}**",
+              f"- Addresses dropped as conflicts (two different roots across sources): **{s['conflicts']}**",
+              f"- of which wallet-kind (hot, cold, funder): **{sum(s['open_per_root_wallet'].values())}**; "
+              f"deposit-kind (`Dep:` per-user addresses): **{sum(s['open_per_root_deposit'].values())}**",
+              f"- Seed + wallet-kind base table (`labels_base`): {s['base_rows']} rows, fingerprint `{s['base_fingerprint']}`",
+              f"- Binance 14 (`0x28c6c06298d514db089934071355e5743bf21d60`) mapped to Binance: **{s['binance14_ok']}**", "",
+              "### Addresses per exchange root", "",
+              "| root | addresses |", "|---|---|"]
+    for root, n in sorted(s["open_per_root"].items(), key=lambda kv: -kv[1]):
+        lines.append(f"| {root} | {n} |")
+    dep, wal = s["open_per_root_deposit"], s["open_per_root_wallet"]
+    lines += ["", "### Label kind: wallets versus deposit addresses (treatment decision)", "",
+              "The open repositories mix operational wallets with per-user deposit addresses "
+              "(`Binance Dep: 0x...`, `Bitget Dep: 0x...`). Deposit labels are almost all from two "
+              "exchanges: " + ", ".join(f"{k} {v}" for k, v in sorted(dep.items(), key=lambda kv: -kv[1])[:3])
+              + ". Used as entity labels they would make Bitget the best-resolved exchange by far "
+              "(it would capture most retail-to-exchange volume) for reasons unrelated to size, and "
+              "would bias graph centrality and every ranking. Treatment:", "",
+              "1. Only wallet-kind labels (plus the config seeds) enter the label tables: they are "
+              "the entity labels and the Tier-3 hot set H. Deposit-kind labels are not uploaded.",
+              "2. Deposit addresses are found uniformly for every exchange by Tier-0 sweep detection "
+              "(one rule, applied to every hot wallet).",
+              "3. The deposit-kind labels are kept in `results/labels_open.csv.gz` (column `kind`) as an "
+              "independent validation set for Tier-0 (`overlap_deposit_labels` in the sweeps "
+              "report), and as ground truth for the Tier-1/2 resolver validation "
+              "(`labels_edges`), which must be reported as deposit-dominated.", "",
+              "Limitation: Tier-0 can only find deposit addresses of exchanges that have hot-wallet "
+              "labels in H, so coverage still differs by exchange (wallet labels per root below).", "",
+              "| root | wallet labels | deposit labels |", "|---|---|---|"]
+    for root in sorted(set(wal) | set(dep), key=lambda r: -(wal.get(r, 0) + dep.get(r, 0)))[:15]:
+        lines.append(f"| {root} | {wal.get(root, 0)} | {dep.get(root, 0)} |")
+    lines += ["", "### Unmapped names with an 'exchange' category", ""]
+    if s["unmapped_exchange_names"]:
+        lines += ["Not mapped to a root. Most are DEX or protocol contracts (routers, exchange "
+                  "proxies, old Synthetix rate oracles), so no alias was added for them.", "",
+                  "| name | records |", "|---|---|"]
+        for name, n in s["unmapped_exchange_names"][:25]:
+            lines.append(f"| {name} | {n} |")
+    else:
+        lines.append("None: every name with an 'exchange' category maps to an exchange root or is excluded.")
+    lines += ["", "### Exclusions", "",
+              "- `vein.config.LABEL_EXCLUDE` (token, deployer, bridge, router, commerce, airdrop, "
+              "nft, governance, pool, vault, swap, exploit, phish, fake) on name and category.",
+              "- `vein.labels.NON_CEX_EXCLUDE` (charity, nonprofit, donate, industry recovery, AVS "
+              "operator, MEV, proposer fee recipient): Binance Charity and similar wallets are not "
+              "trading wallets.",
+              "- Token-contract files (`tokens/`, `tokens.csv`, `tokens.json`) and the duplicated "
+              "`combined/` folders. Non-Ethereum explorer folders (bscscan, polygonscan, arbiscan, "
+              "avalanche, ftmscan, optimism) are skipped by path because they have no chain field.", "",
+              "## Pending (needs credentials)", "",
+              "- `--check`: schema, partitioning and clustering of `token_transfers`, freshness "
+              "(`MAX(block_timestamp) >= 2026-06-30`), USDe 2025-10-10 dedupe.",
+              "- `--budget`, `--selftest`, `--extract all`, `--sweeps`, `--coverage`.", ""]
+    DATA_BUILD_MD.write_text("\n".join(lines))
+
+
+# ---------------------------------------------------------------------------
+# --extract
+# ---------------------------------------------------------------------------
+def stage_extract(which: str) -> dict:
+    keys = EXTRACT_ORDER if which == "all" else [which]
+    out = {}
+    client = bq.get_client()
+    bq.ensure_dataset(client)
+    for key in keys:
+        if key not in config.BQ_EXTRACTS:
+            raise ValueError(f"unknown extract {key!r}")
+        _log(f"  extracting {key} ...")
+        ids, hashes = bq_flows.ensure_extract(key)
+        out[key] = {"tables": ids, "sql_hashes": hashes}
+        if key == "oct25_hourly":
+            check_usde_against_dune()
+    return out
+
+
+def check_usde_against_dune() -> pd.DataFrame:
+    df = bq_flows.usde_daily_bq(dt.date(2025, 10, 8), dt.date(2025, 10, 14))
+    got = {d.strftime("%Y-%m-%d"): float(v) / 1e9 for d, v in zip(df["day"], df["usde"])}
+    rows, bad = [], []
+    for day, dune in DUNE_USDE_BN.items():
+        new = got.get(day)
+        rel = None if new is None else (new - dune) / dune
+        rows.append({"day": day, "dune_bn": dune, "bigquery_bn": new, "rel_diff": rel})
+        if new is None or abs(rel) > USDE_TOL:
+            bad.append(day)
+    _log("  USDe daily check (USD bn):")
+    for r in rows:
+        _log(f"    {r['day']} dune={r['dune_bn']:.3f} bigquery={r['bigquery_bn'] if r['bigquery_bn'] is None else round(r['bigquery_bn'], 3)} "
+             f"rel={None if r['rel_diff'] is None else round(r['rel_diff'] * 100, 2)}%")
+    update_data_build(usde_daily=[{"day": r["day"], "usde_bn": r["bigquery_bn"], "dune_bn": r["dune_bn"],
+                                   "rel_diff": r["rel_diff"]} for r in rows],
+                      usde_daily_check={"tolerance": USDE_TOL, "passed": not bad, "failed_days": bad})
+    if bad:
+        raise StageFailed(f"USDe differs from Dune by more than {USDE_TOL:.0%} on {bad}")
+    return df
+
+
+# ---------------------------------------------------------------------------
+# --sweeps
+# ---------------------------------------------------------------------------
+def _holdout_mask(addresses: pd.Series) -> pd.Series:
+    return addresses.map(lambda a: int(hashlib.sha1(a.encode()).hexdigest(), 16) % 10 < 3)
+
+
+def validate_tier0(key: str) -> dict:
+    """Hold out ~30% of open CEX labels, detect sweeps with the rest, and score the
+    detections against the held-out labels (BQ_SPEC section 6)."""
+    spec = config.BQ_EXTRACTS[key]
+    client = bq.get_client()
+    ids, hashes = bq_flows.ensure_extract(key)
+    open_df = bq_flows._open_labels()                      # wallet-kind labels only
+    hold = _holdout_mask(open_df.address)
+    train = open_df[~hold]
+    # Holdout = 30% of wallet labels plus every deposit-address label. The deposit labels
+    # are never in any label table, so they are an independent check that Tier-0 finds real
+    # deposit addresses (Binance and Bitget only: the other exchanges have none).
+    holdout = pd.concat([open_df[hold], bq_flows._open_labels(kind="deposit")], ignore_index=True)
+    seed = lb.seed_label_table()
+    t0 = lb.merge_labels(seed, train)
+    fq = bq.upload_dataframe(lb.to_bq_frame(t0), f"labels_t0val_{key}", lb.BQ_LABEL_SCHEMA, client)
+    fp = lb.label_fingerprint(t0)
+    usd = bq_flows.usd_per_unit(spec["tokens"], spec["start"], spec["end"])
+    senders = pd.DataFrame(bq.run_sql(bq_sql.sender_usd_sql(ids, hashes, usd, spec["start"], spec["end"]),
+                                      name=f"senders_{key}", client=client))
+    results = {}
+    for label, params in (("default", config.SWEEP_PARAMS),
+                          ("tightened", dict(config.SWEEP_PARAMS, tau=0.9, max_out_cp=2))):
+        sql = bq_sql.sweep_sql(ids, fq, fp, hashes, usd, params)
+        det = pd.DataFrame(bq.run_sql(sql, name=f"sweeps_t0val_{key}_{label}", client=client),
+                           columns=sw.OUT_COLS)
+        results[label] = _score(det, holdout, senders, params)
+    chosen = "default" if results["default"]["overlap"] >= 20 and results["default"]["precision"] >= 0.9 else "tightened"
+    out = {"key": key, "holdout_addresses": int(len(holdout)), "chosen": chosen,
+           "acceptance": "precision >= 0.9 on >= 20 overlapping holdout detections", **results}
+    return out
+
+
+def _score(det: pd.DataFrame, holdout: pd.DataFrame, senders: pd.DataFrame, params: dict) -> dict:
+    deposit_addrs = set(holdout.loc[holdout.get("kind", "wallet") == "deposit", "address"]) \
+        if "kind" in holdout.columns else set()
+    hmap = dict(zip(holdout.address, holdout.entity))
+    det = det.copy()
+    det["holdout_entity"] = det.address.map(hmap)
+    overlap = det[det.holdout_entity.notna()]
+    n_dep = int(overlap.address.isin(deposit_addrs).sum()) if deposit_addrs else 0
+    correct = overlap[overlap.holdout_entity == overlap.entity]
+    wrong = overlap[overlap.holdout_entity != overlap.entity]
+    prec = len(correct) / len(overlap) if len(overlap) else float("nan")
+    s = senders[senders.address.isin(set(holdout.address))].copy() if len(senders) else pd.DataFrame(columns=["address", "out_usd"])
+    s = s[s.out_usd >= 1000.0]
+    hit = s.address.isin(set(correct.address))
+    rec_count = float(hit.mean()) if len(s) else float("nan")
+    rec_vol = float(s.loc[hit, "out_usd"].sum() / s.out_usd.sum()) if len(s) and s.out_usd.sum() else float("nan")
+    per_ex = (det.groupby("entity").agg(detections=("address", "count"), swept_usd=("to_x_usd", "sum"))
+              .reset_index().to_dict(orient="records")) if len(det) else []
+    return {"params": params, "detections": int(len(det)), "overlap": int(len(overlap)),
+            "correct_root": int(len(correct)), "wrong_root": int(len(wrong)),
+            "overlap_deposit_labels": n_dep,
+            "precision": None if np.isnan(prec) else round(prec, 4),
+            "holdout_senders_ge_1k": int(len(s)),
+            "recall_count": None if np.isnan(rec_count) else round(rec_count, 4),
+            "recall_volume": None if np.isnan(rec_vol) else round(rec_vol, 4),
+            "per_exchange": per_ex}
+
+
+def stage_sweeps() -> dict:
+    out = {"per_extract": {}, "validation": {}, "epochs": {}}
+    for key in EXTRACT_ORDER:
+        _log(f"  sweeps for {key} ...")
+        det = bq_flows.detect_deposit_sweeps_bq(key)
+        out["per_extract"][key] = {"detections": int(len(det)),
+                                   "swept_usd": float(det.to_x_usd.sum()) if len(det) else 0.0,
+                                   "per_exchange": det.groupby("entity").size().to_dict() if len(det) else {}}
+        out["validation"][key] = validate_tier0(key)
+        v = out["validation"][key]
+        _log(f"    holdout precision {v['default']['precision']} on {v['default']['overlap']} overlaps; "
+             f"chosen params: {v['chosen']}")
+    for epoch in sorted({v["epoch"] for v in config.BQ_EXTRACTS.values()}):
+        fq, fp = bq_flows.ensure_labels(epoch, refresh=True)
+        out["epochs"][epoch] = {"table": fq, "fingerprint": fp}
+        _log(f"  label epoch {epoch}: {fq} ({fp})")
+    update_data_build(sweeps=out)
+    return out
+
+
+# ---------------------------------------------------------------------------
+# --coverage
+# ---------------------------------------------------------------------------
+def stage_coverage() -> dict:
+    res = {}
+    for key in EXTRACT_ORDER:
+        res[key] = bq_flows.coverage_bq(key)
+    COVERAGE_JSON.write_text(json.dumps(res, indent=2, default=str))
+    write_coverage_md(res)
+    update_data_build(coverage_summary={k: {"total_usd": v.get("total_usd"), "shares": v.get("shares")}
+                                        for k, v in res.items()},
+                      ledger=_ledger_summary(), extract_rows=_extract_markers())
+    return res
+
+
+def _extract_markers() -> dict:
+    out = {}
+    for p in sorted(bq.CACHE_DIR.glob("bq_mat_x_*.json")):
+        m = json.loads(p.read_text())
+        out[m["table"].split(".")[-1]] = {"rows": m.get("num_rows"), "bytes": m.get("num_bytes")}
+    return out
+
+
+def write_coverage_md(res: dict) -> None:
+    lines = ["# Label coverage of on-chain token flows", "",
+             "Shares are of total USD flow in each extract window. 'Both resolved' means both "
+             "endpoints carry a label (seed, open label or sweep). Mint and burn transfers are "
+             "reported separately.", "",
+             "Old-vs-new: the Dune pipeline resolved roughly 1% of the $438bn window flow between two "
+             "named entities (paper baseline). Compare the 'both resolved' row below.", "",
+             "| extract | window | total USD (bn) | both resolved | one side | neither | mint/burn |",
+             "|---|---|---|---|---|---|---|"]
+    for key, r in res.items():
+        sh = r.get("shares") or {}
+        lines.append(f"| {key} | {r.get('window', [None, None])[0]}..{r.get('window', [None, None])[1]} | "
+                     f"{r.get('total_usd', 0) / 1e9:.2f} | {sh.get('both_resolved', 0):.2%} | "
+                     f"{sh.get('one_side', 0):.2%} | {sh.get('neither', 0):.2%} | {sh.get('mint_burn', 0):.2%} |")
+    COVERAGE_MD.write_text("\n".join(lines) + "\n")
+
+
+# ---------------------------------------------------------------------------
+# driver
+# ---------------------------------------------------------------------------
+STAGES = ["check", "budget", "selftest", "labels", "extract", "sweeps", "coverage"]
+
+
+def run(stage: str, extract_key: str | None = None) -> None:
+    _log(f"== {stage}")
+    if stage == "check":
+        stage_check()
+    elif stage == "budget":
+        stage_budget()
+    elif stage == "selftest":
+        stage_selftest()
+    elif stage == "labels":
+        stage_labels()
+    elif stage == "extract":
+        stage_extract(extract_key or "all")
+    elif stage == "sweeps":
+        stage_sweeps()
+    elif stage == "coverage":
+        stage_coverage()
+    else:
+        raise ValueError(stage)
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--check", action="store_true")
+    ap.add_argument("--budget", action="store_true")
+    ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--labels", action="store_true")
+    ap.add_argument("--extract", metavar="KEY|all", nargs="?", const="all")
+    ap.add_argument("--sweeps", action="store_true")
+    ap.add_argument("--coverage", action="store_true")
+    ap.add_argument("--all", action="store_true", help="run every stage in order, stopping at a failure")
+    args = ap.parse_args(argv)
+
+    plan = []
+    if args.all:
+        plan = [("check", None), ("budget", None), ("selftest", None), ("labels", None),
+                ("extract", "all"), ("sweeps", None), ("coverage", None)]
+    else:
+        if args.check: plan.append(("check", None))
+        if args.budget: plan.append(("budget", None))
+        if args.selftest: plan.append(("selftest", None))
+        if args.labels: plan.append(("labels", None))
+        if args.extract is not None: plan.append(("extract", args.extract))
+        if args.sweeps: plan.append(("sweeps", None))
+        if args.coverage: plan.append(("coverage", None))
+    if not plan:
+        ap.print_help()
+        return 1
+    for stage, key in plan:
+        try:
+            run(stage, key)
+        except StageFailed as e:
+            _log(f"STOP at --{stage}: {e}")
+            return STOP
+        except RuntimeError as e:
+            _log(f"STOP at --{stage}: {e}")
+            return 2
+    _log("all requested stages passed")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

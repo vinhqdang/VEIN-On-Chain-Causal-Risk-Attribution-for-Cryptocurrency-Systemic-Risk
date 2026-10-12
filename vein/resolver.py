@@ -32,6 +32,9 @@ from .dune import run_sql
 def fetch_labeled_edges(token: str, start, end) -> pd.DataFrame:
     """Aggregated address->address edges for one token over a window, each side
     tagged with its Dune CEX label (ground truth) if known."""
+    if config.DATA_BACKEND == "bigquery":
+        from . import bq_flows
+        return bq_flows.fetch_labeled_edges_bq(token, start, end)
     addr = config.TOKENS[token]
     dec = {"USDe": 18, "sUSDe": 18, "USDC": 6, "USDT": 6}[token]
     sql = f"""

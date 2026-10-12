@@ -11,6 +11,7 @@ resolution. Unlabeled counterparties collapse into the aggregate
 from __future__ import annotations
 
 import datetime as dt
+import os
 
 # ---------------------------------------------------------------------------
 # Time windows (algorithm.md Section 3.4)
@@ -126,3 +127,62 @@ DOCUMENTED_EDGES = [
 ]
 
 ALL_ADDRESSES = {addr.lower(): name for name, e in ENTITIES.items() for addr in e["addresses"]}
+
+# ---------------------------------------------------------------------------
+# Data backend and BigQuery rebuild (BQ_SPEC sections 1-2).
+# VEIN_BACKEND=dune keeps the legacy Dune code path unchanged.
+# ---------------------------------------------------------------------------
+DATA_BACKEND = os.environ.get("VEIN_BACKEND", "bigquery")
+if DATA_BACKEND not in ("bigquery", "dune"):
+    raise ValueError(f"VEIN_BACKEND must be 'bigquery' or 'dune', got {DATA_BACKEND!r}")
+BQ_SOURCE = "bigquery-public-data.crypto_ethereum"
+BQ_DATASET = os.environ.get("VEIN_BQ_DATASET", "vein")
+BQ_LOCATION = "US"
+BQ_MAX_GIB_PER_QUERY = float(os.environ.get("VEIN_BQ_MAX_GIB_PER_QUERY", 150))
+BQ_HARD_CAP_GIB = float(os.environ.get("VEIN_BQ_HARD_CAP_GIB", 800))
+BQ_MONTHLY_CAP_GIB = float(os.environ.get("VEIN_BQ_MONTHLY_CAP_GIB", 950))
+BQ_STORAGE_CAP_GIB = 9.0
+TOKEN_DECIMALS = {"USDe": 18, "sUSDe": 18, "USDC": 6, "USDT": 6, "wBETH": 18, "WETH": 18}
+ETH_DENOMINATED = {"wBETH", "WETH"}    # converted with daily ETH price; others $1/unit (sUSDe at $1: documented approximation)
+BQ_EXTRACTS = {   # end exclusive
+  "core_daily":   {"start": dt.date(2025,1,1),  "end": dt.date(2026,6,30), "tokens": ["USDe","sUSDe","wBETH"], "bucket": "day",  "chunk_days": 110, "epoch": "e2025"},
+  "oct25_hourly": {"start": dt.date(2025,9,15), "end": dt.date(2025,10,25), "tokens": ["USDe","sUSDe","wBETH","USDC","USDT","WETH"], "bucket": "hour", "chunk_days": 40, "epoch": "e2025"},
+  "ftx_hourly":   {"start": dt.date(2022,11,1), "end": dt.date(2022,11,16), "tokens": ["USDC","USDT","WETH"], "bucket": "hour", "chunk_days": 15, "epoch": "eftx"},
+  "svb_hourly":   {"start": dt.date(2023,3,1),  "end": dt.date(2023,3,16),  "tokens": ["USDC","USDT","WETH"], "bucket": "hour", "chunk_days": 15, "epoch": "esvb"},
+}
+SWEEP_PARAMS = dict(tau=0.8, max_other_hot_share=0.05, max_out_cp=3, k_in=1, min_fwd=0.5,
+                    max_fwd=1.25, max_in_from_hot_share=0.5, min_timed_share=0.8,
+                    h_hours=24, min_sweep_usd=1000.0)
+LABEL_REPOS = {"eth-labels": "https://github.com/dawsbot/eth-labels.git",
+               "etherscan-labels": "https://github.com/brianleect/etherscan-labels.git"}
+EXCHANGE_ALIASES = [  # (root, regex on lower-cased whitespace-collapsed name). FIRST match wins.
+  ("Binance.US", r"^binance[\s.:]*us\b"), ("Binance", r"^binance\b"), ("Coinbase", r"^coinbase\b"),
+  ("OKX", r"^(okx|okex)\b"), ("Bybit", r"^bybit\b"), ("Bitfinex", r"^bitfinex\b"),
+  ("HTX", r"^(htx|huobi)\b"), ("Gate.io", r"^gate(\.io)?\b"), ("Crypto.com", r"^crypto\.com\b"),
+  ("Bitget", r"^bitget\b"), ("Bullish", r"^bullish\b"), ("Kraken", r"^kraken\b"),
+  ("KuCoin", r"^kucoin\b"), ("Gemini", r"^gemini\b"), ("Bitstamp", r"^bitstamp\b"),
+  ("MEXC", r"^mexc\b"), ("Upbit", r"^upbit\b"), ("Bithumb", r"^bithumb\b"),
+  ("Robinhood", r"^robinhood\b"), ("Poloniex", r"^poloniex\b"), ("FTX", r"^ftx(\.com)?\b"),
+  ("Deribit", r"^deribit\b"), ("BitMEX", r"^bitmex\b"), ("Bittrex", r"^bittrex\b"),
+  ("Bitvavo", r"^bitvavo\b"), ("Copper", r"^copper\b"), ("Ceffu", r"^ceffu\b"),
+  ("FalconX", r"^falcon\s*x\b"),
+  # Added after inspecting the open label repos (BQ_SPEC section 5): clear exchange
+  # roots with wallet labels in eth-labels / etherscan-labels.
+  ("AscendEX", r"^(ascendex|bitmax)\b"), ("BitMart", r"^bitmart\b"), ("CoinEx", r"^coinex\b"),
+  ("bitFlyer", r"^bitflyer\b"), ("Coincheck", r"^coincheck\b"), ("Bitkub", r"^bitkub\b"),
+  ("BigONE", r"^bigone\b"), ("Hotbit", r"^hotbit\b"), ("Indodax", r"^indodax\b"),
+  ("Paribu", r"^paribu\b"), ("BtcTurk", r"^btcturk\b"), ("HitBTC", r"^hitbtc\b"),
+  ("Coinone", r"^coinone\b"), ("Korbit", r"^korbit\b"), ("Bitbank", r"^bitbank\b"),
+  ("Coinsbit", r"^coinsbit\b"), ("BTSE", r"^btse\b"), ("DigiFinex", r"^digifinex\b"),
+  ("BloFin", r"^blofin\b"), ("Delta Exchange", r"^delta\s+exchange\b"),
+]
+LABEL_EXCLUDE = r"\b(token|deployer|bridge|router|commerce|airdrop|nft|governance|pool|vault|swap|exploit|phish|fake)\b"
+
+# Label "kind". The open label repos hold ~24k per-user deposit addresses ("Binance Dep:
+# 0x...", "Bitget Dep: 0x...") next to ~800 hot/cold/funder wallets. Deposit labels cover
+# only the exchanges whose scrapers were run (Bitget 19,027 and Binance 5,012 of 24,040), so
+# using them as entity labels would make Bitget the best-resolved exchange for reasons
+# unrelated to its size. Only wallet-kind labels feed the entity table and the Tier-3 hot
+# set H; deposit addresses are found uniformly for every exchange by Tier-0 sweep detection,
+# and the deposit labels serve as an independent validation set for that detector.
+DEPOSIT_LABEL_RE = r"\bdep:"

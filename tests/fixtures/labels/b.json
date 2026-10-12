@@ -1,0 +1,7 @@
+{
+  "0x28c6c06298d514db089934071355e5743bf21d60": {"name": "Binance 14", "labels": ["exchange"]},
+  "0x8888888888888888888888888888888888888888": {"name": "Coinbase 10", "labels": ["exchange", "coinbase"]},
+  "0x9999999999999999999999999999999999999999": {"name": "Kraken 2", "labels": ["kraken"]},
+  "0x7777777777777777777777777777777777777777": {"name": "Kraken 3", "labels": ["kraken"]},
+  "0x4444444444444444444444444444444444444444": {"name": "Binance: BUSD Token", "labels": ["token"]}
+}

@@ -223,7 +223,7 @@ secrets.env
 vein_secrets.env
 
 # VEIN data cache (regenerable, may be large / rate-limited)
-data_cache/
+data_cache/*
 
 # LaTeX build artifacts
 manuscript/*.aux
@@ -235,3 +235,6 @@ manuscript/*.blg
 
 # Springer template package (vendored extract, not needed in repo)
 manuscript/sntemplate/
+
+# BigQuery spend ledger is tracked so the budget cap survives a fresh checkout
+!data_cache/bq_ledger.json

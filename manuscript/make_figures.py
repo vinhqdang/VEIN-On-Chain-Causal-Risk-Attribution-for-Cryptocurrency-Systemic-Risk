@@ -27,12 +27,22 @@ def load(name):
 
 # --- Fig 1: USDe on-chain transfer volume around the cascade (real Dune data) --
 def fig_usde():
-    days = ["Oct 8", "Oct 9", "Oct 10", "Oct 11", "Oct 12", "Oct 13"]
-    vol = [1.405, 0.745, 3.090, 8.828, 1.328, 0.688]   # $B, erc20 USDe transfers
+    # Prefer the BigQuery rebuild (results/data_build.json, written by run_build_data.py).
+    # Without it, fall back to the Dune daily volumes the paper was first built from.
+    build = RES / "data_build.json"
+    if build.exists() and "usde_daily" in json.loads(build.read_text()):
+        rows = json.loads(build.read_text())["usde_daily"]
+        days = [f"Oct {int(r['day'][-2:])}" for r in rows]
+        vol = [r["usde_bn"] for r in rows]
+        source = "BigQuery crypto_ethereum"
+    else:
+        days = ["Oct 8", "Oct 9", "Oct 10", "Oct 11", "Oct 12", "Oct 13"]
+        vol = [1.405, 0.745, 3.090, 8.828, 1.328, 0.688]   # $B, erc20 USDe transfers (Dune, v1)
+        source = "Dune, decoded ERC-20"
     fig, ax = plt.subplots(figsize=(5.4, 3.0))
-    bars = ax.bar(days, vol, color=[GREY, GREY, RED, RED, GREY, GREY])
+    bars = ax.bar(days, vol, color=[GREY, GREY, RED, RED, GREY, GREY][:len(vol)])
     ax.set_ylabel("USDe on-chain transfer volume (USD bn)")
-    ax.set_title("Ethena USDe transfer volume, Oct 2025 (Dune, decoded ERC-20)")
+    ax.set_title(f"Ethena USDe transfer volume, Oct 2025 ({source})")
     for b, v in zip(bars, vol):
         ax.text(b.get_x() + b.get_width() / 2, v + 0.15, f"{v:.2f}", ha="center", fontsize=8)
     ax.set_ylim(0, 9.8)

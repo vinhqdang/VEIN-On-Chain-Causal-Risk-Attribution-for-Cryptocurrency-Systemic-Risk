@@ -27,10 +27,11 @@ from __future__ import annotations
 import pandas as pd
 
 from . import config
+from . import labels as labels_mod
 from .dune import run_sql
 
 # Resolution-confidence by source (Section 2.2 "per-node confidence score").
-CONF = {"seed": 1.0, "dune_cex": 0.9, "sweep": 0.8, "classifier": 0.6,
+CONF = {"seed": 1.0, "label": 0.9, "sweep": 0.8, "classifier": 0.6,
         "cluster": 0.5, "retail": 0.3}
 
 # Descriptor tokens stripped when collapsing sub-wallet labels to the exchange
@@ -44,12 +45,20 @@ _SEEDS = None  # lazily filled from config
 
 
 def normalize_entity(name: str) -> str:
-    """Collapse a Dune CEX sub-wallet label to its exchange-root entity."""
+    """Collapse a CEX sub-wallet label to its exchange-root entity.
+
+    The BigQuery path maps labels to roots before this point, so it only needs the
+    legacy token strip as a fallback. The Dune path keeps its original mapping only,
+    so that its outputs do not change."""
     global _SEEDS
     if _SEEDS is None:
         _SEEDS = set(config.ENTITIES)
     if name in _SEEDS or name == "retail":
         return name
+    if config.DATA_BACKEND == "bigquery":
+        root = labels_mod.normalize_exchange(name)
+        if root is not None:
+            return root
     tokens = name.split()
     root = []
     for tok in tokens:
@@ -129,6 +138,10 @@ def _decimals(tk: str) -> int:
 def load_resolved_flows(start, end, tokens, eth_price=None, bucket="day",
                         min_addr_volume: float = 5e6) -> pd.DataFrame:
     """Resolved inter-entity flows in approximate USD at the given time bucket."""
+    if config.DATA_BACKEND == "bigquery":
+        from . import bq_flows
+        return bq_flows.load_resolved_flows_bq(start, end, tokens, eth_price, bucket,
+                                               min_addr_volume)
     rows = run_sql(resolved_flow_sql(start, end, tokens, min_addr_volume, bucket),
                    name="vein_resolved_flows")
     if not rows:
@@ -175,13 +188,19 @@ def top_k_entities(flows: pd.DataFrame, k: int = 12) -> pd.DataFrame:
                   from_src=("from_src", "max"), to_src=("to_src", "max")))
 
 
-def detect_deposit_sweeps(hot_wallets: list[str], start, end,
-                          min_sweep_ratio: float = 0.8, limit: int = 500) -> pd.DataFrame:
+def detect_deposit_sweeps(hot_wallets: list[str] | None = None, start=None, end=None,
+                          min_sweep_ratio: float = 0.8, limit: int = 500,
+                          key: str = "oct25_hourly") -> pd.DataFrame:
     """Tier-0: addresses that forward >= min_sweep_ratio of inflow to a hot wallet.
 
     Returns candidate deposit addresses to attribute to the exchange owning the
     hot wallet. Scoped to ETH transfers in the window to bound the scan.
+    Under the BigQuery backend the scan is the sweep_sql over the named extract
+    (hot_wallets, start, end are unused there).
     """
+    if config.DATA_BACKEND == "bigquery":
+        from . import bq_flows
+        return bq_flows.detect_deposit_sweeps_bq(key)
     hw = ",\n        ".join(hot_wallets)
     sql = f"""
 WITH hot(addr) AS (VALUES {hw}),
