@@ -59,7 +59,7 @@ def _eth_lookup(eth_px: pd.Series, days) -> np.ndarray:
     s.index = idx.normalize()
     s = s[~s.index.duplicated(keep="last")].sort_index().astype(float)
     days = pd.DatetimeIndex(days)
-    filled = s.reindex(s.index.union(days)).ffill().bfill()
+    filled = s.reindex(s.index.union(days.unique())).ffill().bfill()
     return filled.reindex(days).to_numpy()
 
 

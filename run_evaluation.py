@@ -51,7 +51,7 @@ def jsonable(o):
 
 
 def main():
-    out = {"generated": "2026-06-30", "data_window": [str(FLOW_START), str(FLOW_END)]}
+    out = {"generated": dt.date.today().isoformat(), "data_backend": config.DATA_BACKEND, "data_window": [str(FLOW_START), str(FLOW_END)]}
 
     # ---- 1. market data + TVL (real, keyless) --------------------------------
     print("[1/8] Fetching market prices (CoinGecko) ...")

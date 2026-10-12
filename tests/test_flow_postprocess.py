@@ -114,3 +114,11 @@ def test_open_labels_default_is_wallet_only(monkeypatch, tmp_path):
     assert bq_flows._open_labels().address.tolist() == ["0x" + "b" * 40]
     assert bq_flows._open_labels(kind="deposit").address.tolist() == ["0x" + "a" * 40]
     assert len(bq_flows._open_labels(kind=None)) == 2
+
+
+def test_eth_lookup_handles_repeated_days():
+    import numpy as np
+    from vein.bq_flows import _eth_lookup
+    px = pd.Series([1000.0, 2000.0], index=pd.to_datetime(["2025-10-01", "2025-10-03"]))
+    days = pd.to_datetime(["2025-10-02", "2025-10-02", "2025-10-03", "2025-10-01"])
+    assert np.allclose(_eth_lookup(px, days), [1000.0, 1000.0, 2000.0, 1000.0])

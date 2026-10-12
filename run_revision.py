@@ -111,7 +111,7 @@ def masks(stress):
 
 
 def main():
-    out = {"generated": "2026-06-30"}
+    out = {"generated": dt.date.today().isoformat(), "data_backend": config.DATA_BACKEND}
     flows, prices, stress, graph = build()
     fit_mask, ev_mask = masks(stress)
     comp = [e for e in stress.columns if e in eg.ENTITY_ASSET]

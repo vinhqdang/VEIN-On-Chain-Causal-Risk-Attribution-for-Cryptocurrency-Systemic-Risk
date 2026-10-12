@@ -70,7 +70,7 @@ def build_hourly_stress(flows, entities, prices=None):
 
 
 def main():
-    out = {"generated": "2026-06-30", "resolution": "hourly",
+    out = {"generated": dt.date.today().isoformat(), "data_backend": config.DATA_BACKEND, "resolution": "hourly",
            "window": [str(WIN_START), str(WIN_END)]}
 
     print("[1] Hourly resolved on-chain flows (Dune) ...")

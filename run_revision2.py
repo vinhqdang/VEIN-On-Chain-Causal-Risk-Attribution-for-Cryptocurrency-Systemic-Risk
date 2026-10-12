@@ -10,6 +10,7 @@ final OC-CoVaR ranking (stability under coefficient perturbation).
 Writes results/revision2.json.
 """
 from __future__ import annotations
+import datetime as dt
 import json
 import numpy as np, pandas as pd
 from scipy.stats import spearmanr
@@ -57,7 +58,7 @@ def nonflow_stress(entities, prices, idx):
 
 
 def main():
-    out = {"generated": "2026-06-30"}
+    out = {"generated": dt.date.today().isoformat(), "data_backend": config.DATA_BACKEND}
     flows = er.load_resolved_flows(rb.WIN_START, rb.WIN_END, rb.TOKENS, bucket="hour", min_addr_volume=1e3)
     flows = er.top_k_entities(flows, k=12); flows["day"] = pd.to_datetime(flows["day"])
     prices = md.build_hourly_price_panel(config.MARKET_ASSETS, rb.WIN_START, rb.WIN_END)

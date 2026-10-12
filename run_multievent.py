@@ -88,7 +88,7 @@ def run_event(name, start, end, ev0, ev1, peg_id):
 
 
 def main():
-    out = {"generated": "2026-06-30", "events": []}
+    out = {"generated": dt.date.today().isoformat(), "data_backend": config.DATA_BACKEND, "events": []}
     for name, (s, e, e0, e1, peg) in EVENTS.items():
         print(f"[event] {name} ...", flush=True)
         try:

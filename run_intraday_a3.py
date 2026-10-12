@@ -98,7 +98,7 @@ def main():
         verdict_class = "A3_REFUTED_REVERSAL"
     else:
         verdict_class = "TIE_DIRECTION_UNINFORMATIVE"
-    out = {"generated": "2026-06-30", "resolution": "hourly",
+    out = {"generated": dt.date.today().isoformat(), "data_backend": config.DATA_BACKEND, "resolution": "hourly",
            "window": [str(WIN_START), str(WIN_END)],
            "event_hours": int(len(ev)), "fit_hours": int(len(est_stress)),
            "n_entities": len(entities), "n_predictions": int(rows["true_direction"]["n"]),

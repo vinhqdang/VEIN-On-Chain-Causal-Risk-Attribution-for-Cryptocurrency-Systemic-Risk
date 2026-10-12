@@ -22,6 +22,7 @@ This script closes that gap with two checks:
 Writes results/revision3.json.
 """
 from __future__ import annotations
+import datetime as dt
 import json
 import numpy as np
 import pandas as pd
@@ -56,7 +57,7 @@ def det_exported(scm, ev_days, init_stress, hi, zero):
 
 
 def main():
-    out = {"generated": "2026-06-30"}
+    out = {"generated": dt.date.today().isoformat(), "data_backend": config.DATA_BACKEND}
     print("[1] Rebuild the consolidated hourly pipeline (graph, stress, SCM) ...")
     flows = er.load_resolved_flows(rb.WIN_START, rb.WIN_END, rb.TOKENS, bucket="hour", min_addr_volume=1e3)
     flows = er.top_k_entities(flows, k=12)
