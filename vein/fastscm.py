@@ -30,6 +30,7 @@ class LinearSystem:
     Wf: np.ndarray       # (N, N): Wf[e, p] = coefficient of log1p(flow p -> e)
     b: np.ndarray        # (N,)  intercepts
     resid: np.ndarray    # (n_resid, N) fit-window residuals (rows aligned by position)
+    resid_all: np.ndarray | None = None   # bootstrap refits only: residuals of every original row
 
     @property
     def n(self) -> int:

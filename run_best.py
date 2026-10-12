@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import numpy as np
 from pathlib import Path
 
 import pandas as pd
@@ -131,16 +132,16 @@ def main():
     out["H1"]["H1_supported"] = bool(all(b["status"] == "observed_better" for b in boot.values()))
 
     print("[5] Counterfactual attribution (H4) ...")
-    attrs = []
-    for i in ["Ethena", "Binance"]:
-        if i not in scm.stress_cols:
-            continue
-        for j in scm.stress_cols:
-            if j != i:
-                attrs.append(risk.counterfactual_attribution(
-                    scm, i, j, ev, stress, init_stress, precrisis.get(i, 0.0),
-                    abduction=ABDUCTION))
-    out["counterfactual_attribution"] = sorted(attrs, key=lambda r: -r["attribution"])[:10]
+    # every ordered source -> target pair (not only Binance/Ethena sources), ranked by the share of
+    # the target's realised distress; the same object as uncertainty.json "attribution.channels"
+    S_obs_ev = stress.loc[ev, nodes].values.astype(float)
+    pre_vec = np.array([precrisis.get(e, 0.0) for e in nodes])
+    mat = fs.attribution_matrix(sys, C_ev, S_obs_ev, np.array(init_vec, dtype=float), pre_vec)
+    top, n_pairs = un.top_attribution_channels(nodes, mat, 10)
+    out["counterfactual_attribution"] = top
+    out["counterfactual_attribution_scope"] = (
+        f"all {len(nodes)} entities as sources, {n_pairs} ordered pairs with positive realised "
+        "target loss, ranked by attribution share, top 10")
 
     print("[6] Falsification (A3/H2) with paired intervals ...")
     out["falsification"] = fz.run_falsification(graph, est_stress, est_flows, stress, flows, ev).to_dict("records")
@@ -306,8 +307,9 @@ def write_report(out):
       "(lower = more divergent).")
     top = out["counterfactual_attribution"][0] if out["counterfactual_attribution"] else None
     if top:
-        A(f"- **H4** (counterfactual): top channel {top['i']}→{top['j']} = "
-          f"{top['attribution_share']*100:.1f}% of realized distress.")
+        A(f"- **H4** (counterfactual): top channel over all sources {top['i']}→{top['j']} = "
+          f"{top['attribution_share']*100:.1f}% of realized distress "
+          f"({out.get('counterfactual_attribution_scope', 'all sources')}).")
     tr, rv = fal["true_direction"]["rmse"], fal["reversed_edges"]["rmse"]
     fc = out["falsification_ci"]["reversed_minus_true"]
     A(f"- **A3/H2** (direction causal): true {tr:.3f} vs reversed {rv:.3f} RMSE "

@@ -51,19 +51,24 @@ def design(scm: StructuralCausalModel, stress: pd.DataFrame, flows: pd.DataFrame
 def refit(base: fs.LinearSystem, designs: dict, rows, alpha: float = 1.0) -> fs.LinearSystem:
     """Ridge refit of every equation on the design rows `rows` (with repetition allowed).
 
-    Residuals are y - yhat on all design rows in their original order."""
+    sys.resid is the residual pool of the replicate: y - yhat on the drawn rows, in draw order
+    (the fit-window residuals of the bootstrap world, built the same way as the point
+    estimate's pool: residuals of rows the equations were fitted on). Using the residuals of
+    all original rows instead would mix in rows the refit did not see (about 37% of them per
+    draw), which are larger, and inflate the replicate's shock variance and exported risk.
+    sys.resid_all keeps y - yhat on all original rows in their original order."""
     rows = np.asarray(rows)
     pos = {e: i for i, e in enumerate(base.nodes)}
     N = base.n
     A, Wf, b = np.zeros((N, N)), np.zeros((N, N)), np.zeros(N)
     n_rows = len(next(iter(designs.values()))[1])
-    resid = np.zeros((n_rows, N))
+    resid_all = np.zeros((n_rows, N))
     for e in base.nodes:
         X, y, par = designs[e]
         i = pos[e]
         if not par:
             b[i] = float(np.mean(y[rows]))
-            resid[:, i] = y - b[i]
+            resid_all[:, i] = y - b[i]
             continue
         m = Ridge(alpha=alpha, fit_intercept=True).fit(X[rows], y[rows])
         k = len(par)
@@ -71,8 +76,8 @@ def refit(base: fs.LinearSystem, designs: dict, rows, alpha: float = 1.0) -> fs.
             A[i, pos[p]] = m.coef_[q]
             Wf[i, pos[p]] = m.coef_[k + q]
         b[i] = float(m.intercept_)
-        resid[:, i] = y - m.predict(X)
-    return fs.LinearSystem(list(base.nodes), A, Wf, b, resid)
+        resid_all[:, i] = y - m.predict(X)
+    return fs.LinearSystem(list(base.nodes), A, Wf, b, resid_all[rows], resid_all)
 
 
 def bootstrap_systems(scm: StructuralCausalModel, stress_fit: pd.DataFrame,
@@ -178,24 +183,72 @@ def attribution_draws(scm, stress_fit, flows_fit, ev_days, S_obs, S_prev0, precr
     """Attribution matrices (n_boot, N, N) over the same kind of coefficient bootstrap.
     Abduction is redone with each replicate's coefficients."""
     ev_days = pd.DatetimeIndex(ev_days)
-    out = {"L_obs": [], "attr": [], "share": [], "r2": []}
+    out = {"L_obs": [], "attr": [], "share": [], "r2": [], "r2_own": []}
     for r, rows, sys_r, C_r in bootstrap_systems(scm, stress_fit, flows_fit, ev_days,
                                                  n_boot, seed, block_len, alpha):
         m = fs.attribution_matrix(sys_r, C_r, S_obs, S_prev0, precrisis)
         for k in ("L_obs", "attr", "share"):
             out[k].append(m[k])
-        out["r2"].append(r2_in_sample(sys_r, stress_fit))
+        rep = r2_replicates(sys_r, stress_fit, rows)
+        out["r2"].append(rep["orig"])
+        out["r2_own"].append(rep["own"])
     return {k: np.array(v) for k, v in out.items()}
 
 
 def r2_in_sample(sys: fs.LinearSystem, stress_fit: pd.DataFrame) -> dict:
-    """In-sample R^2 of each refitted equation over its design rows."""
+    """In-sample R^2 of each equation over its design rows (the point estimate).
+
+    For a bootstrap refit this uses sys.resid_all, i.e. the refit coefficients evaluated on the
+    ORIGINAL rows (see r2_replicates); for the full-sample fit sys.resid_all is None."""
     y = stress_fit[sys.nodes].values[1:]
+    res = sys.resid if sys.resid_all is None else sys.resid_all
     ss_tot = ((y - y.mean(axis=0)) ** 2).sum(axis=0)
-    ss_res = (sys.resid ** 2).sum(axis=0)
+    ss_res = (res ** 2).sum(axis=0)
     with np.errstate(divide="ignore", invalid="ignore"):
         r2 = 1 - ss_res / ss_tot
-    return {e: float(r2[i]) if np.isfinite(r2[i]) else float("nan") for i, e in enumerate(sys.nodes)}
+    return {e: _r2_clean(r2[i]) for i, e in enumerate(sys.nodes)}
+
+
+def _r2_clean(v) -> float:
+    """float(v), NaN for non-finite, and exactly 0 for float noise (an equation without parents
+    is an intercept: R^2 = 0 up to rounding)."""
+    v = float(v)
+    if not np.isfinite(v):
+        return float("nan")
+    return 0.0 if abs(v) < 1e-12 else v
+
+
+def r2_replicates(sys: fs.LinearSystem, stress_fit: pd.DataFrame, rows) -> dict:
+    """R^2 statistics of one bootstrap replicate.
+
+    own:  refit evaluated on its own resample (rows drawn, with repetition): the same statistic
+          as the in-sample point R^2 applied to the bootstrap world. Its percentile interval is
+          the bootstrap interval of the in-sample R^2.
+    orig: the refit evaluated on the original rows. It is below `own` on average (the optimism
+          of in-sample R^2) and is NOT an interval for the point estimate.
+    The mean of own - orig over replicates is the Efron-Tibshirani optimism of the in-sample R^2."""
+    rows = np.asarray(rows)
+    y = stress_fit[sys.nodes].values[1:]
+    yb = y[rows]
+    ss_tot_b = ((yb - yb.mean(axis=0)) ** 2).sum(axis=0)
+    ss_tot_o = ((y - y.mean(axis=0)) ** 2).sum(axis=0)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        own = 1 - (sys.resid ** 2).sum(axis=0) / ss_tot_b
+        orig = 1 - (sys.resid_all ** 2).sum(axis=0) / ss_tot_o
+    return {"own": {e: _r2_clean(own[i]) for i, e in enumerate(sys.nodes)},
+            "orig": {e: _r2_clean(orig[i]) for i, e in enumerate(sys.nodes)}}
+
+
+def top_attribution_channels(nodes, mat: dict, k: int = 10) -> list:
+    """Top-k ordered channels i -> j over ALL source entities (any i, any j != i with positive
+    realised target loss), ranked by attribution share of the target's realised loss."""
+    n = len(nodes)
+    pairs = [(i, j) for i in range(n) for j in range(n) if i != j and mat["L_obs"][i, j] > 1e-9]
+    pairs.sort(key=lambda p: -mat["share"][p])
+    return [{"i": nodes[i], "j": nodes[j], "L_observed": float(mat["L_obs"][i, j]),
+             "L_counterfactual": float(mat["L_obs"][i, j] - mat["attr"][i, j]),
+             "attribution": float(mat["attr"][i, j]), "attribution_share": float(mat["share"][i, j])}
+            for i, j in pairs[:k]], len(pairs)
 
 
 # ---------------------------------------------------------------- Shapley

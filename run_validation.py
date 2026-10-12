@@ -73,7 +73,7 @@ def main():
     res = json.loads((RESULTS / "results.json").read_text())
     oc_full = pd.DataFrame(res["oc_covar_ranking"])
 
-    out = {"generated": "2026-06-30"}
+    out = {"generated": dt.date.today().isoformat()}
 
     # ---- 1. external validity ----
     print("[1/6] External validity vs Oct-2025 narrative ...")
@@ -152,6 +152,11 @@ def main():
         dvs = [-dcv.set_index("asset").loc[a, "delta_covar"] for _, a in common]
         mvs = [-mes.set_index("asset").loc[a, "MES"] for _, a in common]
         out["ranking_agreement"] = {
+            "comparison": ("daily OC-CoVaR exported risk (results.json) vs price-based measures, entities "
+                           "mapped to proxy assets by estimated_graph.ENTITY_ASSET (Ethena -> ENA, "
+                           "MakerSky -> DAI included)"),
+            "entity_asset_map": {e: a for e, a in common},
+            "n_entities": len(common),
             "entities": [e for e, _ in common],
             "spearman_oc_vs_deltacovar": float(stats.spearmanr(ocs, dvs)[0]),
             "spearman_oc_vs_mes": float(stats.spearmanr(ocs, mvs)[0])}
@@ -231,6 +236,10 @@ def write_report(out: dict):
     A("## 5. Standard baselines (non-causal) vs OC-CoVaR\n")
     ra = out.get("ranking_agreement", {})
     if ra:
+        A(f"Daily OC-CoVaR vs price-based measures over {ra['n_entities']} entities "
+          f"({', '.join(f'{e}->{a}' for e, a in ra['entity_asset_map'].items())}). "
+          "The Spearman reported for the same comparison in `results.json` (H3) uses 5 entities and maps "
+          "Ethena to USDe and omits MakerSky, so the two values are different comparisons.\n")
         A(f"Rank agreement over {ra['entities']}: Spearman OC-CoVaR vs Δ-CoVaR = "
           f"{ra['spearman_oc_vs_deltacovar']:.2f}; vs MES = {ra['spearman_oc_vs_mes']:.2f}. "
           "Low agreement = VEIN surfaces a different systemic ordering than "

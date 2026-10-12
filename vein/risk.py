@@ -25,27 +25,39 @@ def loss_functional(series: np.ndarray) -> float:
     return float(np.sum(np.clip(series, 0, None)))
 
 
-def moving_block_indices(n: int, n_draw: int, block_len: int, rng) -> np.ndarray:
-    """Row indices for a moving-block bootstrap over n rows.
+def moving_block_indices(n: int, n_draw: int, block_len: int, rng,
+                         circular: bool = True) -> np.ndarray:
+    """Row indices for a block bootstrap over n rows.
 
-    Draws ceil(n_draw / L) block starts uniformly from the n - L + 1 admissible
-    positions, with L = min(block_len, n), and concatenates the contiguous runs
-    start, ..., start + L - 1, truncated to n_draw. Order is preserved inside
-    every block. block_len=1 is ordinary i.i.d. resampling of rows.
-    """
+    Draws ceil(n_draw / L) block starts and concatenates the contiguous runs
+    start, ..., start + L - 1, truncated to n_draw, with L = min(block_len, n). Order is
+    preserved inside every block. block_len=1 is ordinary i.i.d. resampling of rows.
+
+    circular=True (default, circular block bootstrap, Politis-Romano): starts are uniform on
+    the n positions and runs wrap around the end of the sample, so every row has the same
+    inclusion probability and the bootstrap mean is centred on the sample mean.
+    circular=False is the plain moving-block bootstrap (starts uniform on the n - L + 1
+    admissible positions, no wrap); it gives row t an inclusion weight proportional to
+    min(t + 1, L, n - t, n - L + 1), so rows within L of either end are under-weighted and
+    the bootstrap mean is biased towards the middle of the sample (large when n is only a
+    few blocks long). Kept for comparison."""
     if n <= 0:
         raise ValueError("need at least one row to resample")
     if block_len < 1:
         raise ValueError("block_len must be a positive integer")
     L = min(int(block_len), n)
     n_blocks = -(-n_draw // L)
-    starts = rng.integers(0, n - L + 1, size=n_blocks)
-    idx = (starts[:, None] + np.arange(L)[None, :]).ravel()
+    if circular:
+        starts = rng.integers(0, n, size=n_blocks)
+        idx = ((starts[:, None] + np.arange(L)[None, :]) % n).ravel()
+    else:
+        starts = rng.integers(0, n - L + 1, size=n_blocks)
+        idx = (starts[:, None] + np.arange(L)[None, :]).ravel()
     return idx[:n_draw]
 
 
 def paired_time_block_means(d: np.ndarray, tpos: np.ndarray, n_boot: int,
-                            block_len: int, rng) -> np.ndarray:
+                            block_len: int, rng, circular: bool = True) -> np.ndarray:
     """Moving-block bootstrap means of paired errors d, blocked over TIME.
 
     d holds one value per (entity, time) cell and tpos the time position of each
@@ -63,7 +75,7 @@ def paired_time_block_means(d: np.ndarray, tpos: np.ndarray, n_boot: int,
     T = len(starts)
     out = np.empty(n_boot)
     for b in range(n_boot):
-        idx = moving_block_indices(T, T, block_len, rng)
+        idx = moving_block_indices(T, T, block_len, rng, circular)
         out[b] = sums[idx].sum() / counts[idx].sum()
     return out
 

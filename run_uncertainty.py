@@ -8,7 +8,7 @@ pre-event hours and reports, with intervals:
   * the counterfactual attribution of the top channels and the named channels, and the
     Shapley split of the Bybit loss;
   * in-sample R^2 of each equation.
-Coefficient draws: 300 joint moving-block pairs bootstrap replicates of the fit-window rows
+Coefficient draws: 300 joint circular-block pairs bootstrap replicates of the fit-window rows
 (24 h blocks) with a ridge refit (alpha=1). s* is the fit-window 95th percentile, fixed.
 """
 from __future__ import annotations
@@ -117,12 +117,33 @@ def main():
         channels.append({"i": nodes[i], "j": nodes[j], "attribution": float(mat["attr"][i, j]),
                          "share": float(mat["share"][i, j]),
                          "attribution_ci95": ci(ad), "share_ci95": ci(sd),
-                         "p_positive": float(np.mean(ad > 0)), "selected_by": how})
+                         "p_positive": float(np.mean(ad > 0)), "selected_by": how,
+                         "share_boot_median": float(np.median(sd)),
+                         "share_ci_contains_point": bool(ci(sd)[0] <= mat["share"][i, j] <= ci(sd)[1])})
     max_point = float(max([mat["share"][p] for p in pairs] or [0.0]))
     max_rep = np.array([max([draws["share"][r][p] for p in pairs] or [0.0])
                         for r in range(N_BOOT)])
     r2_point = un.r2_in_sample(sys, stress_fit)
-    r2_draws = {e: [draws["r2"][r][e] for r in range(N_BOOT)] for e in nodes}
+    r2_orig = {e: [draws["r2"][r][e] for r in range(N_BOOT)] for e in nodes}
+    r2_own = {e: [draws["r2_own"][r][e] for r in range(N_BOOT)] for e in nodes}
+    r2_report = {}
+    for e in nodes:
+        own, orig = np.array(r2_own[e]), np.array(r2_orig[e])
+        optimism = float(np.nanmean(own - orig))
+        r2_report[e] = {
+            "point": r2_point[e],
+            # percentile interval of the in-sample R^2 statistic recomputed on each resample
+            "ci95": ci(own[np.isfinite(own)]),
+            "boot_mean_own": float(np.nanmean(own)),
+            "optimism": optimism,
+            "point_optimism_corrected": float(r2_point[e] - optimism),
+            # percentile interval of point - (own - orig) over replicates (Efron-Tibshirani optimism)
+            "optimism_corrected_ci95": ci(r2_point[e] - (own - orig)[np.isfinite(own - orig)]),
+            "point_in_ci95": bool(ci(own[np.isfinite(own)])[0] - 1e-9 <= r2_point[e]
+                                  <= ci(own[np.isfinite(own)])[1] + 1e-9),
+            # diagnostic only: refit coefficients scored on the original rows
+            "refit_on_original_rows_ci95": ci(orig[np.isfinite(orig)]),
+        }
 
     shap = None
     if SHAPLEY_TARGET in nodes:
@@ -144,7 +165,7 @@ def main():
         "settings": {"n_boot": N_BOOT, "n_sims": N_SIMS, "n_sims_point": N_SIMS_POINT,
                      "block_len": BLOCK_LEN, "block_unit": "hours", "q": Q,
                      "seed_boot": SEED_BOOT, "seed_attr": SEED_ATTR, "seed_point": SEED_POINT,
-                     "coefficients": "joint moving-block pairs bootstrap of fit-window rows, ridge refit alpha=1",
+                     "coefficients": "joint circular-block pairs bootstrap of fit-window rows, ridge refit alpha=1; replicate shock pool = residuals of the drawn rows",
                      "s_star": f"fixed: fit-window {S_STAR_Q} quantile",
                      "event_window": [str(ev[0]), str(ev[-1])],
                      "fit_window": [str(est[0]), str(est[-1])], "n_fit_rows": int(len(est))},
@@ -153,7 +174,15 @@ def main():
             "channels": channels,
             "note": "top10 selected on point estimate; CIs not selection-adjusted",
             "max_share": {"point": max_point, "ci95": ci(max_rep)},
-            "r2_in_sample": {e: {"point": r2_point[e], "ci95": ci(r2_draws[e])} for e in nodes},
+            "r2_in_sample": r2_report,
+            "r2_note": ("ci95 = percentile interval of the in-sample R^2 recomputed on each bootstrap "
+                        "resample (refit on the resample, scored on the resample). It covers the "
+                        "point but sits above it: a refit scored on its own resample is optimistic by "
+                        "`optimism` (mean of own minus original-rows R^2), so the honest level is "
+                        "point_optimism_corrected with optimism_corrected_ci95; see oos_r2.json for "
+                        "out-of-sample R^2. The earlier interval (refit scored on the original rows) "
+                        "sat below the point by the same optimism and is kept as "
+                        "refit_on_original_rows_ci95 (diagnostic only)."),
             "shapley_bybit": shap,
         },
     }

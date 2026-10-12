@@ -371,13 +371,25 @@ def _header_sections(old_dir: Path, new_dir: Path) -> list[str]:
             if k in oj or k in nj:
                 lines.append(f"| {f}:{k} | {_fmt(oj.get(k))} | {_fmt(nj.get(k))} |")
     lines += ["", "## Entity set", ""]
-    oj = _try_json(old_dir / "results.json")
-    nj = _try_json(new_dir / "results.json")
-    oe = set((oj or {}).get("entity_types", {}))
-    ne = set((nj or {}).get("entity_types", {}))
-    lines.append(f"- Old: {sorted(oe) or 'n/a'}")
-    lines.append(f"- New: {sorted(ne) or 'n/a'}")
-    lines.append(f"- Added: {sorted(ne - oe) or '-'}; removed: {sorted(oe - ne) or '-'}")
+
+    def _sets(name, getter):
+        oj, nj = _try_json(old_dir / name), _try_json(new_dir / name)
+        return (set(getter(oj)) if oj else set()), (set(getter(nj)) if nj else set())
+
+    def _entity_block(label, oe, ne):
+        lines.append(f"**{label}**")
+        lines.append(f"- Old ({len(oe)}): {sorted(oe) or 'n/a'}")
+        lines.append(f"- New ({len(ne)}): {sorted(ne) or 'n/a'}")
+        lines.append(f"- Added: {sorted(ne - oe) or '-'}; removed: {sorted(oe - ne) or '-'}")
+        lines.append("")
+
+    d_old, d_new = _sets("results.json", lambda j: j.get("entity_types", {}))
+    h_old, h_new = _sets("final_results.json", lambda j: [r["entity"] for r in j.get("oc_covar_ranking", [])])
+    _entity_block("Daily run (`results.json: entity_types`)", d_old, d_new)
+    _entity_block("Hourly run (`final_results.json: oc_covar_ranking`, the entities of the main hourly results)",
+                  h_old, h_new)
+    lines.append("The daily and hourly runs select their top-k entities separately, so the new sets differ: "
+                 f"only in daily {sorted(d_new - h_new) or '-'}; only in hourly {sorted(h_new - d_new) or '-'}.")
     lines += ["", "## Coverage", ""]
     cov = _try_json(new_dir / "coverage.json")
     if cov:

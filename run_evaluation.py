@@ -160,8 +160,13 @@ def main():
         dcv_scores = {e: -dcv.set_index("asset").loc[a, "delta_covar"] for e, a in common}  # flip sign: larger=riskier
         ents = [e for e, _ in common]
         rho, p = stats.spearmanr([oc_scores[e] for e in ents], [dcv_scores[e] for e in ents])
-        out["H3_spearman_oc_vs_deltacovar"] = {"rho": float(rho), "p_value": float(p),
-                                               "entities": ents}
+        out["H3_spearman_oc_vs_deltacovar"] = {
+            "rho": float(rho), "p_value": float(p), "entities": ents, "n_entities": len(ents),
+            "entity_asset_map": {e: a for e, a in common},
+            "comparison": ("daily OC-CoVaR exported risk vs Delta-CoVaR; 5 entities, Ethena mapped to "
+                           "USDe, MakerSky not mapped. run_validation.py reports the same comparison "
+                           "on 6 entities (Ethena -> ENA, MakerSky -> DAI) in validation.json "
+                           "ranking_agreement")}
 
     # ---- 6. counterfactual attribution for Oct-2025 USDe event (H4/H5) -------
     print("[6/8] Counterfactual attribution (Pearl L3) for the USDe event ...")

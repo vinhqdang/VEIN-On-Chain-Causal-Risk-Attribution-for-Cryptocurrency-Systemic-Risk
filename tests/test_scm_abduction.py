@@ -171,7 +171,7 @@ def test_block_bootstrap_keeps_contiguous_runs():
     U = risk._bootstrap_U(scm, 12, np.random.default_rng(5), joint=True, block_len=4)
     for e in scm.stress_cols:
         blocks = U[e].reshape(3, 4)
-        assert np.all(np.diff(blocks, axis=1) == 1.0)          # order kept inside blocks
+        assert np.all(np.diff(blocks, axis=1) % 20 == 1.0)     # order kept inside blocks (circular wrap)
     assert np.allclose(U["Y"] - U["X"], 100.0)                 # rows still shared
 
 
@@ -180,14 +180,16 @@ def test_block_bootstrap_truncates_last_block():
     _resid_ramp(scm, n=20)
     U = risk._bootstrap_U(scm, 10, np.random.default_rng(9), joint=True, block_len=4)
     assert len(U["X"]) == 10
-    assert np.all(np.diff(U["X"][:8].reshape(2, 4), axis=1) == 1.0)
+    assert np.all(np.diff(U["X"][:8].reshape(2, 4), axis=1) % 20 == 1.0)
 
 
 def test_moving_block_indices_bounds_and_capping():
     rng = np.random.default_rng(1)
     idx = risk.moving_block_indices(30, 30, 8, rng)
     assert len(idx) == 30 and idx.min() >= 0 and idx.max() < 30
-    assert np.all(np.diff(idx[:24].reshape(3, 8), axis=1) == 1)
+    assert np.all(np.diff(idx[:24].reshape(3, 8), axis=1) % 30 == 1)
+    plain = risk.moving_block_indices(30, 30, 8, rng, circular=False)
+    assert plain.max() < 30 and np.all(np.diff(plain[:24].reshape(3, 8), axis=1) == 1)
     # a block longer than the sample is capped at the sample length
     capped = risk.moving_block_indices(5, 12, 99, rng)
     assert len(capped) == 12 and capped.max() < 5

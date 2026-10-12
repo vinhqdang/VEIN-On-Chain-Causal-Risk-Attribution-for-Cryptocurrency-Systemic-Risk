@@ -227,13 +227,20 @@ def h1_status(ci) -> str:
 
 
 def paired_error_bootstrap(d, tpos, block_len: int = 24, B: int = 2000, seed: int = 7) -> dict:
-    """Moving-block bootstrap (blocked over time) of the mean paired error difference d.
-    Returns mean_diff, ci95, prob_observed_better (share of replicates above 0) and status."""
+    """Circular block bootstrap (blocked over time) of the mean paired error difference d.
+    Returns mean_diff, ci95, prob_observed_better (share of replicates above 0) and status.
+
+    The circular scheme gives every time step the same weight; the plain moving-block scheme
+    under-weights the first and last block_len steps and, with only 48 steps, centres the
+    bootstrap mean away from the sample mean (see risk.moving_block_indices).
+    boot_mean is the mean of the replicates and ci_contains_mean a centring check."""
     d = np.asarray(d, dtype=float)
     draws = risk.paired_time_block_means(d, np.asarray(tpos), B, block_len,
                                          np.random.default_rng(seed))
     ci = [float(np.quantile(draws, 0.025)), float(np.quantile(draws, 0.975))]
-    return {"mean_diff": float(np.mean(d)), "ci95": ci,
+    return {"mean_diff": float(np.mean(d)), "ci95": ci, "boot_mean": float(np.mean(draws)),
+            "ci_contains_mean": bool(ci[0] <= float(np.mean(d)) <= ci[1]),
+            "bootstrap": "circular_block",
             "prob_observed_better": float(np.mean(draws > 0)), "status": h1_status(ci),
             "block_len": int(block_len), "replicates": int(B)}
 
@@ -256,6 +263,7 @@ def h1_bootstrap(obs: dict, est: dict, B: int = 2000, block_len: int = 24, seed:
     weighted = paired_error_bootstrap(est["werr"] - obs["werr"], obs["tpos"], block_len, B, seed)
     block8 = paired_error_bootstrap(d, obs["tpos"], 8, B, seed)
     return {**main, "ci95_weighted": weighted["ci95"], "ci95_block8": block8["ci95"],
+            "mean_diff_weighted": weighted["mean_diff"],
             "status_weighted": weighted["status"], "status_block8": block8["status"]}
 
 
