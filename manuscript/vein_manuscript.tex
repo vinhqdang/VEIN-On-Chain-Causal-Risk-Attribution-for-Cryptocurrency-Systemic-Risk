@@ -16,6 +16,8 @@
 \usepackage{algorithmicx}%
 \usepackage{algpseudocode}%
 \usepackage{enumitem}%
+\usepackage{xurl}%
+\hypersetup{hypertexnames=false}%
 
 \theoremstyle{thmstyleone}%
 \newtheorem{theorem}{Theorem}%
@@ -99,9 +101,12 @@ CoVaR (OC-CoVaR), an interventional measure, and a counterfactual attribution of
 loss. We prove that the interventional effect is a pure network multiplier, derive
 flow-free bounds, and give a closed-form walk decomposition of the linear Shapley
 attribution together with an exact subset algorithm (Propositions~\ref{prop:A}--\ref{prop:C}).
-Third, we implement the pipeline, including a four-tier entity-resolution layer, evaluate
-it on the October 2025 event against price-estimated graphs, and subject every causal claim
-to a falsification and validity battery.
+Third, we implement the pipeline, including a four-tier entity-resolution layer, apply it to
+the October 2025 event (with FTX and USDC/SVB as additional episodes), and test the
+directional assumption by edge reversal and the graph source against price-estimated graphs.
+The output is an entity ranking and a loss decomposition that a supervisor can trace to
+public ledger records and an explicit model, which is the property that price-based
+measures lack.
 
 \section{Related Work and Positioning}
 \label{sec:related}
@@ -322,7 +327,7 @@ Let $\Lambda_i(T)=\sum_{j\ne i}\sum_{t<T}\max(\tau_{ji}(t),0)$. Then
 as $t\to\infty$, so $\Lambda_i(T)/T\to\sum_{j\ne i}\max(m^{(i)}_j,0)$.
 \end{corollary}
 
-Proposition~\ref{prop:A} implies that the interventional effect is a pure network multiplier: it depends on the graph and the coefficients, not on flows, intercepts or the shock law. Proofs are in Appendix~C.
+Proposition~\ref{prop:A} implies that the interventional effect is a pure network multiplier: it depends on the graph and the coefficients, not on flows, intercepts or the shock law. Proofs are in Appendix~\ref{app:proofs}.
 
 \begin{proposition}[Abduction invariance of the stress deviation]
 \label{prop:B}
@@ -438,7 +443,7 @@ The analysis uses public data only. Flows come from SQL over Dune Analytics' dec
 labels, prices and protocol total-value-locked (TVL) series from DefiLlama, and contract
 metadata from Etherscan. The cascade is visible in the raw transfers: on-chain volume of
 the synthetic dollar USDe rises from \$0.74bn on 9~October to \$3.09bn on 10~October and
-\$8.83bn on 11~October (Figure~\ref{fig:usde}). The node set comprises centralised
+\$8.83bn on 11~October (Figure~\ref{fig:usde}, left). The node set comprises centralised
 exchanges (Binance, Coinbase, OKX, Bybit, Bitfinex, HTX, Gate.io, Crypto.com, Bitget,
 Bullish), custodians (Copper, Ceffu, FalconX), DeFi protocols (Aave, Ethena, Lido,
 Maker/Sky), and an aggregate retail node that collects all unresolved addresses. 
@@ -446,24 +451,20 @@ Stress is operationalised by entity type and expressed as rolling $z$-scores: CE
 custodian stress combines the net on-chain outflow ratio with a transfer-volume surge;
 stablecoin-issuer stress combines the peg deviation $|1-p_t|$ with net redemption outflow;
 lending and liquid-staking stress combine TVL and price drawdowns; and retail stress is the
-market (ETH) drawdown. The settlement network is dominated by exchange--retail volume:
-Coinbase receives \$43.5bn from retail and sends \$43.4bn back. Direct exchange-to-exchange
-transfers are smaller but are recovered, and the SCM propagates along them (Figure~\ref{fig:stress}).
+market (ETH) drawdown. The settlement network is dominated by exchange--retail volume (Coinbase receives \$43.5bn from retail and sends \$43.4bn back); the smaller direct exchange-to-exchange transfers are recovered, and the SCM propagates along them (Figure~\ref{fig:usde}, right).
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.32\linewidth]{fig_usde_spike.pdf}
-\caption{On-chain USDe transfer volume around the October~2025 cascade
-(decoded ERC-20 transfers via Dune).}
+\begin{minipage}{0.38\linewidth}\centering
+\includegraphics[width=\linewidth]{fig_usde_spike.pdf}
+\end{minipage}\hfill
+\begin{minipage}{0.60\linewidth}\centering
+\includegraphics[width=\linewidth]{fig_stress.pdf}
+\end{minipage}
+\caption{Left: on-chain USDe transfer volume around the October~2025 cascade (decoded ERC-20
+transfers via Dune). Right: hourly entity stress states $S_{i,t}$ (shaded: the 10--11~October
+event window).}
 \label{fig:usde}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.42\linewidth]{fig_stress.pdf}
-\caption{Hourly entity stress states $S_{i,t}$ around the cascade (shaded: the
-10--11~October event window).}
-\label{fig:stress}
 \end{figure}
 
 \subsection{Entity resolution}
@@ -475,7 +476,7 @@ hot wallet). Tiers~1 and~2 are a gradient-boosted classifier and a truncated-SVD
 the primary path, matches both transfer endpoints to curated seed labels and Dune's
 \texttt{labels.cex\_ethereum}, collapsing sub-wallets to their exchange root. Each edge inherits the
 minimum confidence of its endpoints. The mint/burn sentinel is dropped first because its volume would
-dominate every volume-weighted statistic. Tiers~1--2 are validated in Appendix~B, and
+dominate every volume-weighted statistic. Tiers~1--2 are validated in Appendix~\ref{app:resolution}, and
 their address-count metrics overstate economic recall, so Tier~3 remains the resolver.
 
 \section{Empirical Evaluation}
@@ -483,7 +484,7 @@ their address-count metrics overstate economic recall, so Tier~3 remains the res
 
 Table~\ref{tab:hyp} lists the hypotheses. Unless noted, results are at hourly resolution
 (the consolidated run: 600 fitting hours, 48 event hours, 17 entities, 39 directed edges;
-Figure~\ref{fig:graph}). The daily specification is reported where it differs. It is the only
+Figure~\ref{fig:graph}). The daily specification is reported where it differs; backtests of the return-based inputs are in Appendix~\ref{app:impl}. It is the only
 specification whose coefficients are archived, so the analytic checks in
 Section~\ref{subsec:analytic-checks} refer to it.
 
@@ -512,7 +513,7 @@ channel and the edge-type split in Section~\ref{subsec:h2valid}.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.36\linewidth]{fig_graph.pdf}
+\includegraphics[width=0.62\linewidth]{fig_graph.pdf}
 \caption{The entity-resolved on-chain flow graph $G$ recovered by the Tier-3 layer. Edge
 width is proportional to cumulative USD flow.}
 \label{fig:graph}
@@ -520,8 +521,7 @@ width is proportional to cumulative USD flow.}
 
 \subsection{Observed graph versus estimated graph (H1)}
 \label{subsec:h1}
-Contemporaneous-flow nowcasting uses the within-period flow and is informative about same-period structure only, whereas lagged-flow forecasting is a genuine one-step forecast. The graph is built from pre-event flows only.
-
+The graph is built from pre-event flows only.
 At daily resolution the price-estimated Granger graph predicts better (RMSE 1.35 against
 1.92 over 42 predictions): with seven daily observations per entity, the denser estimated
 graph wins. At hourly resolution the ordering reverses. The observed graph attains RMSE
@@ -579,7 +579,7 @@ $0.98\pm0.01$ and stays positive in all draws. At daily resolution, where compos
 dominate, the leading channel is Ethena$\to$Aave ($11.3\%$).
 
 For Bybit we also compute an order-robust Shapley decomposition of the hinge game over Binance,
-Coinbase and Bitfinex (Figure~\ref{fig:shapley}), by exhaustive enumeration of orderings.
+Coinbase and Bitfinex (Figure~\ref{fig:ocrank}, right), by exhaustive enumeration of orderings.
 In this game a candidate set is held at its observed stress and every other entity at its pre-crisis
 level, so only direct channels into Bybit operate. The values
 are Binance $3.41$, Coinbase $0.00$ and Bitfinex $-0.14$, which sum to the total effect
@@ -627,23 +627,21 @@ daily  & Binance $\to$ Aave     & $4.2\%$  & CEX-to-DeFi spillover\\
 
 \begin{figure}[t]
 \centering
-\begin{minipage}{0.45\linewidth}\centering
+\begin{minipage}{0.52\linewidth}\centering
 \includegraphics[width=\linewidth]{fig_oc_ranking.pdf}
 \end{minipage}\hfill
-\begin{minipage}{0.45\linewidth}\centering
-\includegraphics[width=0.92\linewidth]{fig_h3_scatter.pdf}
+\begin{minipage}{0.44\linewidth}\centering
+\includegraphics[width=\linewidth]{fig_h3_scatter.pdf}
+\end{minipage}\\[6pt]
+\begin{minipage}{0.62\linewidth}\centering
+\includegraphics[width=\linewidth]{fig_shapley.pdf}
 \end{minipage}
-\caption{Left: OC-CoVaR exported-risk ranking (hourly). Right: rank divergence between
-OC-CoVaR and $\Delta$CoVaR over the six mapped entities (hourly; Spearman $\rho=0.52$).}
+\caption{Top left: OC-CoVaR exported-risk ranking (hourly). Top right: rank divergence between
+OC-CoVaR and $\Delta$CoVaR over the six mapped entities (hourly; Spearman $\rho=0.52$).
+Bottom: Shapley decomposition of Bybit's event-window distress over Binance, Coinbase and
+Bitfinex (candidates at observed stress, all others at pre-crisis level); the values sum to the
+total effect (additive residual $\approx10^{-16}$).}
 \label{fig:ocrank}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.32\linewidth]{fig_shapley.pdf}
-\caption{Shapley decomposition of Bybit's event-window distress over Binance, Coinbase and
-Bitfinex (candidates at observed stress, all others at pre-crisis level). The values sum to the total effect (additive residual $\approx10^{-16}$).}
-\label{fig:shapley}
 \end{figure}
 
 \subsection{Edge-reversal falsification and the validity battery (H2)}
@@ -671,7 +669,7 @@ symmetric      & 1.94 & 1.667 & 1.797 & \textbf{0.942}\\
 \end{tabular}
 \end{table}
 
-The result is mixed, and we report it as such. At daily resolution the test has little
+The result is mixed. At daily resolution the test has little
 power and the reversed graph has the lowest error. In the consolidated hourly run the three
 graphs lie within $1.663$--$1.675$, a near-tie. In the 216-fit run they lie within
 $1.790$--$1.801$, and reversal is again marginally best. On the non-flow target, reversal
@@ -803,14 +801,15 @@ Four limitations bound these conclusions. CEX opacity is the main threat to A2: 
 an exchange's pricing engine, is off-chain, and the robustness values bound but cannot remove this
 threat. Resolution recall is the second: only about $1\%$ of the \$438bn of window flow moves directly
 between two named entities, and the volume-weighted recall of the Tier-1 classifier is $0.001$
-(Appendix~B). Third, daily and hourly results disagree on the ranking, external validity holds only
+(Appendix~\ref{app:resolution}). Third, daily and hourly results disagree on the ranking, external validity holds only
 hourly, and hourly coefficients are not archived. Fourth, three episodes are a small basis for
 generality.
 
 VEIN offers a ranking of which on-chain entities export stress and a counterfactual statement of what
-one entity's distress contributed to others' losses, both auditable from public ledger data. Useful next
-steps are intraday analysis across several events, a fuller Tier-1/2 resolution sweep, and an
-instrumented treatment of the CEX engine.
+one entity's distress contributed to others' losses, both auditable from public ledger data. For supervisors
+and exchange or protocol risk teams, this offers a transparent complement to price-based monitoring: each
+attributed channel points to identifiable transfers that can be inspected, and the model-implied reading is
+stated explicitly. Next steps are intraday analysis across several events and an instrumented treatment of the CEX engine.
 
 \backmatter
 

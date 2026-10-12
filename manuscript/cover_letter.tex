@@ -96,9 +96,11 @@ attribution has a closed-form walk decomposition, and an exact subset algorithm
 computes it with $2^p$ rather than $p!\cdot p$ model evaluations. The paper gives
 equal weight to the auditable ledger-based attribution and to its application to
 the October 2025 cascade, with checks on the FTX (2022) and USDC/SVB (2023)
-episodes. In that application the ranking differs from $\Delta$CoVaR (Spearman
-0.52) and remains stable under coefficient perturbation (mean Spearman 0.88 across
-25 perturbations). The analytic checks refer to the daily specification. The
+episodes. In that application the hourly exported-risk ranking differs from $\Delta$CoVaR
+(Spearman 0.52, six entities with matched price series). A deterministic zero-shock
+proxy of the ranking is stable under coefficient perturbation (mean Spearman 0.88 over
+25 draws), which checks the method rather than the reported ranking. The analytic checks
+refer to the daily specification. The
 advantage of the observed graph over a price-estimated graph at hourly frequency
 is small and not consistent across specifications, and I report it as weak
 evidence.
