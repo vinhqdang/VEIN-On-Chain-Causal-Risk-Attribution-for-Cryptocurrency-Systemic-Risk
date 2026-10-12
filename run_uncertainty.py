@@ -19,7 +19,7 @@ from pathlib import Path
 
 import numpy as np
 
-from vein import config, fastscm as fs, pipeline as pl, risk, uncertainty as un
+from vein import config, fastscm as fs, hourly_stress as hs, pipeline as pl, risk, uncertainty as un
 from vein.scm import StructuralCausalModel
 
 RESULTS = Path(__file__).resolve().parent / "results"
@@ -51,6 +51,7 @@ def main():
     EV0, EV1 = pl.EVENT_START, pl.EVENT_END
     fit_mask = stress.index < EV0
     est = stress.index[fit_mask]
+    hs.assert_nonzero_stress(stress, est)
     stress_fit = stress.loc[est]
     flows_fit = flows[flows.day < EV0]
     scm = StructuralCausalModel(graph, alpha=1.0).fit(stress_fit, flows_fit).set_flows(flows)

@@ -112,3 +112,30 @@ def test_shapley_split_is_additive_on_fast_engine():
     pre = stress.iloc[:-24].median()[sys.nodes].values
     res = un.shapley_split(sys, C, S_obs, S_prev0, pre, target="Z", cands=["X", "Y"])
     assert abs(res["additive_residual"]) < 1e-9
+
+
+def test_rolling_placebo_windows_keep_gap_before_event():
+    """Calm windows end at least `gap` rows before the event and never overlap it."""
+    from vein import validation as val
+    graph, stress, flows, scm = _fit()
+    n_ev, gap = 24, 24
+    ev_days = stress.index[-n_ev:]
+    fit_index = stress.index[:-n_ev]
+    pre = {e: float(stress[e].iloc[:-n_ev].median()) for e in stress.columns}
+    seen = []
+    orig = val._stat_from
+
+    def spy(sys, C, S_obs, S_prev0, pre_, connected, nodes):
+        seen.append(len(C))
+        return orig(sys, C, S_obs, S_prev0, pre_, connected, nodes)
+
+    val._stat_from = spy
+    try:
+        res = val.rolling_temporal_placebo(scm, stress, fit_index, ev_days, pre,
+                                           [("X", "Y"), ("Y", "Z")], step=12, roll=24, gap=gap)
+    finally:
+        val._stat_from = orig
+    last_start = 24 + gap + 12 * (res["n_windows"] - 1)
+    assert last_start + n_ev - 1 <= len(stress) - n_ev - gap
+    assert res["n_windows"] >= 1
+    assert 0 < res["p_value"] <= 1

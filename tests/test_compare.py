@@ -111,3 +111,12 @@ def test_map_file_is_valid_and_ids_unique():
     for e in entries:
         assert e.get("fmt", "num") in rc.FORMATS
         assert e["file"] and isinstance(e["path"], list)
+
+
+def test_pending_entry_is_compared_once_produced(tmp_path):
+    old = _write(tmp_path, "old", {})
+    new = _write(tmp_path, "new", {})
+    (new / "f.json").write_text(json.dumps({"p": 0.25}))
+    row = rc.compare_entry({"id": "P", "file": "f.json", "path": ["p"], "pending": True,
+                            "printed": "0.25"}, old, new)
+    assert row["status"] == "ok" and row["new"] == 0.25 and row["matches"] is True

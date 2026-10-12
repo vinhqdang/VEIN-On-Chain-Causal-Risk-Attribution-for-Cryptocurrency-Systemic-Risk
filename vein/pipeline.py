@@ -33,8 +33,9 @@ def build_hourly_context(k: int = 12, win=None, tokens=None) -> SimpleNamespace:
     entities = sorted(set(flows.from_entity) | set(flows.to_entity) | set(config.ENTITIES))
     prices = md.build_hourly_price_panel(config.MARKET_ASSETS, start, end, ffill=False)
     lido = bq_flows.lido_series_bq(start, end)
+    # the component screen (fit-window std) looks at the pre-event rows only
     stress, meta = hs.build_hourly_stress(flows, entities, prices, lido=lido,
-                                          freq="h", window=(start, end))
+                                          fit_end=EVENT_START, freq="h", window=(start, end))
     stress = stress.sort_index()
     graph = og.build_graph(flows, min_usd=1e5)
     return SimpleNamespace(flows=flows, etypes=etypes, entities=entities, prices=prices,

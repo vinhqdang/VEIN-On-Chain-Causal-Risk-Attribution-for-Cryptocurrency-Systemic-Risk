@@ -82,6 +82,8 @@ def main():
     out["n_fit_hours"] = int(len(est_stress))
     out["n_event_hours"] = len(ev)
     out["graph_edges"] = len(graph["edges"])
+    out["fit_gross_usd"] = {e: float(est_flows.loc[(est_flows.from_entity == e) | (est_flows.to_entity == e),
+                                                   "usd_volume"].sum()) for e in stress.columns}
     settings = run_settings(est_stress.index)
     out["settings"] = settings
     print(f"    {len(stress.columns)} entities, {len(est_stress)} fit hours, {len(ev)} event hours, {len(graph['edges'])} edges")
@@ -174,7 +176,8 @@ def main():
                  from_src=("from_src", "max"), to_src=("to_src", "max")))
     g0 = og.build_graph(f0, min_usd=1e5)
     ents0 = sorted(set(f0.from_entity) | set(f0.to_entity) | seeds)
-    s0, _ = hs.build_hourly_stress(f0, ents0, ctx.prices, lido=ctx.lido, window=ctx.win)
+    s0, _ = hs.build_hourly_stress(f0, ents0, ctx.prices, lido=ctx.lido, fit_end=EVENT_START,
+                                   window=ctx.win)
     s0 = s0.sort_index()
     s0_fit = s0[s0.index < EVENT_START]
     scm0 = StructuralCausalModel(g0, alpha=1.0).fit(s0_fit, f0[f0.day < EVENT_START]).set_flows(f0)
@@ -269,10 +272,12 @@ def write_report(out):
     # H1 headline
     A("## H1 — observed on-chain graph vs price-estimated graph (decisive)\n")
     A(f"Nodes: {', '.join(h1['comparison_nodes'])}. Edges: {h1['edge_counts']}.\n")
-    A("| graph source | RMSE | timing corr | n |\n|---|--:|--:|--:|")
+    A("| graph source | weighted RMSE | timing corr | n |\n|---|--:|--:|--:|")
     for s in h1["scores"]:
         A(f"| {s['model']} | {s['rmse']:.4f} | {s['corr']:.4f} | {s['n']} |")
-    A("\nPaired block bootstrap of squared one-step error (estimated minus observed; positive = observed better):\n")
+    A("\nPaired block bootstrap of the unweighted squared one-step error (estimated minus observed; "
+      "positive = observed better). The RMSE above is weighted by |stress|+0.1, so the weighted CI "
+      "column is the one on the scale of the table:\n")
     A("| estimated graph | mean diff | 95% CI | status | 95% CI (weighted) | 95% CI (8-h blocks) |\n|---|--:|--:|---|--:|--:|")
     for g, b in h1["bootstrap"].items():
         A(f"| {g} | {b['mean_diff']:+.4f} | [{b['ci95'][0]:+.4f}, {b['ci95'][1]:+.4f}] | {b['status']} | "

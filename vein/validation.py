@@ -359,7 +359,7 @@ def rolling_temporal_placebo(scm: StructuralCausalModel, stress: pd.DataFrame, f
     """Event statistic against the same statistic on calm windows of the fit period.
 
     Windows have the event length and start every `step` steps from fit_index[roll + gap]
-    on; a window must end at least `gap` steps before the event starts. p = (1 + #calm >=
+    on; a window must end at least `gap` steps (rows of the stress panel) before the event starts. p = (1 + #calm >=
     event) / (n + 1); passes if p <= 0.10."""
     nodes = list(scm.stress_cols)
     ev_days = pd.DatetimeIndex(ev_days)
@@ -378,12 +378,12 @@ def rolling_temporal_placebo(scm: StructuralCausalModel, stress: pd.DataFrame, f
         return _stat_from(sys, C, S_obs, S_prev0, pre, connected, nodes)
 
     event = window_stat(ev_days)
-    limit = ev_days[0] - pd.Timedelta(hours=gap)
+    ev_pos = stress_idx.get_loc(ev_days[0])      # the gap is counted in steps (hours or days)
     calm = []
     start = stress_idx.get_loc(fit_index[min(roll + gap, len(fit_index) - 1)])
     for p in range(start, len(stress_idx), step):
         days = stress_idx[p:p + n]
-        if len(days) < n or days[-1] > limit or p < 1:
+        if len(days) < n or p + n - 1 > ev_pos - gap or p < 1:
             break
         calm.append(window_stat(days))
     n_w = len(calm)

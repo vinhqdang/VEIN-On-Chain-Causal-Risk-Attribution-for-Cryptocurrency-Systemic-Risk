@@ -238,9 +238,19 @@ def compare_entry(e: dict, old_dir: Path, new_dir: Path) -> dict:
            "path": json.dumps(e["path"]), "old": None, "new": None, "delta": None,
            "matches": None, "flags": [], "status": "ok"}
     if e.get("pending"):
-        row["status"] = "PENDING"
-        row["note"] = e.get("note", "produced by a later step")
-        return row
+        # still pending only while the new results do not hold the value; once the rerun has
+        # produced it the entry is compared like any other
+        produced = False
+        obj = _load(new_dir, e["file"])
+        if obj is not None:
+            try:
+                produced = _is_num(resolve(obj, e["path"]))
+            except (KeyError, IndexError, ValueError, TypeError):
+                produced = False
+        if not produced:
+            row["status"] = "PENDING"
+            row["note"] = e.get("note", "produced by a later step")
+            return row
     new_obj = _load(new_dir, e["file"])
     if new_obj is None:
         row["status"] = "MISSING_FILE"
