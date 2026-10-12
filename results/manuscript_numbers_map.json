@@ -37,7 +37,7 @@
   },
   {
    "id": "OOS_GAIN_ARNET",
-   "tex_anchor": "changes squared error by -0.3\\% relative to an",
+   "tex_anchor": "an own-lag model is -0.3\\% (negative means larger",
    "printed": "-0.3",
    "fmt": "pct",
    "file": "oos_r2.json",
@@ -54,7 +54,7 @@
   },
   {
    "id": "OOS_GAIN_ARNET_LO",
-   "tex_anchor": "an own-lag model (interval [-2.0\\%, 1.4\\%]). No channel's",
+   "tex_anchor": "means larger error; interval [-2.0\\%, 1.4\\%]). No channel's",
    "printed": "-2.0",
    "fmt": "pct",
    "file": "oos_r2.json",
@@ -67,7 +67,7 @@
   },
   {
    "id": "OOS_GAIN_ARNET_HI",
-   "tex_anchor": "own-lag model (interval [-2.0\\%, 1.4\\%]). No channel's share",
+   "tex_anchor": "larger error; interval [-2.0\\%, 1.4\\%]). No channel's share",
    "printed": "1.4",
    "fmt": "pct",
    "file": "oos_r2.json",
@@ -809,7 +809,7 @@
   },
   {
    "id": "COV_MODEL",
-   "tex_anchor": "panel, named-to-named flow is 2.8\\% of US\\ 570bn.",
+   "tex_anchor": "model, named-to-named flow is 2.8\\% of US\\ 570bn.",
    "printed": "2.8",
    "fmt": "pct",
    "file": "revision.json",
@@ -1005,7 +1005,7 @@
   },
   {
    "id": "OOS_GAIN_NET",
-   "tex_anchor": "changes squared error by -18.6\\% [-27.1\\%, -6.2\\%], so",
+   "tex_anchor": "the own lag and -18.6\\% [-27.1\\%, -6.2\\%] when",
    "printed": "-18.6",
    "fmt": "pct",
    "file": "oos_r2.json",
@@ -1022,7 +1022,7 @@
   },
   {
    "id": "OOS_GAIN_NET_LO",
-   "tex_anchor": "squared error by -18.6\\% [-27.1\\%, -6.2\\%], so it",
+   "tex_anchor": "own lag and -18.6\\% [-27.1\\%, -6.2\\%] when used",
    "printed": "-27.1",
    "fmt": "pct",
    "file": "oos_r2.json",
@@ -1035,7 +1035,7 @@
   },
   {
    "id": "OOS_GAIN_NET_HI",
-   "tex_anchor": "error by -18.6\\% [-27.1\\%, -6.2\\%], so it is",
+   "tex_anchor": "lag and -18.6\\% [-27.1\\%, -6.2\\%] when used alone,",
    "printed": "-6.2",
    "fmt": "pct",
    "file": "oos_r2.json",
@@ -2494,7 +2494,7 @@
   },
   {
    "id": "MAX_SHARE_LO",
-   "tex_anchor": "largest share is 15.2\\% [13.2\\%, 19.5\\%] (MakerSky retail).",
+   "tex_anchor": "largest share is 15.2\\% [13.2\\%, 19.5\\%] (MakerSky retail;",
    "printed": "13.2",
    "fmt": "pct",
    "file": "uncertainty.json",
@@ -9090,7 +9090,7 @@
   },
   {
    "id": "TK10_T3",
-   "tex_anchor": "the top-three overlap is 3 and 3 entities.",
+   "tex_anchor": "the main run is 3 and 3 of",
    "printed": "3",
    "fmt": "num",
    "file": "topk_sensitivity.json",
@@ -9102,7 +9102,7 @@
   },
   {
    "id": "TK15_T3",
-   "tex_anchor": "overlap is 3 and 3 entities. The top",
+   "tex_anchor": "run is 3 and 3 of three entities.",
    "printed": "3",
    "fmt": "num",
    "file": "topk_sensitivity.json",
@@ -9214,7 +9214,7 @@
   },
   {
    "id": "LS_STR",
-   "tex_anchor": "correlations of 0.986 and 0.904, with a top-three",
+   "tex_anchor": "correlations of 0.986 and 0.904, with a mean",
    "printed": "0.904",
    "fmt": "num",
    "file": "revision3.json",
@@ -9226,7 +9226,7 @@
   },
   {
    "id": "LS_T3",
-   "tex_anchor": "a top-three overlap of 0.67. Coefficient noise (15\\%",
+   "tex_anchor": "top-three overlap fraction of 0.67. Coefficient noise (15\\%",
    "printed": "0.67",
    "fmt": "num",
    "file": "revision3.json",
@@ -10718,7 +10718,7 @@
   },
   {
    "id": "COV_MIN",
-   "tex_anchor": "extracts the range is 0.6--3.0\\%. In the model's",
+   "tex_anchor": "builds) the range is 0.6--3.0\\%. In the panel",
    "printed": "0.6",
    "source_class": "D",
    "file": "coverage.json",
@@ -10727,7 +10727,7 @@
   },
   {
    "id": "COV_MAX",
-   "tex_anchor": "extracts the range is 0.6--3.0\\%. In the model's",
+   "tex_anchor": "builds) the range is 0.6--3.0\\%. In the panel",
    "printed": "3.0",
    "source_class": "D",
    "file": "coverage.json",

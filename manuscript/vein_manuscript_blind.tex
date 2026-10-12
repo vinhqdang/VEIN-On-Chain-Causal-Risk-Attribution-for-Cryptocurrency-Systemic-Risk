@@ -49,7 +49,7 @@
 \author{Anonymous}
 \affil{Anonymous}
 
-\abstract{Crypto systemic-risk measures usually infer contagion networks from prices. We study what can be learned when the entity-resolved Ethereum ledger instead specifies the parent sets of a linear structural causal model of entity stress. On this skeleton we define an interventional tail measure (OC-CoVaR) and a counterfactual loss attribution with full abduction of event shocks. Interventional effects are flow-free network multipliers, and stress deviations under intervention do not depend on the abducted shocks. Linear Shapley attribution has a walk form that gives intermediaries negative credit, and exact Shapley values need $2^p$ rather than $p!\,p$ evaluations. Applied to the October 2025 liquidation cascade with public data and open address labels, the network equations explain little hourly stress: out-of-sample $R^2$ is 0.005 against 0.161 for an own-lag model, and adding the network changes out-of-sample squared error by $-$0.3\% [$-$2.0\%, 1.4\%]. The largest channel explains 15.2\% (upper 95\% bound 19.5\%) of an entity's distress. On the same data, zero-shock abduction raises the Binance-to-Bybit share from 6.3\% to 65.3\%. The observed graph does not clearly beat price-estimated graphs, edge direction is not distinguishable from reversal, and placebo evidence is mixed. We release the pipeline as a reproducible benchmark.}
+\abstract{Crypto systemic-risk measures usually infer contagion networks from prices. We study what can be learned when the entity-resolved Ethereum ledger instead specifies the parent sets of a linear structural causal model of entity stress. On this skeleton we define an interventional tail measure (OC-CoVaR) and a counterfactual loss attribution with full abduction of event shocks. Interventional effects are flow-free network multipliers, and stress deviations under intervention do not depend on the abducted shocks. Linear Shapley attribution has a walk form that gives intermediaries negative credit, and exact Shapley values need $2^p$ rather than $p!\,p$ evaluations. Applied to the October 2025 liquidation cascade with public data and open address labels, the network equations explain little hourly stress: out-of-sample $R^2$ is 0.005 against 0.161 for an own-lag model, and adding the network to the own lag gives an out-of-sample squared-error gain of $-$0.3\% [$-$2.0\%, 1.4\%], where a negative gain means larger error. The largest single channel accounts for 15.2\% (upper 95\% bound 19.5\%) of an entity's realised distress. On the same data, zero-shock abduction raises the Binance-to-Bybit share from 6.3\% to 65.3\%. The observed graph does not clearly beat price-estimated graphs, edge direction is not distinguishable from reversal, and placebo evidence is mixed. We release the pipeline as a reproducible benchmark.}
 
 \keywords{systemic risk, crypto-assets, structural causal model, counterfactual attribution, Shapley value, on-chain data}
 \pacs[JEL Classification]{G01, G23, G28, C32, C15}
@@ -84,7 +84,7 @@ transaction ledger as the causal structure of a systemic-risk measure (Section~\
 None of these makes the ledger the causal skeleton, and none asks how much of measured
 stress such a skeleton can explain.
 
-We make four contributions.
+We call the framework VEIN (ledger-specified on-chain causal risk attribution) and make four contributions.
 \begin{enumerate}[label=(\roman*),leftmargin=*]
 \item \emph{Framework.} A ledger-specified structural causal model (SCM) skeleton for crypto
 systemic risk under assumptions A1--A3 (Section~\ref{sec:method}), in which the in-neighbours of
@@ -94,7 +94,7 @@ are recovered by inverting the structural equations on the observed path, so the
 reproduces realised stress.
 \item \emph{Analytic results.} Flow-free bounds and the network-multiplier form (Proposition~\ref{prop:A},
 Corollaries~\ref{cor:pure}--\ref{cor:bound}); abduction invariance of stress deviations
-(Proposition~\ref{prop:B}) and a share bound (Corollary~\ref{cor:share}, Section~\ref{subsec:attribution});
+(Proposition~\ref{prop:B}) and a share bound (Corollary~\ref{cor:share}, applied in Section~\ref{subsec:attribution});
 the walk representation of linear Shapley attribution, which gives intermediaries negative credit
 (Proposition~\ref{prop:C}); an exact $O(2^p)$ subset algorithm (Algorithm~\ref{alg:shapley}); and a
 certified ranking radius (Lemma~\ref{lem:radius}).
@@ -108,11 +108,11 @@ out-of-sample comparison against an own-lag baseline.
 \end{enumerate}
 
 Hourly stress is better predicted by its own lag than by the network: in-sample $R^2$ is at most
-0.273, and out of sample the network changes squared error by $-$0.3\% relative to an
-own-lag model (interval [$-$2.0\%, 1.4\%]). No channel's share
+0.273, and out of sample the network's squared-error gain over an
+own-lag model is $-$0.3\% (negative means larger error; interval [$-$2.0\%, 1.4\%]). No channel's share
 exceeds 15.2\% (interval upper bound 19.5\%). Retail and MakerSky head the ranking, but
 their order is unresolved and both routes run through the unresolved retail aggregate. Ranks three to six
-are not resolved in pairwise order. The observed graph does not clearly beat price-estimated graphs, so H1 is
+are not resolved in pairwise order. The observed graph does not clearly beat price-estimated graphs, so the hypothesis (H1, Section~\ref{sec:method}) that the observed graph is better is
 not supported, and edge direction is not distinguishable from reversal. The time-shift placebo passes, while the
 rolling calm-window placebo fails in the October 2025 and FTX episodes. The transmitter-absorber check passes for
 Binance and fails for Ethena. The ledger structure is auditable but explains limited stress at hourly scale, so
@@ -578,8 +578,8 @@ the peg component of the Ethena curve (shaded: the 10--11~October event window).
 \subsection{Coverage and a data cross-check}
 \label{subsec:coverage}
 Named-to-named (distinct entities) flow is 3.0\% of entity-touching panel-token flow in October. Across
-the six extracts the range is 0.6--3.0\%. In the model's own panel, named-to-named flow is
-2.8\% of US\$570bn. The graph is therefore dominated by named-entity--retail edges.
+the six coverage extracts (the hourly, extended-window and daily builds) the range is 0.6--3.0\%. In the panel
+that is actually fed to the model, named-to-named flow is 2.8\% of US\$570bn. The graph is therefore dominated by named-entity--retail edges.
 
 As a cross-check, BigQuery daily USDe volume is compared with an earlier independent extraction. The two match within the
 2\% tolerance on all six days, and the largest relative difference is 0.06\%. The volume peaks
@@ -601,9 +601,8 @@ stays clearly above zero, at 0.186 [0.077, 0.265]. The Coinbase and Kraken inter
 zero.
 
 Out of sample, the network equation has pooled $R^2_{OS}=0.005$ [$-$0.017, 0.019], against
-0.161 [0.056, 0.222] for the own lag. Adding the network to the own lag changes squared error by
-$-$0.3\% [$-$2.0\%, 1.4\%], and the network alone changes squared error by
-$-$18.6\% [$-$27.1\%, $-$6.2\%], so it is worse than the own lag. The large entity-level gains are for retail
+0.161 [0.056, 0.222] for the own lag. The network's squared-error gain over the own lag, $1-\mathrm{SSE}(m)/\mathrm{SSE}(\mathrm{AR})$, is $-$0.3\% [$-$2.0\%, 1.4\%] when added to the own lag and
+$-$18.6\% [$-$27.1\%, $-$6.2\%] when used alone, so the network alone has larger error than the own lag. The large entity-level gains are for retail
 (29.4\%) and Coinbase (11.6\%). The other entities lie between
 $-$16.3\% and 1.6\%. Aave has the largest benchmark squared error, about 17.6\% of
 the total, so it carries the most weight in the pooled score. Its own-lag $R^2_{OS}$ is 0.759. Pooled weights
@@ -646,7 +645,7 @@ Rows are sorted by in-sample $R^2$.}
 
 \subsection{Counterfactual attribution and the abduction lesson}
 \label{subsec:attribution}
-The largest share is 15.2\% [13.2\%, 19.5\%] (MakerSky$\to$retail). Of the ten largest channels
+The largest share is 15.2\% [13.2\%, 19.5\%] (MakerSky$\to$retail; the interval is for the maximum over all pairs in each replicate, whereas the channel's own interval is in Table~\ref{tab:channels}). Of the ten largest channels
 in the point estimate, four end at the retail aggregate, two start there, and four connect two named entities.
 Table~\ref{tab:channels} reports the leading channels and Figure~\ref{fig:attribution} draws the top eight.
 
@@ -747,7 +746,7 @@ point rankings is 0.903 [0.793, 0.968].
 
 The retail aggregate matters for the ranking. Without retail, the ranking is led by Binance (17.67), Crypto.com
 (14.81) and Kraken (14.33), and MakerSky drops out of the top six
-(point estimates from the archived no-retail run). Exported-risk levels scale with the number of entities, so only ranks
+(point estimates, no interval). Exported-risk levels scale with the number of entities, so only ranks
 are comparable across runs.
 
 \begin{lrbox}{\tabbox}\footnotesize\setlength{\tabcolsep}{3pt}%
@@ -842,7 +841,7 @@ Symmetric vs true & USDC/SVB, Mar 2023 & 1{,}344 & 1.6514 & 1.6528 & 0.0024 & [$
 \begin{tableorg}[tbp]
 \centering
 \caption{Graph-source and direction comparisons. Mean difference is alternative minus base in squared error per entity-hour
-cell (positive values favour the base). Base is the observed graph for H1 and the true-direction graph otherwise. Status is
+cell (positive values favour the base). The RMSE columns are stress-weighted, whereas the mean difference and its interval use unweighted squared error, so their signs can differ. Base is the observed graph for H1 and the true-direction graph otherwise. Status is
 the bootstrap verdict: base better (interval entirely above zero), alternative better (entirely below zero), or inconclusive.}
 \label{tab:diagnostics}
 \fitbox
@@ -899,15 +898,15 @@ calm-window placebo $p$-value with the number of windows, and the direction verd
 
 \subsection{Robustness}
 \label{subsec:robustness}
-The top-$k$, edge-dropping, latent-shock and coefficient-noise checks use archived runs (\texttt{topk\_sensitivity.json},
-\texttt{revision*.json}) that predate the circular-block shock draws, so they are point comparisons without bootstrap intervals. The top-$k$ check compares the main specification with $k=10$ and $k=15$. The Spearman correlation over the common entities is
-0.984 ($k=10$) and 0.986 ($k=15$), and the top-three overlap is 3 and 3 entities. The top channel,
+The top-$k$, edge-dropping, latent-shock and coefficient-noise checks are point comparisons without bootstrap intervals
+(\texttt{topk\_sensitivity.json}, \texttt{revision*.json}). The top-$k$ check compares the main specification with $k=10$ and $k=15$. The Spearman correlation over the common entities is
+0.984 ($k=10$) and 0.986 ($k=15$), and the top-three overlap with the main run is 3 and 3 of three entities. The top channel,
 MakerSky$\to$retail, has share 15.6\%, 15.2\% and 16.4\% at $k=10$, $12$ and $15$.
 
 For confounding, the robustness values range from 0.089 to 0.231 across the 15 edges with the largest $t$-statistics of the 90 in the hourly graph, with
 MakerSky$\to$retail at 0.231. These values are moderate, not large. Dropping the 22 lowest-RV edges leaves the Spearman
 correlation at 0.989. A latent common shock of strength 0.3 and 0.6 gives Spearman correlations of 0.986 and 0.904,
-with a top-three overlap of 0.67. Coefficient noise (15\% relative standard deviation) changes the Binance$\to$Bybit share
+with a mean top-three overlap fraction of 0.67. Coefficient noise (15\% relative standard deviation) changes the Binance$\to$Bybit share
 by a standard deviation of 0.65 percentage points, and the share stays positive in every draw. The bootstrap width dominates.
 
 Under the alternative resolution rule, the Spearman correlation with the main ranking is 0.714 over 6 common entities
@@ -1077,6 +1076,7 @@ $\tau_{ji}(t)$ is a sum over walks from $i$ to $j$ of length at most $t$ avoidin
 \end{proof}
 
 \section{Daily analytic checks and bounds}\label{app:bounds}
+\setcounter{table}{0}
 
 The numbers come from \texttt{results/analytics.json}, which uses the daily SCM with $T=7$ and 15 entities; the
 spectral radius is $\rho(A)=0.569$. $B^+$ is $\Lambda_i(T)$ per unit $s^\ast$ (Corollary~\ref{cor:bound}), so the stored
