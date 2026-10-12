@@ -1,8 +1,8 @@
 {
  "version": 1,
- "cumulative_billed_bytes": 298554753024,
+ "cumulative_billed_bytes": 336104259584,
  "by_month": {
-  "2026-10": 298554753024
+  "2026-10": 336104259584
  },
  "entries": [
   {
@@ -1062,6 +1062,159 @@
    "billed_bytes": 0,
    "cache_hit": false,
    "job_id": null
+  },
+  {
+   "ts": "2026-10-12T10:05:32+00:00",
+   "name": "dry_run",
+   "sql_hash": "9f4e1db775e13bd7",
+   "kind": "dry_run",
+   "est_bytes": 16577093040,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T10:05:37+00:00",
+   "name": "extract_oct25_lido",
+   "sql_hash": "9f4e1db775e13bd7",
+   "kind": "materialize",
+   "est_bytes": 16577093040,
+   "billed_bytes": 16381902848,
+   "cache_hit": false,
+   "job_id": "1f079732-c688-4c92-bbde-d4ac29eec0fa",
+   "table": "vein-bq-10120733.vein.x_oct25_lido_c00"
+  },
+  {
+   "ts": "2026-10-12T10:05:51+00:00",
+   "name": "dry_run",
+   "sql_hash": "07c809def01cd26b",
+   "kind": "dry_run",
+   "est_bytes": 9092906757,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T10:05:57+00:00",
+   "name": "extract_ftx_ext",
+   "sql_hash": "07c809def01cd26b",
+   "kind": "materialize",
+   "est_bytes": 9092906757,
+   "billed_bytes": 8898215936,
+   "cache_hit": false,
+   "job_id": "fa890e85-9619-45e6-bbf9-31a7ef9debd8",
+   "table": "vein-bq-10120733.vein.x_ftx_ext_c00"
+  },
+  {
+   "ts": "2026-10-12T10:06:10+00:00",
+   "name": "dry_run",
+   "sql_hash": "cc0384bdcf5f3fc5",
+   "kind": "dry_run",
+   "est_bytes": 9422165473,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T10:06:16+00:00",
+   "name": "extract_svb_ext",
+   "sql_hash": "cc0384bdcf5f3fc5",
+   "kind": "materialize",
+   "est_bytes": 9422165473,
+   "billed_bytes": 9227468800,
+   "cache_hit": false,
+   "job_id": "ab589743-b3e9-4232-b10d-101c438050c6",
+   "table": "vein-bq-10120733.vein.x_svb_ext_c00"
+  },
+  {
+   "ts": "2026-10-12T10:06:37+00:00",
+   "name": "dry_run",
+   "sql_hash": "084a34a82882980b",
+   "kind": "dry_run",
+   "est_bytes": 802064756,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T10:07:06+00:00",
+   "name": "sweeps_ftx_ext",
+   "sql_hash": "084a34a82882980b",
+   "kind": "query",
+   "est_bytes": 802064756,
+   "billed_bytes": 802160640,
+   "cache_hit": false,
+   "job_id": "54ced2c3-8d09-4260-b01f-4a956b8e3437"
+  },
+  {
+   "ts": "2026-10-12T10:07:27+00:00",
+   "name": "dry_run",
+   "sql_hash": "d5c3ef2bf8402db7",
+   "kind": "dry_run",
+   "est_bytes": 875201250,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T10:08:04+00:00",
+   "name": "sweeps_svb_ext",
+   "sql_hash": "d5c3ef2bf8402db7",
+   "kind": "query",
+   "est_bytes": 875201250,
+   "billed_bytes": 875560960,
+   "cache_hit": false,
+   "job_id": "df33a3f7-e68c-402e-99ea-cf88c21bc94d"
+  },
+  {
+   "ts": "2026-10-12T10:08:18+00:00",
+   "name": "dry_run",
+   "sql_hash": "cd1a314279b6a0a2",
+   "kind": "dry_run",
+   "est_bytes": 1352902342,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T10:08:19+00:00",
+   "name": "dry_run",
+   "sql_hash": "cd1a314279b6a0a2",
+   "kind": "dry_run",
+   "est_bytes": 1352902342,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T10:08:20+00:00",
+   "name": "verify_tokens",
+   "sql_hash": "cd1a314279b6a0a2",
+   "kind": "query",
+   "est_bytes": 1352902342,
+   "billed_bytes": 1353711616,
+   "cache_hit": false,
+   "job_id": "cad8b44b-4bea-49e5-8235-79cd85cd8e3a"
+  },
+  {
+   "ts": "2026-10-12T10:08:24+00:00",
+   "name": "dry_run",
+   "sql_hash": "c9d254e659696f46",
+   "kind": "dry_run",
+   "est_bytes": 5994150,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T10:08:24+00:00",
+   "name": "lido_series",
+   "sql_hash": "c9d254e659696f46",
+   "kind": "query",
+   "est_bytes": 5994150,
+   "billed_bytes": 10485760,
+   "cache_hit": false,
+   "job_id": "a505b41f-61a7-425f-afda-c5d78dd05449"
   }
  ]
 }

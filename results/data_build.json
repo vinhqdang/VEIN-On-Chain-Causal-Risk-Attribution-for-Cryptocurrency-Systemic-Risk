@@ -2305,5 +2305,64 @@
       "rows": 4332357,
       "bytes": 320594418
     }
+  },
+  "labels_epochs": {
+    "eftx_ext": {
+      "table": "vein-bq-10120733.vein.labels_eftx_ext",
+      "fingerprint": "02390ac46ff0"
+    },
+    "esvb_ext": {
+      "table": "vein-bq-10120733.vein.labels_esvb_ext",
+      "fingerprint": "843694a512bc"
+    }
+  },
+  "protocol_check": {
+    "tokens_lookup": {
+      "rows": [
+        {
+          "address": "0x4f5923fc5fd4a93352581b38b7cd26943012decf",
+          "symbol": "aEthUSDe"
+        },
+        {
+          "address": "0x4d5f47fa6a74757f35c14fd3a6ef8e3c9bc514e8",
+          "symbol": "aEthWETH"
+        },
+        {
+          "address": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+          "symbol": "stETH"
+        },
+        {
+          "address": "0x4579a27af00a62c0eb156349f31b345c08386419",
+          "symbol": "aEthsUSDe"
+        },
+        {
+          "address": "0x3ed3b47dd13ec9a98b44e6204a523e766b225811",
+          "symbol": "aUSDT"
+        },
+        {
+          "address": "0xbcca60bb61934080951369a648fb03df4f96263c",
+          "symbol": "aUSDC"
+        },
+        {
+          "address": "0x23878914efe38d27c4d67ab83ed1b93a74d4086a",
+          "symbol": "aEthUSDT"
+        },
+        {
+          "address": "0x030ba81f1c18d280636f32af80b9aad02cf0854e",
+          "symbol": "aWETH"
+        },
+        {
+          "address": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+          "symbol": "aEthUSDC"
+        }
+      ],
+      "symbols_missing_expected": []
+    },
+    "lido": {
+      "hours": 960,
+      "share_hours_wq_in_gt0": 0.9791666666666666,
+      "sum_wq_in": 450080.6466706543,
+      "sum_mint": 523104.4813564811
+    }
   }
 }
