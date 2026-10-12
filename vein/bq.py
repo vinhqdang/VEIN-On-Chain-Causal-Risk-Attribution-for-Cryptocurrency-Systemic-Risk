@@ -32,17 +32,30 @@ class BudgetError(RuntimeError):
 # client
 # ---------------------------------------------------------------------------
 def get_client():
-    """Build a BigQuery client from GCP_SA_KEY_B64 (base64 service-account JSON)."""
+    """Build a BigQuery client.
+
+    Uses GCP_SA_KEY_B64 (base64 service-account JSON) when set, otherwise
+    Application Default Credentials (``gcloud auth application-default login``)
+    with the project taken from GCP_PROJECT_ID.
+    """
     from google.cloud import bigquery
-    from google.oauth2 import service_account
 
     raw = os.environ.get("GCP_SA_KEY_B64")
-    if not raw:
-        raise RuntimeError("GCP_SA_KEY_B64 not set: no BigQuery credentials in this environment")
-    info = json.loads(base64.b64decode(raw))
-    creds = service_account.Credentials.from_service_account_info(
-        info, scopes=["https://www.googleapis.com/auth/cloud-platform"])
-    project = os.environ.get("GCP_PROJECT_ID") or info["project_id"]
+    if raw:
+        from google.oauth2 import service_account
+        info = json.loads(base64.b64decode(raw))
+        creds = service_account.Credentials.from_service_account_info(
+            info, scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        project = os.environ.get("GCP_PROJECT_ID") or info["project_id"]
+    else:
+        import google.auth
+        project = os.environ.get("GCP_PROJECT_ID")
+        if not project:
+            raise RuntimeError("Set GCP_PROJECT_ID (and GCP_SA_KEY_B64, or log in "
+                               "with gcloud auth application-default login)")
+        creds, _ = google.auth.default(
+            scopes=["https://www.googleapis.com/auth/cloud-platform"],
+            quota_project_id=project)
     # Table ids built by bq_sql.extract_table_ids read GCP_PROJECT_ID, so pin it.
     os.environ.setdefault("GCP_PROJECT_ID", project)
     return bigquery.Client(project=project, credentials=creds, location=config.BQ_LOCATION)

@@ -104,7 +104,22 @@ def stage_check() -> dict:
     part = tt[tt.is_partitioning_column.astype(str).eq("YES")].index.tolist()
     clus = tt[tt.clustering_ordinal_position.notna()].sort_values("clustering_ordinal_position").index.tolist()
     if "block_timestamp" not in part:
-        raise StageFailed(f"block_timestamp is not the partitioning column (got {part})")
+        # token_transfers is published as a view over a partitioned table, so the
+        # view's columns carry no partitioning flag. Verify pruning by dry run
+        # instead: ten days must scan clearly more than one day.
+        one = bq.dry_run_bytes(f"SELECT token_address, from_address, to_address, value FROM "
+                               f"`{src}.token_transfers` WHERE block_timestamp >= "
+                               f"TIMESTAMP('2025-10-10 00:00:00+00') AND block_timestamp < "
+                               f"TIMESTAMP('2025-10-11 00:00:00+00')", client)
+        ten = bq.dry_run_bytes(f"SELECT token_address, from_address, to_address, value FROM "
+                               f"`{src}.token_transfers` WHERE block_timestamp >= "
+                               f"TIMESTAMP('2025-10-10 00:00:00+00') AND block_timestamp < "
+                               f"TIMESTAMP('2025-10-20 00:00:00+00')", client)
+        if not (one > 0 and ten > 2.5 * one):
+            raise StageFailed(f"block_timestamp filter does not prune token_transfers "
+                              f"(1 day {one} B, 10 days {ten} B)")
+        part = ["block_timestamp (via view; pruning verified by dry run: "
+                f"1 day {one / 2**30:.2f} GiB, 10 days {ten / 2**30:.2f} GiB)"]
     _log(f"  schema ok; partitioning={part} clustering={clus}")
 
     fresh = bq.run_sql(f"SELECT MAX(block_timestamp) AS mx FROM `{src}.token_transfers` "
