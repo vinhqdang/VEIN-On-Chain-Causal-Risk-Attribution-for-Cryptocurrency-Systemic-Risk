@@ -1,0 +1,99 @@
+{
+  "generated": "2026-06-30",
+  "H1": {
+    "observed": {
+      "wrmse": 1.2529294293142177,
+      "rmse": 0.518746519151086,
+      "mae": 0.24532061040089662,
+      "dir_acc": 0.7708333333333334,
+      "n": 288
+    },
+    "granger": {
+      "wrmse": 1.2568370633891581,
+      "rmse": 0.5235550157218049,
+      "mae": 0.24822918852040596,
+      "dir_acc": 0.7673611111111112,
+      "n": 288
+    },
+    "mean_werr_diff_granger_minus_observed": 0.003489769073468588,
+    "boot_ci95_diff": [
+      -0.011776398043447711,
+      0.01622222012971849
+    ],
+    "prob_observed_better": 0.713
+  },
+  "lagged_flow": {
+    "observed_wrmse": 1.258136193494444,
+    "granger_wrmse": 1.2471690100654942,
+    "observed_dir_acc": 0.7673611111111112
+  },
+  "edge_type_falsification": {
+    "true": 1.6630030689587931,
+    "reverse_composability": 1.6630030689587931,
+    "reverse_custodial": 1.6747972466101857,
+    "n_composability_edges": 4,
+    "n_custodial_edges": 35
+  },
+  "shapley": {
+    "target": "Bybit",
+    "candidates": [
+      "Binance",
+      "Coinbase",
+      "Bitfinex"
+    ],
+    "shapley_values": {
+      "Binance": 3.414832272689519,
+      "Coinbase": 0.0,
+      "Bitfinex": -0.13869913908449832
+    },
+    "sum_shapley": 3.2761331336050206,
+    "total_effect": 3.276133133605021,
+    "additive_residual": 4.440892098500626e-16
+  },
+  "attribution_sensitivity": {
+    "Binance->Bybit": {
+      "base_share": 0.9813053445286813,
+      "mean": 0.9783357627241317,
+      "sd": 0.010857620288806396,
+      "frac_positive": 1.0
+    },
+    "Ethena->Aave": {
+      "base_share": 0.0,
+      "mean": 0.0,
+      "sd": 0.0,
+      "frac_positive": 0.0
+    }
+  },
+  "no_retail_ranking": [
+    {
+      "entity": "Binance",
+      "exported_risk": 16.016490454241918
+    },
+    {
+      "entity": "FalconX",
+      "exported_risk": 2.4473931463281318
+    },
+    {
+      "entity": "Ethena",
+      "exported_risk": 2.051495443342647
+    },
+    {
+      "entity": "HTX",
+      "exported_risk": 0.6769810562078149
+    },
+    {
+      "entity": "Bybit",
+      "exported_risk": 0.0
+    },
+    {
+      "entity": "Aave",
+      "exported_risk": 0.0
+    }
+  ],
+  "resolution_coverage": {
+    "total_usd": 438279472080.3119,
+    "frac_volume_named_both_sides": 0.009363219529929159,
+    "frac_volume_touching_named": 1.0,
+    "n_named_entities": 15
+  }
+}

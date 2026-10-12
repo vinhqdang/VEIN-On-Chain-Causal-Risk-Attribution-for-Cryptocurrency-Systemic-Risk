@@ -438,5 +438,1830 @@
     "tolerance": 0.02,
     "passed": true,
     "failed_days": []
+  },
+  "sweeps": {
+    "per_extract": {
+      "oct25_hourly": {
+        "detections": 260325,
+        "swept_usd": 74496106415.38841,
+        "per_exchange": {
+          "AscendEX": 145,
+          "BTSE": 256,
+          "Binance": 53190,
+          "Binance.US": 506,
+          "BingX": 3466,
+          "BitMEX": 77,
+          "BitMart": 432,
+          "Bitfinex": 543,
+          "Bitget": 15950,
+          "Bithumb": 608,
+          "Bitkub": 840,
+          "Bitpanda": 633,
+          "Bitstamp": 1574,
+          "Bitvavo": 901,
+          "BloFin": 1221,
+          "BtcTurk": 9,
+          "Bullish": 22,
+          "Bybit": 40123,
+          "Ceffu": 31,
+          "CoinDCX": 1,
+          "CoinEx": 1966,
+          "CoinSpot": 1046,
+          "CoinW": 144,
+          "Coinbase": 46990,
+          "Coinhako": 335,
+          "Coinone": 4,
+          "Coinsquare": 160,
+          "Copper": 30,
+          "Crypto.com": 8634,
+          "Deribit": 323,
+          "FalconX": 124,
+          "Gemini": 271,
+          "HTX": 5407,
+          "HitBTC": 3073,
+          "Indodax": 498,
+          "Korbit": 13,
+          "Kraken": 12783,
+          "KuCoin": 8247,
+          "LBank": 569,
+          "MEXC": 16217,
+          "MaskEX": 244,
+          "OKX": 23003,
+          "Poloniex": 318,
+          "Robinhood": 113,
+          "Upbit": 1,
+          "WhiteBIT": 8848,
+          "XT.com": 436
+        }
+      },
+      "ftx_hourly": {
+        "detections": 95993,
+        "swept_usd": 25460399126.224403,
+        "per_exchange": {
+          "AscendEX": 117,
+          "BTSE": 81,
+          "Binance": 40722,
+          "Binance.US": 881,
+          "BingX": 222,
+          "BitForex": 103,
+          "BitMEX": 111,
+          "BitMart": 153,
+          "Bitfinex": 450,
+          "Bitget": 665,
+          "Bitkub": 319,
+          "Bitpanda": 186,
+          "Bitstamp": 376,
+          "Bittrex": 206,
+          "Bitvavo": 245,
+          "BtcTurk": 212,
+          "Bybit": 4142,
+          "CoinDCX": 1,
+          "CoinEx": 241,
+          "CoinSpot": 331,
+          "CoinW": 51,
+          "Coinbase": 9752,
+          "Coinhako": 40,
+          "Coinsbit": 66,
+          "Coinsquare": 39,
+          "Copper": 34,
+          "Crypto.com": 4004,
+          "Delta Exchange": 3,
+          "Deribit": 5,
+          "EXMO": 5,
+          "FTX": 3703,
+          "FalconX": 45,
+          "Gemini": 802,
+          "HTX": 1673,
+          "HitBTC": 1999,
+          "Hotbit": 30,
+          "Indodax": 256,
+          "Korbit": 8,
+          "Kraken": 5199,
+          "KuCoin": 8496,
+          "LBank": 22,
+          "MEXC": 2180,
+          "MaskEX": 154,
+          "Nobitex": 7,
+          "OKX": 5447,
+          "Paribu": 40,
+          "Poloniex": 221,
+          "Robinhood": 42,
+          "WhiteBIT": 1871,
+          "XT.com": 35
+        }
+      },
+      "svb_hourly": {
+        "detections": 115862,
+        "swept_usd": 27498365537.434875,
+        "per_exchange": {
+          "AscendEX": 111,
+          "BTSE": 108,
+          "Binance": 47724,
+          "Binance.US": 936,
+          "BingX": 289,
+          "BitForex": 4,
+          "BitMEX": 53,
+          "BitMart": 197,
+          "Bitfinex": 576,
+          "Bitget": 1259,
+          "Bitkub": 319,
+          "Bitpanda": 246,
+          "Bitstamp": 531,
+          "Bittrex": 221,
+          "Bitvavo": 349,
+          "BtcTurk": 237,
+          "Bullish": 4,
+          "Bybit": 6760,
+          "CoinDCX": 1,
+          "CoinEx": 281,
+          "CoinSpot": 465,
+          "CoinW": 61,
+          "Coinbase": 13596,
+          "Coinhako": 126,
+          "Coinsbit": 23,
+          "Coinsquare": 46,
+          "Copper": 48,
+          "Crypto.com": 4247,
+          "Deribit": 34,
+          "EXMO": 30,
+          "FalconX": 53,
+          "Gemini": 1131,
+          "HTX": 1983,
+          "HitBTC": 2480,
+          "Hotbit": 20,
+          "Indodax": 242,
+          "Korbit": 12,
+          "Kraken": 8032,
+          "KuCoin": 8800,
+          "LBank": 10,
+          "MEXC": 3393,
+          "MaskEX": 131,
+          "Nobitex": 90,
+          "OKX": 8044,
+          "Paribu": 19,
+          "Poloniex": 248,
+          "Robinhood": 115,
+          "WhiteBIT": 1990,
+          "XT.com": 187
+        }
+      },
+      "core_daily": {
+        "detections": 10851,
+        "swept_usd": 22715218731.724762,
+        "per_exchange": {
+          "Binance": 4499,
+          "BitMart": 3,
+          "Bitget": 1162,
+          "Bybit": 4207,
+          "Ceffu": 1,
+          "Coinone": 11,
+          "Copper": 6,
+          "Deribit": 34,
+          "FalconX": 2,
+          "HTX": 211,
+          "HitBTC": 1,
+          "KuCoin": 97,
+          "MEXC": 615,
+          "XT.com": 2
+        }
+      }
+    },
+    "validation": {
+      "oct25_hourly": {
+        "key": "oct25_hourly",
+        "holdout_addresses": 25080,
+        "chosen": "default",
+        "acceptance": "precision >= 0.9 on >= 20 overlapping holdout detections",
+        "default": {
+          "params": {
+            "tau": 0.8,
+            "max_other_hot_share": 0.05,
+            "max_out_cp": 3,
+            "k_in": 1,
+            "min_fwd": 0.5,
+            "max_fwd": 1.25,
+            "max_in_from_hot_share": 0.5,
+            "min_timed_share": 0.8,
+            "h_hours": 24,
+            "min_sweep_usd": 1000.0
+          },
+          "detections": 234062,
+          "overlap": 423,
+          "correct_root": 423,
+          "wrong_root": 0,
+          "overlap_deposit_labels": 422,
+          "precision": 1.0,
+          "holdout_senders_ge_1k": 619,
+          "recall_count": 0.6834,
+          "recall_volume": 0.0036,
+          "per_exchange": [
+            {
+              "entity": "AscendEX",
+              "detections": 165,
+              "swept_usd": 3470756.916886
+            },
+            {
+              "entity": "BTSE",
+              "detections": 281,
+              "swept_usd": 210145317.521179
+            },
+            {
+              "entity": "Binance",
+              "detections": 60484,
+              "swept_usd": 19547271173.55879
+            },
+            {
+              "entity": "Binance.US",
+              "detections": 518,
+              "swept_usd": 13689936.517669
+            },
+            {
+              "entity": "BitMart",
+              "detections": 482,
+              "swept_usd": 57367988.212259
+            },
+            {
+              "entity": "Bitfinex",
+              "detections": 2,
+              "swept_usd": 45000000.0
+            },
+            {
+              "entity": "Bitget",
+              "detections": 16758,
+              "swept_usd": 2112517126.5211074
+            },
+            {
+              "entity": "Bithumb",
+              "detections": 646,
+              "swept_usd": 45731910.451526
+            },
+            {
+              "entity": "Bitkub",
+              "detections": 724,
+              "swept_usd": 25185684.544087
+            },
+            {
+              "entity": "Bitpanda",
+              "detections": 659,
+              "swept_usd": 5339444.471819
+            },
+            {
+              "entity": "Bitvavo",
+              "detections": 1,
+              "swept_usd": 28138332.451817002
+            },
+            {
+              "entity": "BloFin",
+              "detections": 1276,
+              "swept_usd": 44501056.854829
+            },
+            {
+              "entity": "BtcTurk",
+              "detections": 1,
+              "swept_usd": 3300.0
+            },
+            {
+              "entity": "Bullish",
+              "detections": 3,
+              "swept_usd": 1527723.4845419999
+            },
+            {
+              "entity": "Bybit",
+              "detections": 41597,
+              "swept_usd": 9070070038.150793
+            },
+            {
+              "entity": "Ceffu",
+              "detections": 33,
+              "swept_usd": 1705116997.257232
+            },
+            {
+              "entity": "CoinDCX",
+              "detections": 1,
+              "swept_usd": 19786070.743277
+            },
+            {
+              "entity": "CoinEx",
+              "detections": 2011,
+              "swept_usd": 55241979.233963
+            },
+            {
+              "entity": "CoinSpot",
+              "detections": 689,
+              "swept_usd": 38446022.936393
+            },
+            {
+              "entity": "CoinW",
+              "detections": 216,
+              "swept_usd": 3636057.610848
+            },
+            {
+              "entity": "Coinbase",
+              "detections": 47778,
+              "swept_usd": 23087415682.438946
+            },
+            {
+              "entity": "Coinhako",
+              "detections": 365,
+              "swept_usd": 55385311.557623
+            },
+            {
+              "entity": "Coinone",
+              "detections": 4,
+              "swept_usd": 264060.77026049996
+            },
+            {
+              "entity": "Copper",
+              "detections": 24,
+              "swept_usd": 3295393.8059118497
+            },
+            {
+              "entity": "Crypto.com",
+              "detections": 8856,
+              "swept_usd": 1915279607.469015
+            },
+            {
+              "entity": "Deribit",
+              "detections": 368,
+              "swept_usd": 328269819.0829121
+            },
+            {
+              "entity": "FalconX",
+              "detections": 131,
+              "swept_usd": 2168550808.754274
+            },
+            {
+              "entity": "Gemini",
+              "detections": 279,
+              "swept_usd": 241235456.06072697
+            },
+            {
+              "entity": "HTX",
+              "detections": 1,
+              "swept_usd": 337000.0
+            },
+            {
+              "entity": "Indodax",
+              "detections": 547,
+              "swept_usd": 21509749.809639
+            },
+            {
+              "entity": "Korbit",
+              "detections": 14,
+              "swept_usd": 488205.664074
+            },
+            {
+              "entity": "Kraken",
+              "detections": 12993,
+              "swept_usd": 3078941730.775573
+            },
+            {
+              "entity": "KuCoin",
+              "detections": 8454,
+              "swept_usd": 473167012.278529
+            },
+            {
+              "entity": "LBank",
+              "detections": 698,
+              "swept_usd": 9399607.249237
+            },
+            {
+              "entity": "MEXC",
+              "detections": 17021,
+              "swept_usd": 633197449.1994303
+            },
+            {
+              "entity": "MaskEX",
+              "detections": 247,
+              "swept_usd": 196405559.93241903
+            },
+            {
+              "entity": "OKX",
+              "detections": 62,
+              "swept_usd": 86397138.31318499
+            },
+            {
+              "entity": "Robinhood",
+              "detections": 113,
+              "swept_usd": 1616997.427405
+            },
+            {
+              "entity": "Upbit",
+              "detections": 1,
+              "swept_usd": 1689591.7761000001
+            },
+            {
+              "entity": "WhiteBIT",
+              "detections": 9081,
+              "swept_usd": 392124806.44153094
+            },
+            {
+              "entity": "XT.com",
+              "detections": 478,
+              "swept_usd": 7444643.829744
+            }
+          ]
+        },
+        "tightened": {
+          "params": {
+            "tau": 0.9,
+            "max_other_hot_share": 0.05,
+            "max_out_cp": 2,
+            "k_in": 1,
+            "min_fwd": 0.5,
+            "max_fwd": 1.25,
+            "max_in_from_hot_share": 0.5,
+            "min_timed_share": 0.8,
+            "h_hours": 24,
+            "min_sweep_usd": 1000.0
+          },
+          "detections": 232165,
+          "overlap": 420,
+          "correct_root": 420,
+          "wrong_root": 0,
+          "overlap_deposit_labels": 419,
+          "precision": 1.0,
+          "holdout_senders_ge_1k": 619,
+          "recall_count": 0.6785,
+          "recall_volume": 0.0011,
+          "per_exchange": [
+            {
+              "entity": "AscendEX",
+              "detections": 165,
+              "swept_usd": 3470756.916886
+            },
+            {
+              "entity": "BTSE",
+              "detections": 281,
+              "swept_usd": 210145317.521179
+            },
+            {
+              "entity": "Binance",
+              "detections": 59196,
+              "swept_usd": 13866486195.672861
+            },
+            {
+              "entity": "Binance.US",
+              "detections": 518,
+              "swept_usd": 13689936.517669
+            },
+            {
+              "entity": "BitMart",
+              "detections": 482,
+              "swept_usd": 57367988.212259
+            },
+            {
+              "entity": "Bitfinex",
+              "detections": 1,
+              "swept_usd": 25000000.0
+            },
+            {
+              "entity": "Bitget",
+              "detections": 16758,
+              "swept_usd": 2112517126.5211072
+            },
+            {
+              "entity": "Bithumb",
+              "detections": 638,
+              "swept_usd": 45548079.59778199
+            },
+            {
+              "entity": "Bitkub",
+              "detections": 715,
+              "swept_usd": 22909878.896497
+            },
+            {
+              "entity": "Bitpanda",
+              "detections": 659,
+              "swept_usd": 5339444.471819
+            },
+            {
+              "entity": "Bitvavo",
+              "detections": 1,
+              "swept_usd": 28138332.451817
+            },
+            {
+              "entity": "BloFin",
+              "detections": 1276,
+              "swept_usd": 44501056.854829
+            },
+            {
+              "entity": "BtcTurk",
+              "detections": 1,
+              "swept_usd": 3300.0
+            },
+            {
+              "entity": "Bullish",
+              "detections": 3,
+              "swept_usd": 1527723.484542
+            },
+            {
+              "entity": "Bybit",
+              "detections": 41488,
+              "swept_usd": 5536786406.536255
+            },
+            {
+              "entity": "Ceffu",
+              "detections": 33,
+              "swept_usd": 1705116997.257232
+            },
+            {
+              "entity": "CoinDCX",
+              "detections": 1,
+              "swept_usd": 19786070.743277002
+            },
+            {
+              "entity": "CoinEx",
+              "detections": 2011,
+              "swept_usd": 55241979.233963
+            },
+            {
+              "entity": "CoinSpot",
+              "detections": 682,
+              "swept_usd": 38189387.936361
+            },
+            {
+              "entity": "CoinW",
+              "detections": 216,
+              "swept_usd": 3636057.6108480003
+            },
+            {
+              "entity": "Coinbase",
+              "detections": 47778,
+              "swept_usd": 23087415682.438946
+            },
+            {
+              "entity": "Coinhako",
+              "detections": 365,
+              "swept_usd": 55385311.557623
+            },
+            {
+              "entity": "Coinone",
+              "detections": 4,
+              "swept_usd": 264060.77026049996
+            },
+            {
+              "entity": "Copper",
+              "detections": 22,
+              "swept_usd": 2231552.12126385
+            },
+            {
+              "entity": "Crypto.com",
+              "detections": 8856,
+              "swept_usd": 1915279607.469015
+            },
+            {
+              "entity": "Deribit",
+              "detections": 368,
+              "swept_usd": 328269819.08291215
+            },
+            {
+              "entity": "FalconX",
+              "detections": 130,
+              "swept_usd": 2087989966.7038538
+            },
+            {
+              "entity": "Gemini",
+              "detections": 279,
+              "swept_usd": 241235456.060727
+            },
+            {
+              "entity": "HTX",
+              "detections": 1,
+              "swept_usd": 337000.0
+            },
+            {
+              "entity": "Indodax",
+              "detections": 547,
+              "swept_usd": 21509749.809639
+            },
+            {
+              "entity": "Korbit",
+              "detections": 14,
+              "swept_usd": 488205.664074
+            },
+            {
+              "entity": "Kraken",
+              "detections": 12891,
+              "swept_usd": 2894827242.591395
+            },
+            {
+              "entity": "KuCoin",
+              "detections": 8094,
+              "swept_usd": 300555732.97733396
+            },
+            {
+              "entity": "LBank",
+              "detections": 692,
+              "swept_usd": 9054314.397946
+            },
+            {
+              "entity": "MEXC",
+              "detections": 17021,
+              "swept_usd": 633197449.1994303
+            },
+            {
+              "entity": "MaskEX",
+              "detections": 245,
+              "swept_usd": 195428279.932419
+            },
+            {
+              "entity": "OKX",
+              "detections": 62,
+              "swept_usd": 86397138.31318499
+            },
+            {
+              "entity": "Robinhood",
+              "detections": 113,
+              "swept_usd": 1616997.427405
+            },
+            {
+              "entity": "WhiteBIT",
+              "detections": 9080,
+              "swept_usd": 392122506.44153094
+            },
+            {
+              "entity": "XT.com",
+              "detections": 478,
+              "swept_usd": 7444643.829744
+            }
+          ]
+        }
+      },
+      "ftx_hourly": {
+        "key": "ftx_hourly",
+        "holdout_addresses": 25080,
+        "chosen": "tightened",
+        "acceptance": "precision >= 0.9 on >= 20 overlapping holdout detections",
+        "default": {
+          "params": {
+            "tau": 0.8,
+            "max_other_hot_share": 0.05,
+            "max_out_cp": 3,
+            "k_in": 1,
+            "min_fwd": 0.5,
+            "max_fwd": 1.25,
+            "max_in_from_hot_share": 0.5,
+            "min_timed_share": 0.8,
+            "h_hours": 24,
+            "min_sweep_usd": 1000.0
+          },
+          "detections": 86948,
+          "overlap": 13,
+          "correct_root": 13,
+          "wrong_root": 0,
+          "overlap_deposit_labels": 11,
+          "precision": 1.0,
+          "holdout_senders_ge_1k": 76,
+          "recall_count": 0.1711,
+          "recall_volume": 0.0435,
+          "per_exchange": [
+            {
+              "entity": "AscendEX",
+              "detections": 127,
+              "swept_usd": 7327928.886604
+            },
+            {
+              "entity": "BTSE",
+              "detections": 88,
+              "swept_usd": 33514398.88837
+            },
+            {
+              "entity": "Binance",
+              "detections": 44051,
+              "swept_usd": 11694863574.17234
+            },
+            {
+              "entity": "Binance.US",
+              "detections": 955,
+              "swept_usd": 65266170.884754
+            },
+            {
+              "entity": "BingX",
+              "detections": 234,
+              "swept_usd": 1810122.02122
+            },
+            {
+              "entity": "Bitget",
+              "detections": 440,
+              "swept_usd": 15475617.549623
+            },
+            {
+              "entity": "Bitkub",
+              "detections": 255,
+              "swept_usd": 49940574.462563
+            },
+            {
+              "entity": "Bitpanda",
+              "detections": 229,
+              "swept_usd": 1817932.659737
+            },
+            {
+              "entity": "Bittrex",
+              "detections": 268,
+              "swept_usd": 21771785.685973
+            },
+            {
+              "entity": "Bitvavo",
+              "detections": 303,
+              "swept_usd": 4337899.987105
+            },
+            {
+              "entity": "BtcTurk",
+              "detections": 252,
+              "swept_usd": 20663719.972687
+            },
+            {
+              "entity": "Bullish",
+              "detections": 1,
+              "swept_usd": 100000.0
+            },
+            {
+              "entity": "Bybit",
+              "detections": 4540,
+              "swept_usd": 471190632.677814
+            },
+            {
+              "entity": "CoinDCX",
+              "detections": 1,
+              "swept_usd": 3060.0
+            },
+            {
+              "entity": "CoinSpot",
+              "detections": 147,
+              "swept_usd": 1879709.3262760001
+            },
+            {
+              "entity": "CoinW",
+              "detections": 12,
+              "swept_usd": 111384.803461
+            },
+            {
+              "entity": "Coinbase",
+              "detections": 10736,
+              "swept_usd": 6810331381.628819
+            },
+            {
+              "entity": "Coinhako",
+              "detections": 60,
+              "swept_usd": 1952762.222416
+            },
+            {
+              "entity": "Coinsbit",
+              "detections": 67,
+              "swept_usd": 680218.14864
+            },
+            {
+              "entity": "Coinsquare",
+              "detections": 1,
+              "swept_usd": 774000.0
+            },
+            {
+              "entity": "Copper",
+              "detections": 48,
+              "swept_usd": 44940994.960685
+            },
+            {
+              "entity": "Crypto.com",
+              "detections": 4516,
+              "swept_usd": 78056227.41447
+            },
+            {
+              "entity": "Delta Exchange",
+              "detections": 3,
+              "swept_usd": 6105.359401
+            },
+            {
+              "entity": "Deribit",
+              "detections": 9,
+              "swept_usd": 155825.833795
+            },
+            {
+              "entity": "EXMO",
+              "detections": 5,
+              "swept_usd": 48714.51346
+            },
+            {
+              "entity": "FTX",
+              "detections": 570,
+              "swept_usd": 274390214.108545
+            },
+            {
+              "entity": "FalconX",
+              "detections": 52,
+              "swept_usd": 905288787.202802
+            },
+            {
+              "entity": "Gemini",
+              "detections": 964,
+              "swept_usd": 142613256.51445
+            },
+            {
+              "entity": "HTX",
+              "detections": 1322,
+              "swept_usd": 86253011.546699
+            },
+            {
+              "entity": "HitBTC",
+              "detections": 2015,
+              "swept_usd": 75239048.491318
+            },
+            {
+              "entity": "Hotbit",
+              "detections": 31,
+              "swept_usd": 310727.68379
+            },
+            {
+              "entity": "Indodax",
+              "detections": 272,
+              "swept_usd": 10270646.177462
+            },
+            {
+              "entity": "Korbit",
+              "detections": 13,
+              "swept_usd": 171032.617091
+            },
+            {
+              "entity": "Kraken",
+              "detections": 9,
+              "swept_usd": 107870.57782606583
+            },
+            {
+              "entity": "KuCoin",
+              "detections": 9060,
+              "swept_usd": 207991772.1416
+            },
+            {
+              "entity": "LBank",
+              "detections": 23,
+              "swept_usd": 194588.726414
+            },
+            {
+              "entity": "MEXC",
+              "detections": 17,
+              "swept_usd": 1344010.847983
+            },
+            {
+              "entity": "MaskEX",
+              "detections": 125,
+              "swept_usd": 31916213.00351
+            },
+            {
+              "entity": "Nobitex",
+              "detections": 1,
+              "swept_usd": 99936.78839999999
+            },
+            {
+              "entity": "OKX",
+              "detections": 3192,
+              "swept_usd": 134197994.8049135
+            },
+            {
+              "entity": "Robinhood",
+              "detections": 48,
+              "swept_usd": 1854793.685542
+            },
+            {
+              "entity": "WhiteBIT",
+              "detections": 1886,
+              "swept_usd": 51983507.070332
+            }
+          ]
+        },
+        "tightened": {
+          "params": {
+            "tau": 0.9,
+            "max_other_hot_share": 0.05,
+            "max_out_cp": 2,
+            "k_in": 1,
+            "min_fwd": 0.5,
+            "max_fwd": 1.25,
+            "max_in_from_hot_share": 0.5,
+            "min_timed_share": 0.8,
+            "h_hours": 24,
+            "min_sweep_usd": 1000.0
+          },
+          "detections": 86557,
+          "overlap": 13,
+          "correct_root": 13,
+          "wrong_root": 0,
+          "overlap_deposit_labels": 11,
+          "precision": 1.0,
+          "holdout_senders_ge_1k": 76,
+          "recall_count": 0.1711,
+          "recall_volume": 0.0435,
+          "per_exchange": [
+            {
+              "entity": "AscendEX",
+              "detections": 127,
+              "swept_usd": 7327928.886604
+            },
+            {
+              "entity": "BTSE",
+              "detections": 88,
+              "swept_usd": 33514398.88837
+            },
+            {
+              "entity": "Binance",
+              "detections": 44051,
+              "swept_usd": 11694863574.17234
+            },
+            {
+              "entity": "Binance.US",
+              "detections": 955,
+              "swept_usd": 65266170.884754
+            },
+            {
+              "entity": "BingX",
+              "detections": 234,
+              "swept_usd": 1810122.02122
+            },
+            {
+              "entity": "Bitget",
+              "detections": 427,
+              "swept_usd": 15048266.476474
+            },
+            {
+              "entity": "Bitkub",
+              "detections": 254,
+              "swept_usd": 49825631.72942
+            },
+            {
+              "entity": "Bitpanda",
+              "detections": 229,
+              "swept_usd": 1817932.659737
+            },
+            {
+              "entity": "Bittrex",
+              "detections": 268,
+              "swept_usd": 21771785.685973
+            },
+            {
+              "entity": "Bitvavo",
+              "detections": 303,
+              "swept_usd": 4337899.987105
+            },
+            {
+              "entity": "BtcTurk",
+              "detections": 252,
+              "swept_usd": 20663719.972687
+            },
+            {
+              "entity": "Bullish",
+              "detections": 1,
+              "swept_usd": 100000.0
+            },
+            {
+              "entity": "Bybit",
+              "detections": 4540,
+              "swept_usd": 471190632.677814
+            },
+            {
+              "entity": "CoinDCX",
+              "detections": 1,
+              "swept_usd": 3060.0
+            },
+            {
+              "entity": "CoinSpot",
+              "detections": 147,
+              "swept_usd": 1879709.3262760001
+            },
+            {
+              "entity": "CoinW",
+              "detections": 12,
+              "swept_usd": 111384.803461
+            },
+            {
+              "entity": "Coinbase",
+              "detections": 10736,
+              "swept_usd": 6810331381.628819
+            },
+            {
+              "entity": "Coinhako",
+              "detections": 60,
+              "swept_usd": 1952762.222416
+            },
+            {
+              "entity": "Coinsbit",
+              "detections": 67,
+              "swept_usd": 680218.14864
+            },
+            {
+              "entity": "Coinsquare",
+              "detections": 1,
+              "swept_usd": 774000.0
+            },
+            {
+              "entity": "Copper",
+              "detections": 36,
+              "swept_usd": 26839609.959201
+            },
+            {
+              "entity": "Crypto.com",
+              "detections": 4516,
+              "swept_usd": 78056227.41447
+            },
+            {
+              "entity": "Delta Exchange",
+              "detections": 3,
+              "swept_usd": 6105.359401
+            },
+            {
+              "entity": "Deribit",
+              "detections": 9,
+              "swept_usd": 155825.833795
+            },
+            {
+              "entity": "EXMO",
+              "detections": 5,
+              "swept_usd": 48714.51346
+            },
+            {
+              "entity": "FTX",
+              "detections": 570,
+              "swept_usd": 274390214.108545
+            },
+            {
+              "entity": "FalconX",
+              "detections": 52,
+              "swept_usd": 905288787.202802
+            },
+            {
+              "entity": "Gemini",
+              "detections": 964,
+              "swept_usd": 142613256.51444998
+            },
+            {
+              "entity": "HTX",
+              "detections": 1254,
+              "swept_usd": 69734640.178249
+            },
+            {
+              "entity": "HitBTC",
+              "detections": 2015,
+              "swept_usd": 75239048.491318
+            },
+            {
+              "entity": "Hotbit",
+              "detections": 31,
+              "swept_usd": 310727.68379
+            },
+            {
+              "entity": "Indodax",
+              "detections": 272,
+              "swept_usd": 10270646.177462
+            },
+            {
+              "entity": "Korbit",
+              "detections": 13,
+              "swept_usd": 171032.617091
+            },
+            {
+              "entity": "Kraken",
+              "detections": 9,
+              "swept_usd": 107870.57782606583
+            },
+            {
+              "entity": "KuCoin",
+              "detections": 8983,
+              "swept_usd": 204062745.073856
+            },
+            {
+              "entity": "LBank",
+              "detections": 23,
+              "swept_usd": 194588.726414
+            },
+            {
+              "entity": "MEXC",
+              "detections": 15,
+              "swept_usd": 447808.947891
+            },
+            {
+              "entity": "MaskEX",
+              "detections": 117,
+              "swept_usd": 28397776.00351
+            },
+            {
+              "entity": "Nobitex",
+              "detections": 1,
+              "swept_usd": 99936.78839999999
+            },
+            {
+              "entity": "OKX",
+              "detections": 2982,
+              "swept_usd": 117740658.5860135
+            },
+            {
+              "entity": "Robinhood",
+              "detections": 48,
+              "swept_usd": 1854793.685542
+            },
+            {
+              "entity": "WhiteBIT",
+              "detections": 1886,
+              "swept_usd": 51983507.070332
+            }
+          ]
+        }
+      },
+      "svb_hourly": {
+        "key": "svb_hourly",
+        "holdout_addresses": 25080,
+        "chosen": "default",
+        "acceptance": "precision >= 0.9 on >= 20 overlapping holdout detections",
+        "default": {
+          "params": {
+            "tau": 0.8,
+            "max_other_hot_share": 0.05,
+            "max_out_cp": 3,
+            "k_in": 1,
+            "min_fwd": 0.5,
+            "max_fwd": 1.25,
+            "max_in_from_hot_share": 0.5,
+            "min_timed_share": 0.8,
+            "h_hours": 24,
+            "min_sweep_usd": 1000.0
+          },
+          "detections": 100430,
+          "overlap": 31,
+          "correct_root": 31,
+          "wrong_root": 0,
+          "overlap_deposit_labels": 27,
+          "precision": 1.0,
+          "holdout_senders_ge_1k": 91,
+          "recall_count": 0.3407,
+          "recall_volume": 0.0318,
+          "per_exchange": [
+            {
+              "entity": "AscendEX",
+              "detections": 115,
+              "swept_usd": 2420092.127442
+            },
+            {
+              "entity": "BTSE",
+              "detections": 103,
+              "swept_usd": 42643773.003714
+            },
+            {
+              "entity": "Binance",
+              "detections": 48997,
+              "swept_usd": 10339222108.801088
+            },
+            {
+              "entity": "Binance.US",
+              "detections": 969,
+              "swept_usd": 81742700.83679199
+            },
+            {
+              "entity": "BingX",
+              "detections": 260,
+              "swept_usd": 4146946.970594
+            },
+            {
+              "entity": "Bitget",
+              "detections": 449,
+              "swept_usd": 18986421.109451998
+            },
+            {
+              "entity": "Bitkub",
+              "detections": 255,
+              "swept_usd": 18693912.595349
+            },
+            {
+              "entity": "Bitpanda",
+              "detections": 271,
+              "swept_usd": 8108795.038806
+            },
+            {
+              "entity": "Bitstamp",
+              "detections": 1,
+              "swept_usd": 243653500.300176
+            },
+            {
+              "entity": "Bittrex",
+              "detections": 256,
+              "swept_usd": 31775780.825308
+            },
+            {
+              "entity": "Bitvavo",
+              "detections": 377,
+              "swept_usd": 4940221.618546
+            },
+            {
+              "entity": "BtcTurk",
+              "detections": 257,
+              "swept_usd": 26279934.671789
+            },
+            {
+              "entity": "Bullish",
+              "detections": 5,
+              "swept_usd": 76993881.019454
+            },
+            {
+              "entity": "Bybit",
+              "detections": 6932,
+              "swept_usd": 416307080.277137
+            },
+            {
+              "entity": "CoinSpot",
+              "detections": 182,
+              "swept_usd": 1887231.066633
+            },
+            {
+              "entity": "CoinW",
+              "detections": 27,
+              "swept_usd": 1213487.173623
+            },
+            {
+              "entity": "Coinbase",
+              "detections": 14372,
+              "swept_usd": 14002060540.307919
+            },
+            {
+              "entity": "Coinhako",
+              "detections": 134,
+              "swept_usd": 14285845.487543
+            },
+            {
+              "entity": "Coinsbit",
+              "detections": 23,
+              "swept_usd": 99391.407556
+            },
+            {
+              "entity": "Copper",
+              "detections": 55,
+              "swept_usd": 122085858.648268
+            },
+            {
+              "entity": "Crypto.com",
+              "detections": 4501,
+              "swept_usd": 100319609.922046
+            },
+            {
+              "entity": "Deribit",
+              "detections": 41,
+              "swept_usd": 3761632.408095
+            },
+            {
+              "entity": "EXMO",
+              "detections": 30,
+              "swept_usd": 442477.397066
+            },
+            {
+              "entity": "FalconX",
+              "detections": 58,
+              "swept_usd": 520803025.00997
+            },
+            {
+              "entity": "Gemini",
+              "detections": 1209,
+              "swept_usd": 93235237.178089
+            },
+            {
+              "entity": "HTX",
+              "detections": 2047,
+              "swept_usd": 260553538.828376
+            },
+            {
+              "entity": "HitBTC",
+              "detections": 2488,
+              "swept_usd": 72529540.740193
+            },
+            {
+              "entity": "Hotbit",
+              "detections": 20,
+              "swept_usd": 233028.54096
+            },
+            {
+              "entity": "Indodax",
+              "detections": 253,
+              "swept_usd": 9502045.994584
+            },
+            {
+              "entity": "Korbit",
+              "detections": 13,
+              "swept_usd": 195700.331061
+            },
+            {
+              "entity": "Kraken",
+              "detections": 9,
+              "swept_usd": 288671.3065172262
+            },
+            {
+              "entity": "KuCoin",
+              "detections": 9098,
+              "swept_usd": 355592538.16238
+            },
+            {
+              "entity": "LBank",
+              "detections": 10,
+              "swept_usd": 320038.198377
+            },
+            {
+              "entity": "MEXC",
+              "detections": 337,
+              "swept_usd": 31418860.448363
+            },
+            {
+              "entity": "MaskEX",
+              "detections": 109,
+              "swept_usd": 45933895.003931
+            },
+            {
+              "entity": "OKX",
+              "detections": 4036,
+              "swept_usd": 240591440.9815552
+            },
+            {
+              "entity": "Robinhood",
+              "detections": 117,
+              "swept_usd": 4865192.097891
+            },
+            {
+              "entity": "WhiteBIT",
+              "detections": 2014,
+              "swept_usd": 89796408.399017
+            }
+          ]
+        },
+        "tightened": {
+          "params": {
+            "tau": 0.9,
+            "max_other_hot_share": 0.05,
+            "max_out_cp": 2,
+            "k_in": 1,
+            "min_fwd": 0.5,
+            "max_fwd": 1.25,
+            "max_in_from_hot_share": 0.5,
+            "min_timed_share": 0.8,
+            "h_hours": 24,
+            "min_sweep_usd": 1000.0
+          },
+          "detections": 100023,
+          "overlap": 31,
+          "correct_root": 31,
+          "wrong_root": 0,
+          "overlap_deposit_labels": 27,
+          "precision": 1.0,
+          "holdout_senders_ge_1k": 91,
+          "recall_count": 0.3407,
+          "recall_volume": 0.0318,
+          "per_exchange": [
+            {
+              "entity": "AscendEX",
+              "detections": 115,
+              "swept_usd": 2420092.127442
+            },
+            {
+              "entity": "BTSE",
+              "detections": 103,
+              "swept_usd": 42643773.003714
+            },
+            {
+              "entity": "Binance",
+              "detections": 48997,
+              "swept_usd": 10339222108.801088
+            },
+            {
+              "entity": "Binance.US",
+              "detections": 969,
+              "swept_usd": 81742700.83679199
+            },
+            {
+              "entity": "BingX",
+              "detections": 257,
+              "swept_usd": 4117865.746717
+            },
+            {
+              "entity": "Bitget",
+              "detections": 441,
+              "swept_usd": 18869397.792331
+            },
+            {
+              "entity": "Bitkub",
+              "detections": 250,
+              "swept_usd": 18229301.282084
+            },
+            {
+              "entity": "Bitpanda",
+              "detections": 271,
+              "swept_usd": 8108795.038806
+            },
+            {
+              "entity": "Bitstamp",
+              "detections": 1,
+              "swept_usd": 243653500.30017602
+            },
+            {
+              "entity": "Bittrex",
+              "detections": 256,
+              "swept_usd": 31775780.825308
+            },
+            {
+              "entity": "Bitvavo",
+              "detections": 377,
+              "swept_usd": 4940221.618546
+            },
+            {
+              "entity": "BtcTurk",
+              "detections": 257,
+              "swept_usd": 26279934.671789
+            },
+            {
+              "entity": "Bullish",
+              "detections": 5,
+              "swept_usd": 76993881.019454
+            },
+            {
+              "entity": "Bybit",
+              "detections": 6932,
+              "swept_usd": 416307080.277137
+            },
+            {
+              "entity": "CoinSpot",
+              "detections": 181,
+              "swept_usd": 1877281.066633
+            },
+            {
+              "entity": "CoinW",
+              "detections": 27,
+              "swept_usd": 1213487.173623
+            },
+            {
+              "entity": "Coinbase",
+              "detections": 14372,
+              "swept_usd": 14002060540.307919
+            },
+            {
+              "entity": "Coinhako",
+              "detections": 134,
+              "swept_usd": 14285845.487543
+            },
+            {
+              "entity": "Coinsbit",
+              "detections": 23,
+              "swept_usd": 99391.407556
+            },
+            {
+              "entity": "Copper",
+              "detections": 53,
+              "swept_usd": 110559079.21842399
+            },
+            {
+              "entity": "Crypto.com",
+              "detections": 4501,
+              "swept_usd": 100319609.922046
+            },
+            {
+              "entity": "Deribit",
+              "detections": 41,
+              "swept_usd": 3761632.408095
+            },
+            {
+              "entity": "EXMO",
+              "detections": 30,
+              "swept_usd": 442477.397066
+            },
+            {
+              "entity": "FalconX",
+              "detections": 58,
+              "swept_usd": 520803025.00997
+            },
+            {
+              "entity": "Gemini",
+              "detections": 1209,
+              "swept_usd": 93235237.178089
+            },
+            {
+              "entity": "HTX",
+              "detections": 2047,
+              "swept_usd": 260553538.828376
+            },
+            {
+              "entity": "HitBTC",
+              "detections": 2488,
+              "swept_usd": 72529540.740193
+            },
+            {
+              "entity": "Hotbit",
+              "detections": 20,
+              "swept_usd": 233028.54096
+            },
+            {
+              "entity": "Indodax",
+              "detections": 253,
+              "swept_usd": 9502045.994584
+            },
+            {
+              "entity": "Korbit",
+              "detections": 13,
+              "swept_usd": 195700.331061
+            },
+            {
+              "entity": "Kraken",
+              "detections": 8,
+              "swept_usd": 286618.7662470985
+            },
+            {
+              "entity": "KuCoin",
+              "detections": 9008,
+              "swept_usd": 295040457.139
+            },
+            {
+              "entity": "LBank",
+              "detections": 10,
+              "swept_usd": 320038.198377
+            },
+            {
+              "entity": "MEXC",
+              "detections": 320,
+              "swept_usd": 19924047.937566
+            },
+            {
+              "entity": "MaskEX",
+              "detections": 103,
+              "swept_usd": 44606691.850981
+            },
+            {
+              "entity": "OKX",
+              "detections": 3762,
+              "swept_usd": 200677600.1655342
+            },
+            {
+              "entity": "Robinhood",
+              "detections": 117,
+              "swept_usd": 4865192.097891
+            },
+            {
+              "entity": "WhiteBIT",
+              "detections": 2014,
+              "swept_usd": 89796408.399017
+            }
+          ]
+        }
+      },
+      "core_daily": {
+        "key": "core_daily",
+        "holdout_addresses": 25080,
+        "chosen": "default",
+        "acceptance": "precision >= 0.9 on >= 20 overlapping holdout detections",
+        "default": {
+          "params": {
+            "tau": 0.8,
+            "max_other_hot_share": 0.05,
+            "max_out_cp": 3,
+            "k_in": 1,
+            "min_fwd": 0.5,
+            "max_fwd": 1.25,
+            "max_in_from_hot_share": 0.5,
+            "min_timed_share": 0.8,
+            "h_hours": 24,
+            "min_sweep_usd": 1000.0
+          },
+          "detections": 10842,
+          "overlap": 64,
+          "correct_root": 64,
+          "wrong_root": 0,
+          "overlap_deposit_labels": 64,
+          "precision": 1.0,
+          "holdout_senders_ge_1k": 116,
+          "recall_count": 0.5517,
+          "recall_volume": 0.0006,
+          "per_exchange": [
+            {
+              "entity": "Binance",
+              "detections": 4581,
+              "swept_usd": 11337650806.358667
+            },
+            {
+              "entity": "Bitget",
+              "detections": 1172,
+              "swept_usd": 33670562.8218395
+            },
+            {
+              "entity": "Bybit",
+              "detections": 4304,
+              "swept_usd": 11119453906.839304
+            },
+            {
+              "entity": "Ceffu",
+              "detections": 1,
+              "swept_usd": 5040491.987054644
+            },
+            {
+              "entity": "Coinone",
+              "detections": 11,
+              "swept_usd": 350541.01229653996
+            },
+            {
+              "entity": "Copper",
+              "detections": 5,
+              "swept_usd": 10738042.303840999
+            },
+            {
+              "entity": "Deribit",
+              "detections": 34,
+              "swept_usd": 20712885.843697246
+            },
+            {
+              "entity": "FalconX",
+              "detections": 2,
+              "swept_usd": 88201.0
+            },
+            {
+              "entity": "KuCoin",
+              "detections": 97,
+              "swept_usd": 2013458.0504946213
+            },
+            {
+              "entity": "MEXC",
+              "detections": 633,
+              "swept_usd": 182600760.19993737
+            },
+            {
+              "entity": "XT.com",
+              "detections": 2,
+              "swept_usd": 5537.489522210091
+            }
+          ]
+        },
+        "tightened": {
+          "params": {
+            "tau": 0.9,
+            "max_other_hot_share": 0.05,
+            "max_out_cp": 2,
+            "k_in": 1,
+            "min_fwd": 0.5,
+            "max_fwd": 1.25,
+            "max_in_from_hot_share": 0.5,
+            "min_timed_share": 0.8,
+            "h_hours": 24,
+            "min_sweep_usd": 1000.0
+          },
+          "detections": 10840,
+          "overlap": 64,
+          "correct_root": 64,
+          "wrong_root": 0,
+          "overlap_deposit_labels": 64,
+          "precision": 1.0,
+          "holdout_senders_ge_1k": 116,
+          "recall_count": 0.5517,
+          "recall_volume": 0.0006,
+          "per_exchange": [
+            {
+              "entity": "Binance",
+              "detections": 4581,
+              "swept_usd": 11337650806.358667
+            },
+            {
+              "entity": "Bitget",
+              "detections": 1172,
+              "swept_usd": 33670562.8218395
+            },
+            {
+              "entity": "Bybit",
+              "detections": 4303,
+              "swept_usd": 11119286868.958242
+            },
+            {
+              "entity": "Ceffu",
+              "detections": 1,
+              "swept_usd": 5040491.987054644
+            },
+            {
+              "entity": "Coinone",
+              "detections": 11,
+              "swept_usd": 350541.01229653996
+            },
+            {
+              "entity": "Copper",
+              "detections": 4,
+              "swept_usd": 2637197.722341
+            },
+            {
+              "entity": "Deribit",
+              "detections": 34,
+              "swept_usd": 20712885.843697246
+            },
+            {
+              "entity": "FalconX",
+              "detections": 2,
+              "swept_usd": 88201.0
+            },
+            {
+              "entity": "KuCoin",
+              "detections": 97,
+              "swept_usd": 2013458.0504946213
+            },
+            {
+              "entity": "MEXC",
+              "detections": 633,
+              "swept_usd": 182600760.19993737
+            },
+            {
+              "entity": "XT.com",
+              "detections": 2,
+              "swept_usd": 5537.489522210091
+            }
+          ]
+        }
+      }
+    },
+    "epochs": {
+      "e2025": {
+        "table": "vein-bq-10120733.vein.labels_e2025",
+        "fingerprint": "77e9bcb096fe"
+      },
+      "eftx": {
+        "table": "vein-bq-10120733.vein.labels_eftx",
+        "fingerprint": "79dfa9194ae2"
+      },
+      "esvb": {
+        "table": "vein-bq-10120733.vein.labels_esvb",
+        "fingerprint": "55921ed54d53"
+      }
+    }
+  },
+  "coverage_summary": {
+    "oct25_hourly": {
+      "total_usd": 5435474610947.834,
+      "shares": {
+        "both_resolved": 0.03945572299356216,
+        "one_side": 0.08514484349337653,
+        "neither": 0.8638973687444643,
+        "mint_burn": 0.01150206476859702
+      }
+    },
+    "ftx_hourly": {
+      "total_usd": 555112448660.9858,
+      "shares": {
+        "both_resolved": 0.10027050603864812,
+        "one_side": 0.16128910598239035,
+        "neither": 0.6964389879255374,
+        "mint_burn": 0.042001400053424114
+      }
+    },
+    "svb_hourly": {
+      "total_usd": 560127674787.7473,
+      "shares": {
+        "both_resolved": 0.0930631445898423,
+        "one_side": 0.17668054617270734,
+        "neither": 0.7014760660317764,
+        "mint_burn": 0.02878024320567393
+      }
+    },
+    "core_daily": {
+      "total_usd": 646404136562.6743,
+      "shares": {
+        "both_resolved": 0.08480068354658875,
+        "one_side": 0.07588755497135297,
+        "neither": 0.7573553473401449,
+        "mint_burn": 0.08195641414191333
+      }
+    }
+  },
+  "ledger": {
+    "cumulative_billed_gib": 270.2900390625,
+    "by_month_gib": {
+      "2026-10": 270.2900390625
+    },
+    "n_entries": 80,
+    "n_dry_runs": 45,
+    "n_queries_billed": 35,
+    "n_cache_hits": 0
+  },
+  "extract_rows": {
+    "x_core_daily_c00": {
+      "rows": 312588,
+      "bytes": 23226932
+    },
+    "x_core_daily_c01": {
+      "rows": 253778,
+      "bytes": 18859833
+    },
+    "x_core_daily_c02": {
+      "rows": 416941,
+      "bytes": 30979782
+    },
+    "x_core_daily_c03": {
+      "rows": 318529,
+      "bytes": 23666594
+    },
+    "x_core_daily_c04": {
+      "rows": 230940,
+      "bytes": 17159399
+    },
+    "x_ftx_hourly_c00": {
+      "rows": 4226301,
+      "bytes": 312746274
+    },
+    "x_oct25_hourly_c00": {
+      "rows": 25443752,
+      "bytes": 1882932897
+    },
+    "x_svb_hourly_c00": {
+      "rows": 4332357,
+      "bytes": 320594418
+    }
   }
 }

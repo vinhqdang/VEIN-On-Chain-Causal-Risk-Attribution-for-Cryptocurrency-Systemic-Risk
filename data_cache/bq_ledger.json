@@ -1,8 +1,8 @@
 {
  "version": 1,
- "cumulative_billed_bytes": 277820211200,
+ "cumulative_billed_bytes": 290221719552,
  "by_month": {
-  "2026-10": 277820211200
+  "2026-10": 290221719552
  },
  "entries": [
   {
@@ -412,6 +412,406 @@
    "cache_hit": false,
    "job_id": "eaffe31c-1529-4d7c-8cf6-16926a68dbcd",
    "table": "vein-bq-10120733.vein.x_core_daily_c04"
+  },
+  {
+   "ts": "2026-10-12T07:56:06+00:00",
+   "name": "dry_run",
+   "sql_hash": "3145d15f05c205a6",
+   "kind": "dry_run",
+   "est_bytes": 1883079596,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:56:46+00:00",
+   "name": "sweeps_oct25_hourly",
+   "sql_hash": "3145d15f05c205a6",
+   "kind": "query",
+   "est_bytes": 1883079596,
+   "billed_bytes": 1883242496,
+   "cache_hit": false,
+   "job_id": "8c99eee4-8383-402b-8e1e-0dbc4dbb41d5"
+  },
+  {
+   "ts": "2026-10-12T07:56:54+00:00",
+   "name": "dry_run",
+   "sql_hash": "e18e50fa86ee8b2b",
+   "kind": "dry_run",
+   "est_bytes": 1323170353,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:00:53+00:00",
+   "name": "senders_oct25_hourly",
+   "sql_hash": "e18e50fa86ee8b2b",
+   "kind": "query",
+   "est_bytes": 1323170353,
+   "billed_bytes": 1323302912,
+   "cache_hit": false,
+   "job_id": "5c3abb61-0335-4871-b9aa-0c1134830944"
+  },
+  {
+   "ts": "2026-10-12T08:01:05+00:00",
+   "name": "dry_run",
+   "sql_hash": "1b289982cddf7f9d",
+   "kind": "dry_run",
+   "est_bytes": 1883036063,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:01:44+00:00",
+   "name": "sweeps_t0val_oct25_hourly_default",
+   "sql_hash": "1b289982cddf7f9d",
+   "kind": "query",
+   "est_bytes": 1883036063,
+   "billed_bytes": 1883242496,
+   "cache_hit": false,
+   "job_id": "39058d03-3d20-4b3a-8625-e896031eb285"
+  },
+  {
+   "ts": "2026-10-12T08:01:47+00:00",
+   "name": "dry_run",
+   "sql_hash": "cb2eeb6b57393c40",
+   "kind": "dry_run",
+   "est_bytes": 1883036063,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:02:26+00:00",
+   "name": "sweeps_t0val_oct25_hourly_tightened",
+   "sql_hash": "cb2eeb6b57393c40",
+   "kind": "query",
+   "est_bytes": 1883036063,
+   "billed_bytes": 1883242496,
+   "cache_hit": false,
+   "job_id": "17df4d95-b3bd-4fa6-afda-a40c8db144be"
+  },
+  {
+   "ts": "2026-10-12T08:02:35+00:00",
+   "name": "dry_run",
+   "sql_hash": "0e7afa265817ca98",
+   "kind": "dry_run",
+   "est_bytes": 312892973,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:02:55+00:00",
+   "name": "sweeps_ftx_hourly",
+   "sql_hash": "0e7afa265817ca98",
+   "kind": "query",
+   "est_bytes": 312892973,
+   "billed_bytes": 313524224,
+   "cache_hit": false,
+   "job_id": "ea7100fc-4381-4394-b549-d9c9f6b9ea7e"
+  },
+  {
+   "ts": "2026-10-12T08:03:10+00:00",
+   "name": "dry_run",
+   "sql_hash": "ad6a0a89ad6cf1a1",
+   "kind": "dry_run",
+   "est_bytes": 219767652,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:04:08+00:00",
+   "name": "senders_ftx_hourly",
+   "sql_hash": "ad6a0a89ad6cf1a1",
+   "kind": "query",
+   "est_bytes": 219767652,
+   "billed_bytes": 220200960,
+   "cache_hit": false,
+   "job_id": "55793c50-0d9a-43f5-b2b1-1e44674763d4"
+  },
+  {
+   "ts": "2026-10-12T08:04:10+00:00",
+   "name": "dry_run",
+   "sql_hash": "9f06bc1487bdde4b",
+   "kind": "dry_run",
+   "est_bytes": 312849440,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:04:30+00:00",
+   "name": "sweeps_t0val_ftx_hourly_default",
+   "sql_hash": "9f06bc1487bdde4b",
+   "kind": "query",
+   "est_bytes": 312849440,
+   "billed_bytes": 313524224,
+   "cache_hit": false,
+   "job_id": "de158701-5e23-41da-8e95-de82fafe940a"
+  },
+  {
+   "ts": "2026-10-12T08:04:31+00:00",
+   "name": "dry_run",
+   "sql_hash": "31c25783aae96ab1",
+   "kind": "dry_run",
+   "est_bytes": 312849440,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:04:50+00:00",
+   "name": "sweeps_t0val_ftx_hourly_tightened",
+   "sql_hash": "31c25783aae96ab1",
+   "kind": "query",
+   "est_bytes": 312849440,
+   "billed_bytes": 313524224,
+   "cache_hit": false,
+   "job_id": "5ee34819-c2b3-4efe-bb36-f49067c9a8ae"
+  },
+  {
+   "ts": "2026-10-12T08:05:04+00:00",
+   "name": "dry_run",
+   "sql_hash": "379a1ed8b9a8f75e",
+   "kind": "dry_run",
+   "est_bytes": 320741117,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:05:28+00:00",
+   "name": "sweeps_svb_hourly",
+   "sql_hash": "379a1ed8b9a8f75e",
+   "kind": "query",
+   "est_bytes": 320741117,
+   "billed_bytes": 320864256,
+   "cache_hit": false,
+   "job_id": "eb703dd8-c1de-45b7-9edc-8a3c91c9a019"
+  },
+  {
+   "ts": "2026-10-12T08:05:34+00:00",
+   "name": "dry_run",
+   "sql_hash": "1cde276ca88a3a9d",
+   "kind": "dry_run",
+   "est_bytes": 225282564,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:06:31+00:00",
+   "name": "senders_svb_hourly",
+   "sql_hash": "1cde276ca88a3a9d",
+   "kind": "query",
+   "est_bytes": 225282564,
+   "billed_bytes": 225443840,
+   "cache_hit": false,
+   "job_id": "53a3f34a-1fc6-43b2-95eb-3254cfa078a2"
+  },
+  {
+   "ts": "2026-10-12T08:06:34+00:00",
+   "name": "dry_run",
+   "sql_hash": "b883a496fdc40256",
+   "kind": "dry_run",
+   "est_bytes": 320697584,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:06:53+00:00",
+   "name": "sweeps_t0val_svb_hourly_default",
+   "sql_hash": "b883a496fdc40256",
+   "kind": "query",
+   "est_bytes": 320697584,
+   "billed_bytes": 320864256,
+   "cache_hit": false,
+   "job_id": "8859a591-6fee-4d77-9a7e-3028c12c7819"
+  },
+  {
+   "ts": "2026-10-12T08:06:54+00:00",
+   "name": "dry_run",
+   "sql_hash": "a0d8fb2f673c2905",
+   "kind": "dry_run",
+   "est_bytes": 320697584,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:07:11+00:00",
+   "name": "sweeps_t0val_svb_hourly_tightened",
+   "sql_hash": "a0d8fb2f673c2905",
+   "kind": "query",
+   "est_bytes": 320697584,
+   "billed_bytes": 320864256,
+   "cache_hit": false,
+   "job_id": "c7c8fe4c-b79e-4f26-b7ec-0501d5735e28"
+  },
+  {
+   "ts": "2026-10-12T08:07:24+00:00",
+   "name": "dry_run",
+   "sql_hash": "696b31fc5ebbcdbd",
+   "kind": "dry_run",
+   "est_bytes": 114039239,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:07:29+00:00",
+   "name": "sweeps_core_daily",
+   "sql_hash": "696b31fc5ebbcdbd",
+   "kind": "query",
+   "est_bytes": 114039239,
+   "billed_bytes": 114294784,
+   "cache_hit": false,
+   "job_id": "397f8b43-d289-4272-bb8c-ef52f16d29ea"
+  },
+  {
+   "ts": "2026-10-12T08:07:36+00:00",
+   "name": "dry_run",
+   "sql_hash": "5c760d7791545044",
+   "kind": "dry_run",
+   "est_bytes": 80171468,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:07:49+00:00",
+   "name": "senders_core_daily",
+   "sql_hash": "5c760d7791545044",
+   "kind": "query",
+   "est_bytes": 80171468,
+   "billed_bytes": 80740352,
+   "cache_hit": false,
+   "job_id": "0bfb87fe-56cc-4c7a-a50c-a7e244fdd822"
+  },
+  {
+   "ts": "2026-10-12T08:07:50+00:00",
+   "name": "dry_run",
+   "sql_hash": "45c006b1720e8e8a",
+   "kind": "dry_run",
+   "est_bytes": 113995706,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:07:56+00:00",
+   "name": "sweeps_t0val_core_daily_default",
+   "sql_hash": "45c006b1720e8e8a",
+   "kind": "query",
+   "est_bytes": 113995706,
+   "billed_bytes": 114294784,
+   "cache_hit": false,
+   "job_id": "827ecee7-4525-4e45-936a-855478073b65"
+  },
+  {
+   "ts": "2026-10-12T08:07:58+00:00",
+   "name": "dry_run",
+   "sql_hash": "e3b08d5a96b089e3",
+   "kind": "dry_run",
+   "est_bytes": 113995706,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:08:04+00:00",
+   "name": "sweeps_t0val_core_daily_tightened",
+   "sql_hash": "e3b08d5a96b089e3",
+   "kind": "query",
+   "est_bytes": 113995706,
+   "billed_bytes": 114294784,
+   "cache_hit": false,
+   "job_id": "01a2d0f8-34c6-42bf-b6ce-7fe0097b45b4"
+  },
+  {
+   "ts": "2026-10-12T08:09:14+00:00",
+   "name": "dry_run",
+   "sql_hash": "8caf26a1d65f8fc6",
+   "kind": "dry_run",
+   "est_bytes": 1890812909,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:09:15+00:00",
+   "name": "coverage_oct25_hourly",
+   "sql_hash": "8caf26a1d65f8fc6",
+   "kind": "query",
+   "est_bytes": 1890812909,
+   "billed_bytes": 1891631104,
+   "cache_hit": false,
+   "job_id": "03ec6b24-f674-4759-97ca-d0a4ffc76794"
+  },
+  {
+   "ts": "2026-10-12T08:09:24+00:00",
+   "name": "dry_run",
+   "sql_hash": "6903881047f66399",
+   "kind": "dry_run",
+   "est_bytes": 315630717,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:09:25+00:00",
+   "name": "coverage_ftx_hourly",
+   "sql_hash": "6903881047f66399",
+   "kind": "query",
+   "est_bytes": 315630717,
+   "billed_bytes": 316669952,
+   "cache_hit": false,
+   "job_id": "f14aa591-f4e0-45b6-86ee-242cf1530baf"
+  },
+  {
+   "ts": "2026-10-12T08:09:46+00:00",
+   "name": "dry_run",
+   "sql_hash": "b4b6875d1d90c557",
+   "kind": "dry_run",
+   "est_bytes": 324055062,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:09:47+00:00",
+   "name": "coverage_svb_hourly",
+   "sql_hash": "b4b6875d1d90c557",
+   "kind": "query",
+   "est_bytes": 324055062,
+   "billed_bytes": 325058560,
+   "cache_hit": false,
+   "job_id": "ba1a10a7-de3b-4eb8-a125-e7e38ff58c34"
+  },
+  {
+   "ts": "2026-10-12T08:10:00+00:00",
+   "name": "dry_run",
+   "sql_hash": "9a28521394de3587",
+   "kind": "dry_run",
+   "est_bytes": 121772552,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T08:10:01+00:00",
+   "name": "coverage_core_daily",
+   "sql_hash": "9a28521394de3587",
+   "kind": "query",
+   "est_bytes": 121772552,
+   "billed_bytes": 122683392,
+   "cache_hit": false,
+   "job_id": "b53c88fb-93f1-4341-b50e-7ffde65d6324"
   }
  ]
 }
