@@ -1,20 +1,31 @@
 #!/usr/bin/env python3
-"""Compare the Dune-era (v1) results with the BigQuery rerun (BQ_SPEC section 10).
+"""Compare the Dune-era (v1) results with the BigQuery rerun and check the manuscript numbers.
 
-Step A reads every printed number in the manuscript (decimals, percentages and
-dollar amounts in billions) with about 60 characters of context, and matches it to a
-numeric leaf of the archived v1 results (results/v1_dune/*.json). Matches go to
-results/manuscript_numbers.csv; numbers with no match are marked for manual review.
+The comparison uses a curated map, results/manuscript_numbers_map.json. Each entry names one
+printed number of the manuscript (the text anchor, the printed string and its format) and the
+JSON path of the value in the old and in the new results. Paths never fall back to searching
+for a matching value: a path that does not resolve is reported, not guessed.
 
-Step B reads each confirmed number at the same JSON path in the new results and
-writes results/RERUN_COMPARISON.md. Flags: sign flip, rank change, confidence
-interval that includes zero before but not after (or the reverse), verdict change,
-and relative change above 25%. A missing path is reported as STRUCTURE_CHANGED with
-the nearest key of the same name.
+Path elements:
+  "key"            dict key
+  {"field": value} selects the unique element of a list whose fields equal the given values
+                   (error if none or several match), e.g. {"entity": "Coinbase"}
+  "lo" / "hi"      endpoints of a [lo, hi] interval, only directly after a key ending in ci95
+  integers         rejected (positional indices are not allowed)
+
+Each entry's flags: sign flip, >25% change, CI zero-inclusion change (when the entry names the
+interval with "ci_path"), MANUSCRIPT_STALE (the printed number is not the new value rounded to
+the printed decimals). Entries marked "pending" name results that a later step produces; they
+are listed but not compared.
 
 Usage:
   python run_compare.py [--old-dir results/v1_dune] [--new-dir results]
-                        [--tex manuscript/vein_manuscript.tex]
+                        [--map results/manuscript_numbers_map.json]
+  python run_compare.py --extract-candidates [--tex manuscript/vein_manuscript.tex]
+
+--extract-candidates writes results/manuscript_numbers_candidates.csv: every number of the
+manuscript with its context and the leaf of the old results it happens to equal. It is a
+curator aid for building the map; the comparison does not read it.
 """
 from __future__ import annotations
 
@@ -24,10 +35,12 @@ import json
 import math
 import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 RESULTS = ROOT / "results"
+MAP_PATH = RESULTS / "manuscript_numbers_map.json"
 NUM_RE = re.compile(r"(?<![\w.\\])(\d+(?:\.\d+)?)(\s*\\?%)?")
 DOLLAR_RE = re.compile(r"\\\$\s*(\d+(?:\.\d+)?)\s*(\\,)?\s*(bn|billion|m|million|k)?", re.I)
 SECTION_RE = re.compile(r"\\(?:sub)*section\*?\{([^}]*)\}")
@@ -35,10 +48,11 @@ CONTEXT = 60
 METHOD_KEYS = ["abduction", "bootstrap", "joint", "block_len", "s_star_window", "s_star_q",
                "data_backend", "generated"]
 DIFF_TOL = 0.25
+FORMATS = ("num", "pct", "usd", "usd_bn", "usd_m")
 
 
 # ---------------------------------------------------------------------------
-# Step A: manuscript numbers
+# candidates (curator aid, not used by the comparison)
 # ---------------------------------------------------------------------------
 def extract_tex_numbers(tex_path: Path) -> list[dict]:
     text = tex_path.read_text(errors="replace")
@@ -85,25 +99,18 @@ def _leaves(obj, path=()):
             yield from _leaves(v, path + (i,))
 
 
-def _matches(value: float, printed: str, fmt: str) -> bool:
+def _candidate_match(value: float, printed: str, fmt: str) -> bool:
     nd = len(printed.split(".")[1]) if "." in printed else 0
     target = float(printed)
-    cands = []
-    if fmt == "pct":
-        cands = [value * 100, value]
-    elif fmt == "usd_bn":
-        cands = [value / 1e9, value]
-    elif fmt == "usd_m":
-        cands = [value / 1e6, value]
-    else:
-        cands = [value]
+    cands = {"pct": [value * 100, value], "usd_bn": [value / 1e9, value],
+             "usd_m": [value / 1e6, value]}.get(fmt, [value])
     for c in cands:
         if round(c, nd) == round(target, nd) and (nd > 0 or abs(c - target) < 0.5):
             return True
     return False
 
 
-def match_numbers(rows: list[dict], old_dir: Path) -> list[dict]:
+def candidate_rows(rows: list[dict], old_dir: Path) -> list[dict]:
     leaves = []
     for f in sorted(old_dir.glob("*.json")):
         try:
@@ -113,7 +120,7 @@ def match_numbers(rows: list[dict], old_dir: Path) -> list[dict]:
         for path, v in _leaves(obj):
             leaves.append((f.name, path, v))
     for r in rows:
-        hits = [(fn, p, v) for fn, p, v in leaves if _matches(v, r["printed"], r["fmt"])]
+        hits = [(fn, p, v) for fn, p, v in leaves if _candidate_match(v, r["printed"], r["fmt"])]
         if hits:
             fn, p, v = hits[0]
             r.update(file=fn, json_path=json.dumps(list(p)), old_value=v,
@@ -123,7 +130,7 @@ def match_numbers(rows: list[dict], old_dir: Path) -> list[dict]:
     return rows
 
 
-def write_numbers_csv(rows: list[dict], path: Path) -> None:
+def write_candidates_csv(rows: list[dict], path: Path) -> None:
     cols = ["id", "line", "section", "context", "printed", "fmt", "file", "json_path",
             "old_value", "ambiguous", "confirmed"]
     with path.open("w", newline="") as fh:
@@ -134,147 +141,163 @@ def write_numbers_csv(rows: list[dict], path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Step B: old vs new
+# path resolution
 # ---------------------------------------------------------------------------
-def _get(obj, path: list):
+_MISSING = object()
+
+
+def _select(items: list, selector: dict):
+    hits = [x for x in items
+            if isinstance(x, dict) and all(x.get(k, _MISSING) == v for k, v in selector.items())]
+    if not hits:
+        raise KeyError(f"no element matches {selector}")
+    if len(hits) > 1:
+        raise ValueError(f"selector {selector} is ambiguous ({len(hits)} matches)")
+    return hits[0]
+
+
+def resolve(obj, path: list):
+    """Value at a curated path. Raises KeyError, ValueError or TypeError if it does not resolve."""
     cur = obj
-    for p in path:
-        if isinstance(cur, dict):
-            if str(p) not in cur:
-                raise KeyError(p)
-            cur = cur[str(p)]
-        elif isinstance(cur, list):
-            cur = cur[int(p)]
+    for k, p in enumerate(path):
+        if isinstance(p, bool) or isinstance(p, int):
+            raise ValueError("positional index not allowed")
+        if isinstance(p, dict):
+            if not isinstance(cur, list):
+                raise TypeError(f"selector {p} applied to a non-list")
+            cur = _select(cur, p)
+        elif isinstance(p, str):
+            after_ci = k > 0 and isinstance(path[k - 1], str) and path[k - 1].endswith("ci95")
+            if p in ("lo", "hi") and after_ci:
+                if not (isinstance(cur, (list, tuple)) and len(cur) == 2):
+                    raise ValueError(f"{p} needs a [lo, hi] pair")
+                cur = cur[0] if p == "lo" else cur[1]
+            elif isinstance(cur, dict):
+                if p not in cur:
+                    raise KeyError(p)
+                cur = cur[p]
+            else:
+                raise TypeError(f"key {p!r} applied to a non-dict")
         else:
-            raise KeyError(p)
+            raise TypeError(f"unsupported path element {p!r}")
     return cur
 
 
-def _nearest(new_obj, path: list):
-    """Same key name under a parent that still exists in the new structure."""
-    if not path:
-        return None
-    leaf = str(path[-1])
-    parent_path = path[:-1]
-    try:
-        parent = _get(new_obj, parent_path) if parent_path else new_obj
-    except (KeyError, IndexError, ValueError):
-        return None
-    if isinstance(parent, dict):
-        for k in parent:
-            if str(k) == leaf:
-                return k
+def _zero_included(ci) -> bool | None:
+    if isinstance(ci, (list, tuple)) and len(ci) == 2 and all(_is_num(x) for x in ci):
+        return bool(ci[0] <= 0 <= ci[1])
     return None
 
 
-def _ci_includes_zero(ci) -> bool | None:
-    if isinstance(ci, (list, tuple)) and len(ci) == 2 and all(isinstance(x, (int, float)) for x in ci):
-        return ci[0] <= 0 <= ci[1]
-    return None
+def _is_num(x) -> bool:
+    return isinstance(x, (int, float)) and not isinstance(x, bool) and not (
+        isinstance(x, float) and math.isnan(x))
 
 
-def _sibling_ci(obj, path: list):
-    """CI pair that goes with the value at path: the parent list itself when the value
-    is one end of a [lo, hi] pair, or a ci95/boot_ci95/ci key in the parent dict."""
+# ---------------------------------------------------------------------------
+# map and comparison
+# ---------------------------------------------------------------------------
+def load_map(path: Path) -> list[dict]:
+    doc = json.loads(path.read_text())
+    if doc.get("version") != 1:
+        raise ValueError(f"{path}: unsupported map version {doc.get('version')!r}")
+    entries = doc.get("entries", [])
+    ids = [e["id"] for e in entries]
+    dup = [i for i, n in Counter(ids).items() if n > 1]
+    if dup:
+        raise ValueError(f"{path}: duplicate ids {dup}")
+    for e in entries:
+        if e.get("fmt", "num") not in FORMATS:
+            raise ValueError(f"{e['id']}: unknown fmt {e.get('fmt')!r}")
+    return entries
+
+
+def _display(x: float, fmt: str) -> float:
+    return {"pct": x * 100, "usd_bn": x / 1e9, "usd_m": x / 1e6}.get(fmt, x)
+
+
+def printed_matches(value: float, printed: str, fmt: str) -> bool:
+    nd = len(printed.split(".")[1]) if "." in printed else 0
+    return round(_display(value, fmt), nd) == round(float(printed), nd)
+
+
+_CACHE: dict = {}
+
+
+def _load(directory: Path, name: str):
+    key = (str(directory), name)
+    if key not in _CACHE:
+        p = directory / name
+        _CACHE[key] = json.loads(p.read_text()) if p.exists() else None
+    return _CACHE[key]
+
+
+def compare_entry(e: dict, old_dir: Path, new_dir: Path) -> dict:
+    fmt = e.get("fmt", "num")
+    row = {"id": e["id"], "printed": e.get("printed"), "fmt": fmt, "file": e["file"],
+           "path": json.dumps(e["path"]), "old": None, "new": None, "delta": None,
+           "matches": None, "flags": [], "status": "ok"}
+    if e.get("pending"):
+        row["status"] = "PENDING"
+        row["note"] = e.get("note", "produced by a later step")
+        return row
+    new_obj = _load(new_dir, e["file"])
+    if new_obj is None:
+        row["status"] = "MISSING_FILE"
+        return row
     try:
-        parent = _get(obj, path[:-1]) if len(path) > 1 else obj
-    except (KeyError, IndexError, ValueError):
-        return None
-    if isinstance(parent, list) and len(parent) == 2 and all(isinstance(x, (int, float)) for x in parent):
-        return parent
-    if isinstance(parent, dict):
-        for key in ("ci95", "boot_ci95", "ci", "CI95"):
-            if key in parent:
-                return parent[key]
-    return None
+        new_val = resolve(new_obj, e["path"])
+    except (KeyError, IndexError, ValueError, TypeError) as ex:
+        row["status"] = "STRUCTURE_CHANGED"
+        row["flags"].append(f"STRUCTURE_CHANGED ({ex})")
+        return row
+    if not _is_num(new_val):
+        row["status"] = "NOT_NUMERIC"
+        return row
+    row["new"] = float(new_val)
 
-
-def _rank_among_siblings(obj, path: list, value: float):
-    """Rank of the value among its peers: the other numbers in the same dict, or the same
-    key across the items of the list that contains it (e.g. entity rankings)."""
-    try:
-        parent = _get(obj, path[:-1]) if len(path) > 1 else obj
-    except (KeyError, IndexError, ValueError):
-        return None
-    if isinstance(parent, list) and path and isinstance(path[-1], str) is False:
-        return None
-    if isinstance(parent, dict):
-        vals = [v for v in parent.values() if isinstance(v, (int, float)) and not isinstance(v, bool)]
-    elif isinstance(parent, list):
-        vals = [v for v in parent if isinstance(v, (int, float)) and not isinstance(v, bool)]
-    else:
-        vals = []
-    # a record inside a list of dicts: rank its key across the list
-    try:
-        grand = _get(obj, path[:-2]) if len(path) > 2 else None
-    except (KeyError, IndexError, ValueError):
-        grand = None
-    if isinstance(grand, list) and isinstance(parent, dict):
-        key = path[-1]
-        vals = [item[key] for item in grand if isinstance(item, dict)
-                and isinstance(item.get(key), (int, float)) and not isinstance(item.get(key), bool)]
-    if len(vals) < 2 or value not in vals:
-        return None
-    return sorted(vals, reverse=True).index(value) + 1
-
-
-def compare(rows: list[dict], old_dir: Path, new_dir: Path) -> list[dict]:
-    new_cache = {}
-    out = []
-    for r in rows:
-        if not r.get("confirmed"):
-            out.append({**r, "new": None, "delta": None, "flags": "MANUAL"})
-            continue
-        fn = r["file"]
-        if fn not in new_cache:
-            p = new_dir / fn
-            new_cache[fn] = json.loads(p.read_text()) if p.exists() else None
-        new_obj = new_cache[fn]
-        path = json.loads(r["json_path"]) if r["json_path"] else []
-        flags = []
-        if new_obj is None:
-            out.append({**r, "new": None, "delta": None, "flags": "MISSING_FILE"})
-            continue
+    old_obj = _load(old_dir, e.get("old_file", e["file"]))
+    old_val = None
+    if old_obj is not None:
         try:
-            new_val = float(_get(new_obj, path))
+            old_val = resolve(old_obj, e.get("old_path", e["path"]))
         except (KeyError, IndexError, ValueError, TypeError):
-            near = _nearest(new_obj, path)
-            flags.append("STRUCTURE_CHANGED" + (f" (nearest key: {near})" if near is not None else ""))
-            out.append({**r, "new": None, "delta": None, "flags": "; ".join(flags)})
-            continue
-        old = float(r["old_value"])
-        delta = new_val - old
-        rel = abs(delta) / abs(old) if old else (math.inf if delta else 0.0)
-        if old * new_val < 0:
-            flags.append("sign flip")
+            old_val = None
+    if _is_num(old_val):
+        old = float(old_val)
+        row["old"] = old
+        row["delta"] = row["new"] - old
+        if old * row["new"] < 0:
+            row["flags"].append("sign flip")
+        rel = abs(row["delta"]) / abs(old) if old else (math.inf if row["delta"] else 0.0)
         if rel > DIFF_TOL:
-            flags.append(">25% change")
-        ci_new = _sibling_ci(new_obj, path)
-        if ci_new is not None:
-            zi_new = _ci_includes_zero(ci_new)
-            zi_old = _ci_includes_zero(_old_sibling_ci(old_dir, fn, path))
-            if zi_old is not None and zi_new is not None and zi_old != zi_new:
-                flags.append("CI zero inclusion change")
-        rk_old = _rank_among_siblings(_old_obj(old_dir, fn), path, old)
-        rk_new = _rank_among_siblings(new_obj, path, new_val)
-        if rk_old is not None and rk_new is not None and rk_old != rk_new:
-            flags.append(f"rank change {rk_old}->{rk_new}")
-        out.append({**r, "new": new_val, "delta": delta, "flags": "; ".join(flags)})
-    return out
+            row["flags"].append(">25% change")
+
+    if e.get("ci_path"):
+        zi_new = None
+        try:
+            zi_new = _zero_included(resolve(new_obj, e["ci_path"]))
+        except (KeyError, IndexError, ValueError, TypeError):
+            pass
+        zi_old = None
+        if old_obj is not None:
+            try:
+                zi_old = _zero_included(resolve(old_obj, e.get("old_ci_path", e["ci_path"])))
+            except (KeyError, IndexError, ValueError, TypeError):
+                pass
+        if zi_new is not None and zi_old is not None and zi_new != zi_old:
+            row["flags"].append("CI zero inclusion change")
+
+    if e.get("printed") is not None:
+        row["matches"] = printed_matches(row["new"], e["printed"], fmt)
+        if not row["matches"]:
+            row["flags"].append("MANUSCRIPT_STALE")
+    return row
 
 
-_OLD_CACHE: dict = {}
-
-
-def _old_obj(old_dir: Path, fn: str):
-    key = (str(old_dir), fn)
-    if key not in _OLD_CACHE:
-        _OLD_CACHE[key] = json.loads((old_dir / fn).read_text())
-    return _OLD_CACHE[key]
-
-
-def _old_sibling_ci(old_dir: Path, fn: str, path: list):
-    return _sibling_ci(_old_obj(old_dir, fn), path)
+def compare_map(entries: list[dict], old_dir: Path, new_dir: Path) -> list[dict]:
+    _CACHE.clear()
+    return [compare_entry(e, old_dir, new_dir) for e in entries]
 
 
 def _fmt(x) -> str:
@@ -285,19 +308,34 @@ def _fmt(x) -> str:
     return str(x)
 
 
+def _matches_cell(m) -> str:
+    return {True: "yes", False: "no", None: "-"}[m]
+
+
 def write_comparison(rows: list[dict], old_dir: Path, new_dir: Path, out_path: Path) -> None:
+    status = Counter(r["status"] for r in rows)
+    flagged = Counter(f.split(" (")[0] for r in rows if r["status"] != "PENDING" for f in r["flags"])
     lines = ["# Rerun comparison: Dune (v1) vs BigQuery (v2)", "",
-             "Generated by `run_compare.py`. Every confirmed number in the manuscript is listed, "
-             "with its old and new value at the same JSON path. Unconfirmed numbers are marked MANUAL "
-             "and need a person to check them.", ""]
+             "Generated by `run_compare.py` from `results/manuscript_numbers_map.json`. Each row is one "
+             "printed number of the manuscript, with its value at the curated path in the old and new "
+             "results. PENDING rows name results that a later step produces.", "",
+             "Status: " + ", ".join(f"{k} {v}" for k, v in sorted(status.items())), ""]
+    if flagged:
+        lines.append("Flags: " + ", ".join(f"{k} {v}" for k, v in sorted(flagged.items())))
+        lines.append("")
     lines += _header_sections(old_dir, new_dir)
     lines += ["## Numbers", "",
-              "| id | section/line | context | old | new | Δ | flag |",
+              "| id | printed | old | new | manuscript matches new (rounded) | flags | source |",
               "|---|---|---|---|---|---|---|"]
     for r in rows:
-        ctx = r["context"].replace("|", "\\|")
-        lines.append(f"| {r['id']} | {r['section']} / {r['line']} | {ctx} | {_fmt(r.get('old_value'))} | "
-                     f"{_fmt(r.get('new'))} | {_fmt(r.get('delta'))} | {r.get('flags') or ''} |")
+        src = f"{r['file']} {r['path']}"
+        flags = "; ".join(r["flags"]) if r["flags"] else ""
+        if r["status"] == "PENDING":
+            flags = f"PENDING: {r['note']}"
+        elif r["status"] != "ok":
+            flags = r["status"] + ("; " + flags if flags else "")
+        lines.append(f"| {r['id']} | {r.get('printed') or '-'} | {_fmt(r['old'])} | {_fmt(r['new'])} | "
+                     f"{_matches_cell(r['matches'])} | {flags} | {src.replace('|', chr(92) + '|')} |")
     out_path.write_text("\n".join(lines) + "\n")
 
 
@@ -352,20 +390,32 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--old-dir", type=Path, default=RESULTS / "v1_dune")
     ap.add_argument("--new-dir", type=Path, default=RESULTS)
+    ap.add_argument("--map", type=Path, default=MAP_PATH)
     ap.add_argument("--tex", type=Path, default=ROOT / "manuscript" / "vein_manuscript.tex")
+    ap.add_argument("--extract-candidates", action="store_true",
+                    help="write manuscript_numbers_candidates.csv (curator aid) and stop")
     args = ap.parse_args(argv)
     if not args.old_dir.is_dir():
         print(f"old results not found: {args.old_dir} (archive v1 results before the rerun)")
         return 1
-    rows = extract_tex_numbers(args.tex)
-    rows = match_numbers(rows, args.old_dir)
-    write_numbers_csv(rows, args.new_dir / "manuscript_numbers.csv")
-    n_conf = sum(1 for r in rows if r["confirmed"])
-    print(f"manuscript numbers: {len(rows)} found, {n_conf} matched to v1 results, "
-          f"{len(rows) - n_conf} need manual review")
-    rows = compare(rows, args.old_dir, args.new_dir)
-    write_comparison(rows, args.old_dir, args.new_dir, args.new_dir / "RERUN_COMPARISON.md")
-    print(f"wrote {args.new_dir / 'RERUN_COMPARISON.md'}")
+    if args.extract_candidates:
+        rows = candidate_rows(extract_tex_numbers(args.tex), args.old_dir)
+        path = args.new_dir / "manuscript_numbers_candidates.csv"
+        write_candidates_csv(rows, path)
+        n_conf = sum(1 for r in rows if r["confirmed"])
+        print(f"manuscript numbers: {len(rows)} found, {n_conf} with a candidate in the old results; "
+              f"wrote {path}")
+        return 0
+    if not args.map.exists():
+        print(f"map not found: {args.map}")
+        return 1
+    entries = load_map(args.map)
+    rows = compare_map(entries, args.old_dir, args.new_dir)
+    out = args.new_dir / "RERUN_COMPARISON.md"
+    write_comparison(rows, args.old_dir, args.new_dir, out)
+    status = Counter(r["status"] for r in rows)
+    print(f"compared {len(rows)} mapped numbers: " + ", ".join(f"{k} {v}" for k, v in sorted(status.items())))
+    print(f"wrote {out}")
     return 0
 
 

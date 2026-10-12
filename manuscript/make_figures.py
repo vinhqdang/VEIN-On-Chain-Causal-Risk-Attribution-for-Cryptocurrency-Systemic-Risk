@@ -25,7 +25,13 @@ def load(name):
     return json.loads((RES / name).read_text())
 
 
-# --- Fig 1: USDe on-chain transfer volume around the cascade (real Dune data) --
+def load_optional(name):
+    """Parsed results file, or None if it has not been produced yet."""
+    p = RES / name
+    return json.loads(p.read_text()) if p.exists() else None
+
+
+# --- Fig 1: USDe on-chain transfer volume around the cascade (real on-chain data) --
 def fig_usde():
     # Prefer the BigQuery rebuild (results/data_build.json, written by run_build_data.py).
     # Without it, fall back to the Dune daily volumes the paper was first built from.
@@ -76,14 +82,25 @@ def fig_graph():
 
 # --- Fig 3: OC-CoVaR systemic ranking (hourly) ---------------------------------
 def fig_ocranking():
+    """Top 10 entities; 95% coefficient-bootstrap intervals when uncertainty.json exists."""
     d = load("final_results.json")
-    r = d["oc_covar_ranking"][:8]
-    names = [x["entity"] for x in r][::-1]
-    vals = [x["exported_risk"] for x in r][::-1]
-    fig, ax = plt.subplots(figsize=(5.4, 3.2))
+    r = d["oc_covar_ranking"][:10][::-1]
+    names = [x["entity"] for x in r]
+    vals = [x["exported_risk"] for x in r]
+    unc = load_optional("uncertainty.json")
+    fig, ax = plt.subplots(figsize=(5.4, 3.4))
     ax.barh(names, vals, color=BLUE)
+    if unc:
+        by = unc["ranking"]["by_entity"]
+        pos = [i for i, n in enumerate(names) if n in by]
+        if pos:
+            lo = np.array([vals[i] - by[names[i]]["exported_risk_ci95"][0] for i in pos])
+            hi = np.array([by[names[i]]["exported_risk_ci95"][1] - vals[i] for i in pos])
+            ax.errorbar(np.array(vals)[pos], pos, xerr=[np.clip(lo, 0, None), np.clip(hi, 0, None)],
+                        fmt="none", ecolor="black", capsize=2, lw=0.8)
     ax.set_xlabel("Exported tail risk  $\\sum_j \\Delta$OC-CoVaR$(j\\,|\\,\\mathrm{do}(S_i))$")
-    ax.set_title("OC-CoVaR systemic-importance ranking (hourly)")
+    ax.set_title("OC-CoVaR systemic-importance ranking (hourly"
+                 + (", 95% CI)" if unc else ")"))
     fig.tight_layout(); fig.savefig(FIG / "fig_oc_ranking.pdf"); plt.close(fig)
 
 
@@ -137,17 +154,100 @@ def fig_robustness():
 
 # --- Fig 7: counterfactual attribution shares (hourly) -------------------------
 def fig_attribution():
-    d = load("final_results.json")["counterfactual_attribution"]
-    pairs = [(f"{x['i']}→{x['j']}", x["attribution_share"] * 100) for x in d
-             if x["attribution_share"] > 0.5][:7][::-1]
-    if not pairs:
-        return
-    names = [p[0] for p in pairs]; vals = [p[1] for p in pairs]
-    fig, ax = plt.subplots(figsize=(5.4, 3.0))
-    ax.barh(names, vals, color=RED)
+    """Top 8 channels by share, with 95% intervals when uncertainty.json exists. Without it the
+    point estimates from final_results.json are drawn without intervals."""
+    unc = load_optional("uncertainty.json")
+    fig, ax = plt.subplots(figsize=(5.4, 3.2))
+    if unc and unc["attribution"].get("channels"):
+        ch = sorted(unc["attribution"]["channels"], key=lambda c: -c["share"])[:8][::-1]
+        names = [f"{c['i']}→{c['j']}" for c in ch]
+        vals = [c["share"] * 100 for c in ch]
+        lo = np.array([c["share"] * 100 - c["share_ci95"][0] * 100 for c in ch])
+        hi = np.array([c["share_ci95"][1] * 100 - c["share"] * 100 for c in ch])
+        ax.barh(names, vals, color=RED)
+        ax.errorbar(vals, range(len(names)), xerr=[np.clip(lo, 0, None), np.clip(hi, 0, None)],
+                    fmt="none", ecolor="black", capsize=2, lw=0.8)
+        title = "Counterfactual loss attribution (Pearl Level-3), hourly, 95% CI"
+    else:
+        d = load("final_results.json").get("counterfactual_attribution", [])[:8][::-1]
+        if not d:
+            plt.close(fig)
+            return
+        names = [f"{x['i']}→{x['j']}" for x in d]
+        vals = [x["attribution_share"] * 100 for x in d]
+        ax.barh(names, vals, color=RED)
+        title = "Counterfactual loss attribution (Pearl Level-3), hourly"
     ax.set_xlabel("counterfactual attribution share (\\% of $j$'s realised distress)")
-    ax.set_title("Counterfactual loss attribution (Pearl Level-3), hourly")
+    ax.set_title(title)
     fig.tight_layout(); fig.savefig(FIG / "fig_attribution.pdf"); plt.close(fig)
+
+
+# --- Fig 10: ranking uncertainty, point rank and 95% bootstrap rank interval ---
+def fig_rank_ci():
+    unc = load_optional("uncertainty.json")
+    if not unc:
+        print("fig_rank_ci skipped: uncertainty.json not produced yet")
+        return
+    by = unc["ranking"]["by_entity"]
+    ents = sorted(by, key=lambda e: by[e]["rank_point"])
+    y = np.arange(len(ents))[::-1]
+    fig, ax = plt.subplots(figsize=(5.4, 0.28 * len(ents) + 1.4))
+    for yi, e in zip(y, ents):
+        lo, hi = by[e]["rank_ci95"]
+        ax.plot([lo, hi], [yi, yi], color=GREY, lw=2.5, solid_capstyle="butt", zorder=2)
+    ax.scatter([by[e]["rank_point"] for e in ents], y, marker="D", color=BLUE, zorder=3,
+               label="point rank")
+    ax.scatter([by[e]["rank_median"] for e in ents], y, marker="o", s=14, color=RED, zorder=4,
+               label="bootstrap median")
+    ax.set_yticks(y); ax.set_yticklabels(ents, fontsize=8)
+    ax.set_xlim(0.5, len(ents) + 0.5)
+    ax.set_xlabel("rank of exported risk (1 = largest)")
+    ax.set_title("Ranking uncertainty: 95% bootstrap rank intervals")
+    ax.legend(frameon=False, fontsize=8, loc="lower right")
+    fig.tight_layout(); fig.savefig(FIG / "fig_rank_ci.pdf"); plt.close(fig)
+
+
+# --- Fig 11: pairwise order probabilities among the top-6 point-ranked entities ---
+def fig_pairwise_top6():
+    unc = load_optional("uncertainty.json")
+    if not unc:
+        print("fig_pairwise_top6 skipped: uncertainty.json not produced yet")
+        return
+    pw = unc["ranking"]["pairwise_top6"]
+    ents = pw["entities"]
+    M = np.ma.masked_invalid(np.array([[np.nan if v is None else v for v in row]
+                                       for row in pw["p_row_above_col"]], dtype=float))
+    fig, ax = plt.subplots(figsize=(4.8, 4.1))
+    im = ax.imshow(M, vmin=0, vmax=1, cmap="Blues")
+    for i in range(len(ents)):
+        for j in range(len(ents)):
+            if i != j:
+                ax.text(j, i, f"{M[i, j]:.2f}", ha="center", va="center", fontsize=7,
+                        color="white" if M[i, j] > 0.6 else "black")
+    ax.set_xticks(range(len(ents))); ax.set_xticklabels(ents, rotation=45, ha="right", fontsize=8)
+    ax.set_yticks(range(len(ents))); ax.set_yticklabels(ents, fontsize=8)
+    ax.set_xlabel("entity j"); ax.set_ylabel("entity i")
+    ax.set_title("P(exported risk of row $i$ > column $j$)")
+    fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    fig.tight_layout(); fig.savefig(FIG / "fig_pairwise_top6.pdf"); plt.close(fig)
+
+
+# --- Fig 12: time-shift placebo distribution against the observed statistic ---
+def fig_placebo():
+    fr = load_optional("final_results.json") or {}
+    ts = (fr.get("placebo") or {}).get("time_shift") or {}
+    if "placebo_stats" not in ts:
+        print("fig_placebo skipped: no time-shift placebo in final_results.json")
+        return
+    fig, ax = plt.subplots(figsize=(5.4, 3.0))
+    ax.hist(ts["placebo_stats"], bins=20, color=GREY, edgecolor="white")
+    ax.axvline(ts["real_stat"], color=RED, lw=1.5,
+               label=f"observed (p = {ts['p_value']:.3f})")
+    ax.set_xlabel("mean |counterfactual attribution| over connected pairs")
+    ax.set_ylabel("placebo draws")
+    ax.set_title("Time-shift placebo: coefficients re-estimated on shifted stress")
+    ax.legend(frameon=False, fontsize=8)
+    fig.tight_layout(); fig.savefig(FIG / "fig_placebo.pdf"); plt.close(fig)
 
 
 # --- Fig 8: H3 rank divergence scatter -----------------------------------------
@@ -209,7 +309,7 @@ def fig_stress():
 
 if __name__ == "__main__":
     fig_usde(); fig_graph(); fig_ocranking(); fig_h1(); fig_falsification(); fig_robustness()
-    fig_attribution(); fig_h3(); fig_stress()
+    fig_attribution(); fig_h3(); fig_stress(); fig_rank_ci(); fig_pairwise_top6(); fig_placebo()
     print("figures written to", FIG)
     for p in sorted(FIG.glob("*.pdf")):
         print(" ", p.name)

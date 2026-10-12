@@ -41,3 +41,32 @@ def build_hourly_context(k: int = 12, win=None, tokens=None) -> SimpleNamespace:
                            prices_ffill=prices.ffill(),
                            lido=lido, stress=stress, stress_meta=meta, graph=graph,
                            win=(start, end), tokens=tokens, k=k)
+
+
+def _daily_prices_raw(assets: dict, start, end) -> pd.DataFrame:
+    """Daily price panel with observed quotes only (no forward fill)."""
+    cols = {}
+    for ticker, cg in assets.items():
+        s = md.coingecko_prices(cg, start, end)
+        if s is not None and not s.empty:
+            cols[ticker] = s
+    return pd.DataFrame(cols).sort_index()
+
+
+def load_window_inputs(start, end, tokens, bucket: str = "hour", min_addr_volume: float = 1e3,
+                       k: int = 12):
+    """Top-k resolved flows and raw (not forward-filled) prices for one event window.
+
+    bucket "hour" gives the primary resolution; "day" the daily robustness variant (the
+    caller passes the daily min_addr_volume, 1e6)."""
+    flows = er.load_resolved_flows(start, end, list(tokens), bucket=bucket,
+                                   min_addr_volume=min_addr_volume)
+    if flows.empty:
+        return flows, pd.DataFrame()
+    flows = er.top_k_entities(flows, k=k)
+    flows["day"] = pd.to_datetime(flows["day"])
+    if bucket == "hour":
+        prices = md.build_hourly_price_panel(config.MARKET_ASSETS, start, end, ffill=False)
+    else:
+        prices = _daily_prices_raw(config.MARKET_ASSETS, start, end)
+    return flows, prices

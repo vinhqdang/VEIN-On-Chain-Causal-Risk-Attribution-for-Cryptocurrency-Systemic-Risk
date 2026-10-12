@@ -1,0 +1,455 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "N_ENTITIES",
+      "tex_anchor": "hourly run: 17 entities",
+      "printed": "17",
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "n_entities"
+      ]
+    },
+    {
+      "id": "N_FIT_HOURS",
+      "tex_anchor": "hourly run: 600 fitting hours",
+      "printed": "600",
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "n_fit_hours"
+      ]
+    },
+    {
+      "id": "N_EVENT_HOURS",
+      "tex_anchor": "hourly run: 48 event hours",
+      "printed": "48",
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "n_event_hours"
+      ]
+    },
+    {
+      "id": "GRAPH_EDGES",
+      "tex_anchor": "hourly run: 39 directed edges",
+      "printed": "39",
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "graph_edges"
+      ]
+    },
+    {
+      "id": "H3_SPEARMAN_DELTACOVAR",
+      "tex_anchor": "rank agreement with Delta-CoVaR is 0.52",
+      "printed": "0.52",
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "ranking_agreement",
+        "spearman_oc_vs_deltacovar"
+      ]
+    },
+    {
+      "id": "OC_RETAIL",
+      "tex_anchor": "OC-CoVaR exported risk, retail",
+      "printed": null,
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "oc_covar_ranking",
+        {
+          "entity": "retail"
+        },
+        "exported_risk"
+      ]
+    },
+    {
+      "id": "OC_COINBASE",
+      "tex_anchor": "OC-CoVaR exported risk, Coinbase",
+      "printed": null,
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "oc_covar_ranking",
+        {
+          "entity": "Coinbase"
+        },
+        "exported_risk"
+      ]
+    },
+    {
+      "id": "OC_BINANCE",
+      "tex_anchor": "OC-CoVaR exported risk, Binance",
+      "printed": null,
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "oc_covar_ranking",
+        {
+          "entity": "Binance"
+        },
+        "exported_risk"
+      ]
+    },
+    {
+      "id": "OC_BITFINEX",
+      "tex_anchor": "OC-CoVaR exported risk, Bitfinex",
+      "printed": null,
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "oc_covar_ranking",
+        {
+          "entity": "Bitfinex"
+        },
+        "exported_risk"
+      ]
+    },
+    {
+      "id": "OC_OKX",
+      "tex_anchor": "OC-CoVaR exported risk, OKX",
+      "printed": null,
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "oc_covar_ranking",
+        {
+          "entity": "OKX"
+        },
+        "exported_risk"
+      ]
+    },
+    {
+      "id": "FALS_TRUE_DIRECTION_RMSE",
+      "tex_anchor": "edge-reversal falsification RMSE",
+      "printed": "1.663",
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "falsification",
+        {
+          "model": "true_direction"
+        },
+        "rmse"
+      ]
+    },
+    {
+      "id": "FALS_REVERSED_EDGES_RMSE",
+      "tex_anchor": "edge-reversal falsification RMSE",
+      "printed": "1.675",
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "falsification",
+        {
+          "model": "reversed_edges"
+        },
+        "rmse"
+      ]
+    },
+    {
+      "id": "FALS_SYMMETRIC_RMSE",
+      "tex_anchor": "edge-reversal falsification RMSE",
+      "printed": "1.667",
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "falsification",
+        {
+          "model": "symmetric"
+        },
+        "rmse"
+      ]
+    },
+    {
+      "id": "H1_RMSE_OBSERVED_ONCHAIN",
+      "tex_anchor": "H1 one-step RMSE, observed_onchain",
+      "printed": null,
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "H1",
+        "scores",
+        {
+          "model": "observed_onchain"
+        },
+        "rmse"
+      ]
+    },
+    {
+      "id": "H1_RMSE_ESTIMATED_GRANGER",
+      "tex_anchor": "H1 one-step RMSE, estimated_granger",
+      "printed": null,
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "H1",
+        "scores",
+        {
+          "model": "estimated_granger"
+        },
+        "rmse"
+      ]
+    },
+    {
+      "id": "H1_RMSE_ESTIMATED_PARTIAL_CORR",
+      "tex_anchor": "H1 one-step RMSE, estimated_partial_corr",
+      "printed": null,
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "H1",
+        "scores",
+        {
+          "model": "estimated_partial_corr"
+        },
+        "rmse"
+      ]
+    },
+    {
+      "id": "H1_BOOT_GRANGER_CI_LO",
+      "tex_anchor": "H1 block bootstrap CI vs Granger graph (lower)",
+      "printed": null,
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "H1",
+        "bootstrap",
+        "granger",
+        "ci95",
+        "lo"
+      ],
+      "ci_path": [
+        "H1",
+        "bootstrap",
+        "granger",
+        "ci95"
+      ],
+      "pending": true,
+      "note": "produced by run_best.py (H1 bootstrap block)"
+    },
+    {
+      "id": "H1_BOOT_GRANGER_CI_HI",
+      "tex_anchor": "H1 block bootstrap CI vs Granger graph (upper)",
+      "printed": null,
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "H1",
+        "bootstrap",
+        "granger",
+        "ci95",
+        "hi"
+      ],
+      "ci_path": [
+        "H1",
+        "bootstrap",
+        "granger",
+        "ci95"
+      ],
+      "pending": true,
+      "note": "produced by run_best.py (H1 bootstrap block)"
+    },
+    {
+      "id": "PLACEBO_TIME_SHIFT_P",
+      "tex_anchor": "time-shift placebo p-value",
+      "printed": null,
+      "fmt": "num",
+      "file": "final_results.json",
+      "path": [
+        "placebo",
+        "time_shift",
+        "p_value"
+      ],
+      "pending": true,
+      "note": "produced by run_best.py (placebo block)"
+    },
+    {
+      "id": "UNC_RANK_BINANCE_LO",
+      "tex_anchor": "rank 95% interval, Binance",
+      "printed": null,
+      "fmt": "num",
+      "file": "uncertainty.json",
+      "path": [
+        "ranking",
+        "by_entity",
+        "Binance",
+        "rank_ci95",
+        "lo"
+      ],
+      "ci_path": [
+        "ranking",
+        "by_entity",
+        "Binance",
+        "rank_ci95"
+      ],
+      "pending": true,
+      "note": "produced by run_uncertainty.py"
+    },
+    {
+      "id": "UNC_RANK_BINANCE_HI",
+      "tex_anchor": "rank 95% interval, Binance",
+      "printed": null,
+      "fmt": "num",
+      "file": "uncertainty.json",
+      "path": [
+        "ranking",
+        "by_entity",
+        "Binance",
+        "rank_ci95",
+        "hi"
+      ],
+      "ci_path": [
+        "ranking",
+        "by_entity",
+        "Binance",
+        "rank_ci95"
+      ],
+      "pending": true,
+      "note": "produced by run_uncertainty.py"
+    },
+    {
+      "id": "UNC_RANK_RETAIL_LO",
+      "tex_anchor": "rank 95% interval, retail",
+      "printed": null,
+      "fmt": "num",
+      "file": "uncertainty.json",
+      "path": [
+        "ranking",
+        "by_entity",
+        "retail",
+        "rank_ci95",
+        "lo"
+      ],
+      "ci_path": [
+        "ranking",
+        "by_entity",
+        "retail",
+        "rank_ci95"
+      ],
+      "pending": true,
+      "note": "produced by run_uncertainty.py"
+    },
+    {
+      "id": "UNC_RANK_RETAIL_HI",
+      "tex_anchor": "rank 95% interval, retail",
+      "printed": null,
+      "fmt": "num",
+      "file": "uncertainty.json",
+      "path": [
+        "ranking",
+        "by_entity",
+        "retail",
+        "rank_ci95",
+        "hi"
+      ],
+      "ci_path": [
+        "ranking",
+        "by_entity",
+        "retail",
+        "rank_ci95"
+      ],
+      "pending": true,
+      "note": "produced by run_uncertainty.py"
+    },
+    {
+      "id": "UNC_CHANNEL_BINANCE_BYBIT_SHARE",
+      "tex_anchor": "attribution share Binance to Bybit",
+      "printed": null,
+      "fmt": "pct",
+      "file": "uncertainty.json",
+      "path": [
+        "attribution",
+        "channels",
+        {
+          "i": "Binance",
+          "j": "Bybit"
+        },
+        "share"
+      ],
+      "old_file": "final_results.json",
+      "old_path": [
+        "counterfactual_attribution",
+        {
+          "i": "Binance",
+          "j": "Bybit"
+        },
+        "attribution_share"
+      ],
+      "pending": true,
+      "note": "produced by run_uncertainty.py"
+    },
+    {
+      "id": "UNC_CHANNEL_BINANCE_BYBIT_SHARE_LO",
+      "tex_anchor": "attribution share Binance to Bybit, 95% CI (lower)",
+      "printed": null,
+      "fmt": "pct",
+      "file": "uncertainty.json",
+      "path": [
+        "attribution",
+        "channels",
+        {
+          "i": "Binance",
+          "j": "Bybit"
+        },
+        "share_ci95",
+        "lo"
+      ],
+      "ci_path": [
+        "attribution",
+        "channels",
+        {
+          "i": "Binance",
+          "j": "Bybit"
+        },
+        "share_ci95"
+      ],
+      "pending": true,
+      "note": "produced by run_uncertainty.py"
+    },
+    {
+      "id": "REV_NAMED_BOTH_SIDES",
+      "tex_anchor": "share of volume named on both sides",
+      "printed": null,
+      "fmt": "num",
+      "file": "revision.json",
+      "path": [
+        "resolution_coverage",
+        "frac_volume_named_both_sides"
+      ]
+    },
+    {
+      "id": "MULTIEVENT_FTX_FIT_ROWS",
+      "tex_anchor": "FTX multi-event: fit rows",
+      "printed": null,
+      "fmt": "num",
+      "file": "multievent.json",
+      "path": [
+        "events",
+        {
+          "event": "FTX_Nov2022"
+        },
+        "n_fit_rows"
+      ],
+      "pending": true,
+      "note": "produced by run_multievent.py (hourly fit rows)"
+    },
+    {
+      "id": "COVERAGE_OCT25_NAMED_DISTINCT",
+      "tex_anchor": "Oct 2025 named-to-named share of entity-touching volume",
+      "printed": null,
+      "fmt": "pct",
+      "file": "coverage.json",
+      "path": [
+        "oct25_hourly",
+        "panel_tokens",
+        "named_distinct_share_of_touching"
+      ],
+      "pending": true,
+      "note": "produced by run_build_data.py --coverage"
+    }
+  ]
+}
