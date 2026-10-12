@@ -42,7 +42,8 @@ def _req(method: str, url: str, body: dict | None = None, retries: int = 5) -> d
             if e.code in (429, 502, 503, 504):
                 time.sleep(2 ** i + 1)   # backoff on rate-limit / transient
                 continue
-            raise
+            detail = e.read().decode(errors="replace")
+            raise RuntimeError(f"Dune HTTP {e.code} on {url}: {detail}") from e
     raise RuntimeError(f"Dune request failed after {retries} tries: {last}")
 
 
@@ -55,13 +56,10 @@ def run_sql(sql: str, name: str = "vein_query", poll_s: float = 5.0,
         return json.loads(cache.read_text())["rows"]
 
     time.sleep(1.0)   # politeness spacing to respect free-tier rate limits
-    created = _req("POST", f"{API}/query",
-                   {"name": f"{name}_{h}", "query_sql": sql, "is_private": False})
-    qid = created.get("query_id")
-    if qid is None:
-        raise RuntimeError(f"Dune query creation failed: {created}")
-
-    ex = _req("POST", f"{API}/query/{qid}/execute", {})
+    # Execute the SQL directly (no saved query is created), which works on
+    # accounts that cannot create queries through the API.
+    qid = None
+    ex = _req("POST", f"{API}/sql/execute", {"sql": sql})
     exec_id = ex.get("execution_id")
     if exec_id is None:
         raise RuntimeError(f"Dune execute failed: {ex}")
@@ -76,7 +74,12 @@ def run_sql(sql: str, name: str = "vein_query", poll_s: float = 5.0,
     else:
         raise RuntimeError("Dune execution timed out")
 
-    res = _req("GET", f"{API}/execution/{exec_id}/results")
-    rows = res.get("result", {}).get("rows", [])
+    rows, offset = [], 0
+    while True:   # large results are paginated; follow next_offset to the end
+        res = _req("GET", f"{API}/execution/{exec_id}/results?limit=10000&offset={offset}")
+        rows.extend(res.get("result", {}).get("rows", []))
+        offset = res.get("next_offset")
+        if offset is None:
+            break
     cache.write_text(json.dumps({"sql": sql, "query_id": qid, "rows": rows}))
     return rows
