@@ -72,9 +72,13 @@ tiered pipeline rather than assumed:
   (assumption A1) makes the cyclic multi-entity system a well-defined recursive
   dynamical system simulated day-by-day in `scm.simulate`.
 - **OC-CoVaR (Level 2)** — `risk.oc_covar` forces `do(S_i = s*)` (severing i's
-  parents) and Monte-Carlos the exogenous shocks forward to get VaR_q(L_j).
+  parents) and Monte-Carlos the exogenous shocks forward to get VaR_q(L_j). The
+  shocks are a joint block bootstrap of fit-window residuals (one row draw shared by
+  all entities, `block_len` contiguous rows). s* is the 95th percentile of the
+  fit-window stress only (`risk.fit_window_s_star`).
 - **Counterfactual attribution (Level 3)** — `risk.counterfactual_attribution`
-  runs abduction (recover Û from residuals) → action (force i to pre-crisis) →
+  runs full abduction (recover Û from the observed event path, `SCM.event_residuals`)
+  → action (force i to pre-crisis) →
   prediction (recompute L_j).
 - **Falsification (A3)** — `falsification.run_falsification` refits the SCM on
   true / reversed / symmetric graphs and scores event-window prediction.

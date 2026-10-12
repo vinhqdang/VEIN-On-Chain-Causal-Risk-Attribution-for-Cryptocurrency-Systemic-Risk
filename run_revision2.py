@@ -102,7 +102,7 @@ def main():
     print("[3] OC-CoVaR ranking stability under coefficient perturbation")
     ev_days = list(stress.index[evm2])
     init = stress[stress.index < EVENT_START].iloc[-1].to_dict()
-    hi = {e: float(np.quantile(stress[e].values, 0.95)) for e in stress.columns}
+    hi = risk.fit_window_s_star(stress, stress.index[stress.index < rb.EVENT_START], rb.S_STAR_Q)
     Z = {e: np.zeros(len(ev_days)) for e in graph["nodes"]}   # zero-shock (deterministic)
 
     def det_exported(scm):

@@ -22,6 +22,7 @@ import run_best as rb
 
 RESULTS = Path(__file__).resolve().parent / "results"
 EVENT_START, EVENT_END = rb.EVENT_START, rb.EVENT_END
+BOOT_BLOCK = 8                      # H1 paired block length (hours; whole time steps)
 rng = np.random.default_rng(7)
 
 
@@ -76,8 +77,8 @@ def onestep_errors(stress, flows, parents, fit_mask, eval_mask, flow_lag=0, alph
         beta = np.linalg.solve(A, X.T @ y)
         coefs[ent] = (beta, par)
 
-    preds, acts, wts = [], [], []
-    for ent in stress.columns:
+    preds, acts, wts, tpos_all, ent_all = [], [], [], [], []
+    for ent_pos, ent in enumerate(stress.columns):
         beta, par = coefs[ent]
         for tpos in range(1, len(idx)):
             if not eval_mask[tpos]:
@@ -90,6 +91,7 @@ def onestep_errors(stress, flows, parents, fit_mask, eval_mask, flow_lag=0, alph
                 yhat = beta @ np.array([1.0] + feats)
             y = stress.iloc[tpos][ent]
             preds.append(yhat); acts.append(y); wts.append(abs(y) + 0.1)
+            tpos_all.append(tpos); ent_all.append(ent_pos)
     preds, acts, wts = np.array(preds), np.array(acts), np.array(wts)
     err2 = (preds - acts) ** 2
     wrmse = float(np.sqrt(np.average(err2, weights=wts)))
@@ -97,7 +99,8 @@ def onestep_errors(stress, flows, parents, fit_mask, eval_mask, flow_lag=0, alph
     mae = float(np.mean(np.abs(preds - acts)))
     diracc = float(np.mean(np.sign(preds) == np.sign(acts)))
     return {"wrmse": wrmse, "rmse": rmse, "mae": mae, "dir_acc": diracc,
-            "werr": (err2 * wts), "wts": wts, "n": len(preds)}
+            "werr": (err2 * wts), "wts": wts, "n": len(preds),
+            "tpos": np.array(tpos_all), "ent": np.array(ent_all)}
 
 
 def masks(stress):
@@ -128,20 +131,24 @@ def main():
     print("[1] H1 metrics + bootstrap CI")
     obs = onestep_errors(stress_c, flows_c, sub_parents_obs, fitm, evm)
     grg = onestep_errors(stress_c, flows_c, gr["parents"], fitm, evm)
-    # paired block bootstrap on weighted errors (observed - granger), block=entity-day chunks
-    d = grg["werr"][:min(len(grg["werr"]), len(obs["werr"]))] - obs["werr"][:min(len(grg["werr"]), len(obs["werr"]))]
-    B, n = 2000, len(d); block = 8
-    diffs = []
-    for _ in range(B):
-        idxs = rng.integers(0, n, size=n)
-        diffs.append(np.mean(d[idxs]))
-    diffs = np.array(diffs)
+    # Paired moving-block bootstrap of the weighted prediction-level errors
+    # (granger minus observed). Both models predict the same (entity, hour) cells,
+    # so the arrays are paired by position. Blocking is over TIME: whole hours
+    # (all entities at that hour) are resampled in contiguous blocks of BOOT_BLOCK
+    # hours, so cross-entity and serial dependence are both kept.
+    assert len(grg["werr"]) == len(obs["werr"]), "paired H1 errors must align"
+    assert np.array_equal(grg["tpos"], obs["tpos"]) and np.array_equal(grg["ent"], obs["ent"])
+    d = grg["werr"] - obs["werr"]
+    B = 2000
+    diffs = risk.paired_time_block_means(d, obs["tpos"], B, BOOT_BLOCK, rng)
     out["H1"] = {
         "observed": {k: obs[k] for k in ["wrmse", "rmse", "mae", "dir_acc", "n"]},
         "granger": {k: grg[k] for k in ["wrmse", "rmse", "mae", "dir_acc", "n"]},
         "mean_werr_diff_granger_minus_observed": float(np.mean(d)),
         "boot_ci95_diff": [float(np.quantile(diffs, .025)), float(np.quantile(diffs, .975))],
-        "prob_observed_better": float(np.mean(diffs > 0))}
+        "prob_observed_better": float(np.mean(diffs > 0)),
+        "bootstrap": {"scheme": "paired_moving_block", "block_len": BOOT_BLOCK,
+                      "block_unit": "hours (whole time steps, all entities)", "replicates": B}}
 
     # ---- #4,#5,#6: leakage-free lagged-flow + pre-event graph ----
     print("[2] lagged-flow / leakage-free")
@@ -180,7 +187,7 @@ def main():
     ev_days = list(stress.index[ev_mask])
     init = stress[stress.index < EVENT_START].iloc[-1].to_dict()
     precrisis = {e: float(stress[stress.index < EVENT_START][e].median()) for e in stress.columns}
-    U = scm.abduct(stress, ev_days)
+    U = scm.event_residuals(stress, ev_days, init)
 
     def Lj(target, distressed_sources):
         """loss of target with `distressed_sources` held at observed, others at precrisis."""
@@ -249,9 +256,10 @@ def main():
     s_nr = stress[[c for c in stress.columns if c != "retail"]]
     scm_nr = StructuralCausalModel(g_nr, alpha=1.0).fit(s_nr[s_nr.index < EVENT_START],
                                                         flows[(flows.from_entity != "retail") & (flows.to_entity != "retail") & (flows.day < EVENT_START)]).set_flows(flows)
-    hi_nr = {e: float(np.quantile(s_nr[e].values, 0.95)) for e in s_nr.columns}
+    hi_nr = risk.fit_window_s_star(s_nr, s_nr.index[s_nr.index < EVENT_START], rb.S_STAR_Q)
     init_nr = s_nr[s_nr.index < EVENT_START].iloc[-1].to_dict()
-    oc_nr = risk.systemic_ranking(scm_nr, ev_days, init_nr, hi_nr, n_sims=120, seed=7)
+    oc_nr = risk.systemic_ranking(scm_nr, ev_days, init_nr, hi_nr, n_sims=120, seed=7,
+                                  joint=True, block_len=rb.BLOCK_LEN)
     out["no_retail_ranking"] = oc_nr[["entity", "exported_risk"]].head(6).to_dict("records")
 
     # ---- #12: resolution volume coverage ----

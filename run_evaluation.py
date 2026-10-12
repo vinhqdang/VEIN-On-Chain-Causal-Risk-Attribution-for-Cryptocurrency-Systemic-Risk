@@ -37,6 +37,8 @@ RESULTS.mkdir(exist_ok=True)
 FLOW_START = dt.date(2025, 1, 1)
 FLOW_END = config.REGIME_END
 EST_CUTOFF = pd.Timestamp(config.ESTIMATION_END)
+BLOCK_LEN = 5                       # daily: one trading week of contiguous residual rows
+S_STAR_Q = 0.95                     # s* = 95th percentile of fit-window (pre-event) stress
 
 
 def jsonable(o):
@@ -126,7 +128,7 @@ def main():
         for e, c in scm.coef_.items()}
 
     # severe-distress level s* per entity = 95th pct of its stress over full window
-    stress_hi = {e: float(np.quantile(stress[e].values, 0.95)) for e in stress.columns}
+    stress_hi = risk.fit_window_s_star(stress, est_stress.index, S_STAR_Q)
     # init stress = last day before event window
     pre = stress[stress.index < pd.Timestamp(config.EVENT_START)]
     init_stress = pre.iloc[-1].to_dict() if len(pre) else {e: 0.0 for e in stress.columns}
@@ -134,7 +136,8 @@ def main():
     # ---- 5. OC-CoVaR ranking (H3) + Delta-CoVaR benchmark --------------------
     print("[5/8] Computing OC-CoVaR systemic ranking + Delta-CoVaR benchmark ...")
     oc_rank = risk.systemic_ranking(scm, event_days, init_stress, stress_hi,
-                                    q=0.95, n_sims=300, seed=7)
+                                    q=0.95, n_sims=300, seed=7,
+                                    joint=True, block_len=BLOCK_LEN)
     out["oc_covar_ranking"] = oc_rank[["entity", "exported_risk"]].to_dict(orient="records")
 
     dcv = bm.delta_covar(returns[[c for c in returns.columns]], q=0.05)

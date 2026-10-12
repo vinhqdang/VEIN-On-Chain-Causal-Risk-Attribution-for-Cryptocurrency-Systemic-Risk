@@ -69,7 +69,7 @@ def main():
     est_flows = flows[flows.day < rb.EVENT_START]
     ev = list(stress.index[(stress.index >= rb.EVENT_START) & (stress.index <= rb.EVENT_END)])
     init_stress = est_stress.iloc[-1].to_dict()
-    hi = {e: float(np.quantile(stress[e].values, 0.95)) for e in stress.columns}
+    hi = risk.fit_window_s_star(stress, est_stress.index, rb.S_STAR_Q)
     zero = {n: np.zeros(len(ev)) for n in graph["nodes"]}
 
     scm = StructuralCausalModel(graph, alpha=1.0).fit(est_stress, est_flows).set_flows(flows)
@@ -127,7 +127,7 @@ def main():
         est_confounded = stress_confounded[stress_confounded.index < rb.EVENT_START]
         scm_c = StructuralCausalModel(graph, alpha=1.0).fit(est_confounded, est_flows).set_flows(flows)
         init_c = est_confounded.iloc[-1].to_dict()
-        hi_c = {e: float(np.quantile(stress_confounded[e].values, 0.95)) for e in stress_confounded.columns}
+        hi_c = risk.fit_window_s_star(stress_confounded, est_confounded.index, rb.S_STAR_Q)
         r_c = det_exported(scm_c, ev, init_c, hi_c, zero)
         common_c = [e for e in base.index if e in r_c.index]
         rho_c, _ = spearmanr(base.loc[common_c].values, r_c.loc[common_c].values)

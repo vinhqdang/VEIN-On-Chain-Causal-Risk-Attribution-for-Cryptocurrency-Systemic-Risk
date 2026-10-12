@@ -21,6 +21,14 @@ import pandas as pd
 from sklearn.linear_model import Ridge
 
 
+def _flow_span(flows: pd.DataFrame):
+    """(first, last) day covered by a flow table, or None if it is empty."""
+    if flows is None or len(flows) == 0:
+        return None
+    days = pd.to_datetime(flows["day"])
+    return (pd.Timestamp(days.min()), pd.Timestamp(days.max()))
+
+
 class StructuralCausalModel:
     def __init__(self, graph: dict, alpha: float = 1.0):
         self.graph = graph
@@ -30,6 +38,7 @@ class StructuralCausalModel:
         self.coef_: dict[str, dict] = {}     # entity -> {parents, w_stress, w_flow, b}
         self.resid_: dict[str, pd.Series] = {}
         self.stress_cols: list[str] = []
+        self.flow_span_: tuple | None = None  # (first, last) flow day the lookup covers
 
     # ------------------------------------------------------------------ fit
     def _flow_feature(self, flows_pivot, parent, child, index):
@@ -45,6 +54,7 @@ class StructuralCausalModel:
         for (i, j), g in flows.groupby(["from_entity", "to_entity"]):
             fp[(i, j)] = g.set_index("day").usd_volume
         self._flows_pivot = fp
+        self.flow_span_ = _flow_span(flows)
         idx = stress.index
 
         for ent in self.stress_cols:
@@ -105,6 +115,7 @@ class StructuralCausalModel:
         agg = flows.groupby(["from_entity", "to_entity", "day"]).usd_volume.sum()
         self._flow_map = {(i, j, pd.Timestamp(d)): float(v)
                           for (i, j, d), v in agg.items()}
+        self.flow_span_ = _flow_span(flows)
         return self
 
     def flow_on(self, parent, child, day) -> float:
@@ -171,8 +182,20 @@ class StructuralCausalModel:
 
         Unlike abduct(), this does not rely on the pre-event residuals, which
         are zero on the event window (legacy_zero behaviour).
+
+        Requires the observed stress on every day of `days` and a flow span
+        (from fit() or set_flows()) that covers the first and last day.
         """
         idx = stress.index
+        days = pd.DatetimeIndex(days)
+        missing = days.difference(idx)
+        if len(missing):
+            raise ValueError(f"full abduction needs observed stress on every day; "
+                             f"{len(missing)} day(s) missing, first {missing[0]}")
+        if self.flow_span_ is None or not (self.flow_span_[0] <= days[0]
+                                           and days[-1] <= self.flow_span_[1]):
+            raise ValueError("full abduction needs flows covering the event window; "
+                             "call set_flows() with flows spanning the window")
         U = {e: np.zeros(len(days)) for e in self.stress_cols}
         for ti, day in enumerate(days):
             day = pd.Timestamp(day)

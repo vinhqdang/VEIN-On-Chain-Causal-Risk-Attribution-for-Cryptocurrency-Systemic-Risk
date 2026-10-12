@@ -33,22 +33,31 @@ python run_analytics.py
 python -m pytest -q tests
 ```
 
-The archived results were produced with two default settings that the code
-keeps for reproducibility. Both can be switched on to test the alternatives:
+The estimator defaults are the ones the code now uses everywhere:
 
-- `risk.counterfactual_attribution(..., abduction="legacy_zero")` (default)
-  takes the event-window shocks from `SCM.abduct()`, which are zero because the
-  residuals exist only on the pre-event fit days. `abduction="full"` uses
-  `SCM.event_residuals()`, which inverts the structural equations on the
-  observed event path.
-- `risk._bootstrap_U(..., joint=False)` (default, also the `joint` argument of
-  `oc_covar`, `delta_oc_covar` and `systemic_ranking`) resamples each entity's
-  residuals independently. `joint=True` draws one set of row indices shared by
-  all entities.
+- Full abduction. `risk.counterfactual_attribution(..., abduction="full")` (default)
+  recovers the event-window shocks from the observed path with
+  `SCM.event_residuals()`, which inverts the structural equations on the observed
+  stress and flows. It requires the observed stress on every event day and a flow
+  span (from `fit` or `set_flows`) covering the window. `abduction="legacy_zero"`
+  takes the shocks from `SCM.abduct()` (zero on the event window) and is kept only
+  for comparison with earlier runs.
+- Joint block bootstrap. `risk._bootstrap_U`, `oc_covar`, `delta_oc_covar` and
+  `systemic_ranking` default to `joint=True`: one set of row indices is shared by
+  all entities. `block_len` draws contiguous runs of residual rows. The run scripts
+  pass `block_len=24` for hourly runs and `block_len=5` for daily runs. `joint=False`
+  is independent per-entity i.i.d. resampling and accepts only `block_len=1`.
+- Pre-event s*. `risk.fit_window_s_star(stress, fit_index, q=0.95)` takes the 95th
+  percentile of each entity's stress over the fit window only, so event-window rows
+  never enter s*.
+
+The H1 paired bootstrap in `run_revision.py` is a moving-block bootstrap (block
+length 8) over the paired prediction errors, put in time order (hour, then entity).
 
 `run_best.py` (hourly, requires the Dune data) also writes
 `results/hourly_scm_export.json`, so the analytic checks can be repeated on the
-hourly coefficients.
+hourly coefficients. The export and `results/final_results.json` record the
+settings used (abduction mode, bootstrap mode, block length, s* window).
 
 ## Quick start
 

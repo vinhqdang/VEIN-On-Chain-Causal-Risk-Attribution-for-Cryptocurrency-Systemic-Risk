@@ -25,6 +25,8 @@ from vein import risk
 RESULTS = Path(__file__).resolve().parent / "results"
 TOKENS = ["USDC", "USDT", "WETH"]
 ROLL = 14
+BLOCK_LEN = 5                       # daily: one trading week of contiguous residual rows
+S_STAR_Q = 0.95                     # s* = 95th percentile of pre-event stress
 
 EVENTS = {
     "FTX_Nov2022":  (dt.date(2022, 11, 1), dt.date(2022, 11, 16),
@@ -73,9 +75,10 @@ def run_event(name, start, end, ev0, ev1, peg_id):
     if len(pre) < 4 or len(ev) < 1:
         return {"event": name, "ok": False, "reason": "insufficient window", "n_pre": len(pre), "n_ev": len(ev)}
     scm = StructuralCausalModel(graph, alpha=1.0).fit(pre, flows[flows.day < ev0]).set_flows(flows)
-    hi = {e: float(np.quantile(stress[e].values, 0.95)) for e in stress.columns}
+    hi = risk.fit_window_s_star(stress, pre.index, S_STAR_Q)
     init = pre.iloc[-1].to_dict()
-    oc = risk.systemic_ranking(scm, ev, init, hi, n_sims=150, seed=7)
+    oc = risk.systemic_ranking(scm, ev, init, hi, n_sims=150, seed=7,
+                               joint=True, block_len=BLOCK_LEN)
     fal = fz.run_falsification(graph, pre, flows[flows.day < ev0], stress, flows, ev)
     return {"event": name, "ok": True,
             "n_entities": len(stress.columns), "n_pre_days": len(pre), "n_event_days": len(ev),

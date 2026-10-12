@@ -27,6 +27,8 @@ from vein import risk
 RESULTS = Path(__file__).resolve().parent / "results"
 FLOW_START = dt.date(2025, 1, 1)
 EST_CUTOFF = pd.Timestamp(config.ESTIMATION_END)
+BLOCK_LEN = 5                       # daily: one trading week of contiguous residual rows
+S_STAR_Q = 0.95                     # s* = 95th percentile of fit-window (pre-event) stress
 
 
 def rebuild():
@@ -105,9 +107,10 @@ def main():
     s0 = st.build_stress_panel(f0, prices, {}, et0).sort_index()
     scm0 = StructuralCausalModel(g0, alpha=1.0).fit(
         s0[s0.index <= EST_CUTOFF], f0[f0.day <= EST_CUTOFF]).set_flows(f0)
-    hi0 = {e: float(np.quantile(s0[e].values, 0.95)) for e in s0.columns}
+    hi0 = risk.fit_window_s_star(s0, s0[s0.index <= EST_CUTOFF].index, S_STAR_Q)
     init0 = s0[s0.index < pd.Timestamp(config.EVENT_START)].iloc[-1].to_dict()
-    oc_tier0 = risk.systemic_ranking(scm0, event_days, init0, hi0, n_sims=200, seed=7)
+    oc_tier0 = risk.systemic_ranking(scm0, event_days, init0, hi0, n_sims=200, seed=7,
+                                     joint=True, block_len=BLOCK_LEN)
     out["resolution_robustness"] = val.resolution_robustness(oc_full, oc_tier0)
     out["resolution_robustness"]["tier0_ranking"] = oc_tier0[["entity", "exported_risk"]].to_dict("records")
 

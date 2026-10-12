@@ -39,6 +39,10 @@ CALM_START = pd.Timestamp("2025-09-20 00:00")
 CALM_END = pd.Timestamp("2025-09-21 23:00")
 TOKENS = ["USDe", "sUSDe", "wBETH", "USDC", "USDT"]
 ROLL = 48
+ABDUCTION = "full"                  # event-window shocks from the observed path
+BOOTSTRAP = "joint_moving_block"    # one row draw shared by entities, contiguous blocks
+BLOCK_LEN = 24                      # hourly: one day of contiguous residual rows
+S_STAR_Q = 0.95                     # s* = 95th percentile of fit-window stress
 
 
 def zscore(s, win=ROLL):
@@ -94,12 +98,15 @@ def main():
     out["n_fit_hours"] = int(len(est_stress))
     out["n_event_hours"] = len(ev)
     out["graph_edges"] = len(graph["edges"])
+    settings = run_settings(est_stress.index)
+    out["settings"] = settings
     print(f"    {len(stress.columns)} entities, {len(est_stress)} fit hours, {len(ev)} event hours, {len(graph['edges'])} edges")
 
     print("[4] OC-CoVaR systemic ranking (H3) ...")
-    hi = {e: float(np.quantile(stress[e].values, 0.95)) for e in stress.columns}
-    export_hourly_scm(scm, stress, flows, ev, hi, init_stress, precrisis)
-    oc = risk.systemic_ranking(scm, ev, init_stress, hi, n_sims=150, seed=7)
+    hi = risk.fit_window_s_star(stress, est_stress.index, S_STAR_Q)
+    export_hourly_scm(scm, stress, flows, ev, hi, init_stress, precrisis, settings)
+    oc = risk.systemic_ranking(scm, ev, init_stress, hi, n_sims=150, seed=7,
+                               joint=True, block_len=BLOCK_LEN)
     out["oc_covar_ranking"] = oc[["entity", "exported_risk"]].to_dict("records")
 
     print("[5] H1 head-to-head (observed vs estimated graph, hourly) ...")
@@ -127,7 +134,8 @@ def main():
         for j in scm.stress_cols:
             if j != i:
                 attrs.append(risk.counterfactual_attribution(
-                    scm, i, j, ev, stress, init_stress, precrisis.get(i, 0.0)))
+                    scm, i, j, ev, stress, init_stress, precrisis.get(i, 0.0),
+                    abduction=ABDUCTION))
     out["counterfactual_attribution"] = sorted(attrs, key=lambda r: -r["attribution"])[:10]
 
     print("[7] Falsification (A3/H2) ...")
@@ -152,9 +160,10 @@ def main():
     g0 = og.build_graph(f0, min_usd=1e5)
     s0 = build_hourly_stress(f0, sorted(set(f0.from_entity) | set(f0.to_entity) | seeds), prices).sort_index()
     scm0 = StructuralCausalModel(g0, alpha=1.0).fit(s0[s0.index < EVENT_START], f0[f0.day < EVENT_START]).set_flows(f0)
-    hi0 = {e: float(np.quantile(s0[e].values, 0.95)) for e in s0.columns}
+    hi0 = risk.fit_window_s_star(s0, s0.index[s0.index < EVENT_START], S_STAR_Q)
     init0 = s0[s0.index < EVENT_START].iloc[-1].to_dict()
-    oc0 = risk.systemic_ranking(scm0, ev, init0, hi0, n_sims=150, seed=7)
+    oc0 = risk.systemic_ranking(scm0, ev, init0, hi0, n_sims=150, seed=7,
+                                joint=True, block_len=BLOCK_LEN)
     out["resolution_robustness"] = val.resolution_robustness(oc, oc0)
 
     print("[9] Baselines (Delta-CoVaR, MES) + backtests ...")
@@ -177,13 +186,28 @@ def main():
     print("Done. Wrote results/FINAL_REPORT.md")
 
 
-def export_hourly_scm(scm, stress, flows, ev, s_star, init_stress, precrisis):
+def run_settings(fit_index):
+    """Estimator settings recorded with every hourly run and export."""
+    fit = pd.DatetimeIndex(fit_index)
+    return {"abduction": ABDUCTION,
+            "bootstrap": BOOTSTRAP,
+            "joint_residual_rows": True,
+            "block_len": BLOCK_LEN,
+            "block_unit": "hours",
+            "s_star_quantile": S_STAR_Q,
+            "s_star_window": [str(fit[0]), str(fit[-1])],
+            "s_star_window_rows": int(len(fit)),
+            "s_star_excludes_event_window": bool(fit.max() < EVENT_START)}
+
+
+def export_hourly_scm(scm, stress, flows, ev, s_star, init_stress, precrisis, settings):
     """Archive the hourly SCM so the analytic checks can be re-run offline.
 
     Writes the coefficients in the schema of results/results.json
     ("scm_coefficients", with "intercept" in place of the in-memory "b"), the
     residual std, s*, the pre-event and pre-crisis levels, the event-window
-    stress and the event-window flow per edge. Needs the Dune data, so it is
+    stress, the event-window flow per edge, and the settings used (abduction
+    mode, bootstrap mode, block length, s* window). Needs the Dune data, so it is
     produced by a local rerun of this script, not by the archived results.
     """
     coef = {e: {"parents": list(c["parents"]),
@@ -195,6 +219,7 @@ def export_hourly_scm(scm, stress, flows, ev, s_star, init_stress, precrisis):
     edges = fl.groupby(["from_entity", "to_entity", "day"]).usd_volume.sum().reset_index()
     payload = {
         "resolution": "hourly",
+        "settings": settings,
         "event_window": [str(ev[0]), str(ev[-1])],
         "scm_coefficients": coef,
         "scm_residual_std": scm.residual_std(),
