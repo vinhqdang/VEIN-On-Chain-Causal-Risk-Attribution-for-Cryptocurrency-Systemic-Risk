@@ -3,7 +3,9 @@
 Fixtures in tests/fixtures/labels: a.csv (CSV), b.json (address-keyed dict),
 c.json (list with chainId). Addresses are synthetic apart from Binance 14.
 """
+import re
 import shutil
+import subprocess
 from pathlib import Path
 
 import pandas as pd
@@ -14,6 +16,13 @@ from vein import labels as lb
 
 FIX = Path(__file__).parent / "fixtures" / "labels"
 BINANCE14 = "0x28c6c06298d514db089934071355e5743bf21d60"
+SB_FIX = FIX / "spellbook_sample.sql"          # synthetic six-row file, not the real list
+SB_BIN1 = "0x" + "1" * 40                      # Binance 1
+SB_CB_DEP = "0x" + "2" * 40                    # Coinbase Prime Deposit 1
+SB_GATE = "0x" + "abcdef" * 6 + "abcd"         # Gate.io 1 (cex_name 'Gate', upper-case in file)
+SB_CHARITY = "0x" + "4" * 40                   # Binance Charity (not a wallet)
+SB_KAIA = "0x" + "5" * 40                      # Bithumb 1 kaia (other chain)
+SB_UNKNOWN = "0x" + "6" * 40                   # Unknown Venue 1 (no exchange)
 
 
 @pytest.fixture
@@ -187,3 +196,140 @@ def test_wallet_and_deposit_filters_and_old_tables_without_kind():
 
 def test_seed_labels_are_wallet_kind():
     assert set(lb.seed_label_table()["kind"]) == {"wallet"}
+
+
+# --- third source: Dune Spellbook CEX list (BSL 1.1, pinned, never redistributed) ---------
+def _spellbook_dir(tmp_path, sub="spellbook"):
+    """A spellbook checkout as clone_label_repos leaves it: the SQL file and LICENSE only."""
+    d = tmp_path / sub
+    (d / Path(config.SPELLBOOK_SQL).parent).mkdir(parents=True)
+    shutil.copy(SB_FIX, d / config.SPELLBOOK_SQL)
+    (d / "LICENSE").write_text("Business Source License 1.1\n")
+    return d
+
+
+def test_config_pins_spellbook_to_a_full_sha_with_sparse_paths():
+    assert re.fullmatch(r"[0-9a-f]{40}", config.SPELLBOOK_COMMIT)
+    assert config.LABEL_REPOS["spellbook"] == "https://github.com/duneanalytics/spellbook.git"
+    assert config.LABEL_PINNED["spellbook"] == {"commit": config.SPELLBOOK_COMMIT,
+                                                "sparse": config.SPELLBOOK_SPARSE}
+    assert "LICENSE" in config.SPELLBOOK_SPARSE and config.SPELLBOOK_SQL in config.SPELLBOOK_SPARSE
+
+
+def test_spellbook_parser_reads_every_row_with_fields():
+    recs = list(lb.iter_spellbook_records(SB_FIX))
+    assert len(recs) == 6
+    by = {r["address"]: r for r in recs}
+    assert set(by) == {SB_BIN1, SB_CB_DEP, SB_GATE, SB_CHARITY, SB_KAIA, SB_UNKNOWN}
+    assert by[SB_BIN1]["category"] == "Binance" and by[SB_BIN1]["name"] == "Binance 1"
+    assert by[SB_CB_DEP]["category"] == "Coinbase Prime"
+    assert by[SB_KAIA]["chain"] == "kaia" and by[SB_BIN1]["chain"] == ""
+    assert all(r["source_file"].endswith("spellbook_sample.sql") for r in recs)
+
+
+def test_spellbook_parser_lowercases_and_skips_sql_comments(tmp_path):
+    p = tmp_path / "x.sql"
+    p.write_text("-- , (0x9999999999999999999999999999999999999999, 'Binance', 'Binance 9', 'a', date '2020-01-01')\n"
+                 "FROM (VALUES\n"
+                 "    (0xABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCD, 'Binance', 'Binance 2', 'a', date '2020-01-01')\n")
+    recs = list(lb.iter_spellbook_records(p))
+    assert [r["address"] for r in recs] == ["0x" + "abcdef" * 6 + "abcd"]
+
+
+def test_spellbook_deposit_kind_detection():
+    assert lb.spellbook_kind("Coinbase Prime Deposit 1") == "deposit"
+    assert lb.spellbook_kind("Binance Wintermute Deposit 1") == "deposit"
+    assert lb.spellbook_kind("Binance 1") == "wallet"
+    assert lb.spellbook_kind("Binance: Hot Wallet 3") == "wallet"
+    kinds = {r["address"]: r["kind"] for r in lb.iter_spellbook_records(SB_FIX)}
+    assert kinds[SB_CB_DEP] == "deposit" and kinds[SB_BIN1] == "wallet"
+
+
+def test_spellbook_root_uses_cex_name_then_distinct_name():
+    assert lb.spellbook_root("Coinbase Prime", "Coinbase Prime Deposit 1") == "Coinbase"
+    assert lb.spellbook_root("Gate", "Gate.io 1") == "Gate.io"
+    assert lb.spellbook_root("Unknown Venue", "Bybit 3") == "Bybit"      # fallback
+    assert lb.spellbook_root("Binance", "Binance Charity") is None        # not a wallet
+    assert lb.spellbook_root("Unknown Venue", "Unknown Venue 1") is None
+
+
+def test_build_counts_spellbook_exclusions_and_kinds(tmp_path):
+    df, rep = lb.build_open_label_table([_spellbook_dir(tmp_path)])
+    sb = rep["sources"]["spellbook"]
+    assert (sb["records"], sb["excluded_other_chain"], sb["excluded_non_wallet"],
+            sb["unmapped_names"]) == (6, 1, 1, 1)
+    assert dict(zip(df.address, df.entity)) == {SB_BIN1: "Binance", SB_CB_DEP: "Coinbase",
+                                                SB_GATE: "Gate.io"}
+    assert dict(zip(df.address, df.kind))[SB_CB_DEP] == "deposit"
+    assert rep["addresses_per_root_wallet"] == {"Binance": 1, "Gate.io": 1}
+    assert rep["addresses_per_root_deposit"] == {"Coinbase": 1}
+    assert rep["unmapped_spellbook_names"] == [("Unknown Venue", 1)]
+
+
+def test_spellbook_conflict_with_open_source_is_dropped(tmp_path):
+    mit = tmp_path / "eth"
+    mit.mkdir()
+    (mit / "x.csv").write_text(f"Address,Name Tag,Label\n{SB_BIN1},Bybit 9,exchange\n")
+    sb = _spellbook_dir(tmp_path)
+    df, rep = lb.build_open_label_table([mit, sb])
+    assert SB_BIN1 not in set(df.address)
+    assert rep["conflicts"] == 1 and rep["conflicts_involving_spellbook"] == 1
+    pub, _ = lb.public_table([mit, sb])
+    assert dict(zip(pub.address, pub.entity))[SB_BIN1] == "Bybit"
+
+
+def test_public_table_excludes_spellbook_rows_and_tags(tmp_path):
+    sb = _spellbook_dir(tmp_path)
+    mit = tmp_path / "eth"
+    mit.mkdir()
+    (mit / "x.csv").write_text(f"Address,Name Tag,Label\n{SB_GATE},Gate.io 9,exchange\n")
+    full, _ = lb.build_open_label_table([mit, sb])
+    pub, prep = lb.public_table([mit, sb])
+    assert SB_BIN1 in set(full.address) and SB_BIN1 not in set(pub.address)
+    assert SB_CB_DEP not in set(pub.address)
+    assert "spellbook" not in prep["sources"] and "spellbook" not in prep["licence"]
+    # A row also present in an MIT source keeps the MIT tag only.
+    assert dict(zip(pub.address, pub.source)) == {SB_GATE: "eth"}
+    assert full.loc[full.address == SB_GATE, "source"].item() == "eth+spellbook"
+    mit_only, _ = lb.build_open_label_table([mit])
+    pd.testing.assert_frame_equal(pub, mit_only)
+    # The file that would be redistributed contains no trace of the spellbook list.
+    out = tmp_path / "public.csv.gz"
+    pub.to_csv(out, index=False, compression="gzip")
+    import gzip
+    assert b"spellbook" not in gzip.open(out).read().lower()
+    assert b"Binance 1" not in gzip.open(out).read()
+
+
+def _git_commit(repo, msg):
+    subprocess.run(["git", "-C", str(repo), "add", "-A"], check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(repo), "-c", "user.name=test", "-c",
+                    "user.email=test@example.com", "commit", "-q", "-m", msg],
+                   check=True, capture_output=True)
+
+
+def test_clone_pinned_checks_out_only_the_pinned_commit(tmp_path):
+    up = tmp_path / "upstream"
+    up.mkdir()
+    subprocess.run(["git", "init", "-q", str(up)], check=True)
+    (up / "sub").mkdir()
+    (up / "LICENSE").write_text("Business Source License 1.1\n")
+    (up / "sub" / "keep.sql").write_text("v1\n")
+    (up / "other.txt").write_text("x\n")
+    _git_commit(up, "one")
+    c1 = lb._git(up, "rev-parse", "HEAD")
+    (up / "sub" / "keep.sql").write_text("v2\n")
+    _git_commit(up, "two")
+    c2 = lb._git(up, "rev-parse", "HEAD")
+    lb._git(up, "config", "uploadpack.allowFilter", "true")
+    lb._git(up, "config", "uploadpack.allowAnySHA1InWant", "true")
+
+    dest = tmp_path / "clone"
+    sparse = ["LICENSE", "sub/keep.sql"]
+    assert lb._clone_pinned(up.as_uri(), dest, c1, sparse) == c1
+    assert (dest / "sub" / "keep.sql").read_text() == "v1\n"
+    assert not (dest / "other.txt").exists()                  # outside the sparse set
+    assert lb._licence(dest) == "Business Source License 1.1"
+    # A second call re-pins the existing checkout to the other commit.
+    assert lb._clone_pinned(up.as_uri(), dest, c2, sparse) == c2
+    assert (dest / "sub" / "keep.sql").read_text() == "v2\n"

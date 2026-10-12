@@ -277,11 +277,19 @@ def _flow_reference(x: pd.DataFrame, labels: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # --labels (runs without BigQuery)
 # ---------------------------------------------------------------------------
+SPELLBOOK_NAME = lb.SPELLBOOK
+PAPER_ENTITIES = ["Binance", "Coinbase", "OKX", "Bybit", "Bitfinex", "HTX", "Gate.io",
+                  "Crypto.com", "Bitget", "Bullish", "Copper", "Ceffu", "FalconX", "Aave",
+                  "Ethena", "Lido", "MakerSky"]
+
+
 def stage_labels() -> dict:
     revs = lb.clone_label_repos()
     repo_dirs = [lb.CACHE_DIR / "labels_src" / name for name in config.LABEL_REPOS]
     discover_out = {}
     for rd in repo_dirs:
+        if rd.name in config.LABEL_PINNED:   # pinned sources are parsed by their own reader
+            continue
         cap = io.StringIO()
         with contextlib.redirect_stdout(cap):
             lb.discover(rd)
@@ -301,25 +309,38 @@ def stage_labels() -> dict:
     _log(f"  known-good check: Binance 14 -> {b14.entity.tolist() or 'MISSING'}")
     if not b14_ok:
         raise StageFailed("Binance 14 is not mapped to Binance by the open label parser")
+    # Redistributable file: MIT sources only (no spellbook rows, no spellbook source tags).
+    pub_df, pub_rep = lb.public_table(repo_dirs)
     cache = lb.CACHE_DIR
     cache.mkdir(parents=True, exist_ok=True)
     open_df.to_csv(cache / "labels_open.csv.gz", index=False, compression="gzip")
-    open_df.to_csv(RESULTS / "labels_open.csv.gz", index=False, compression="gzip")
+    pub_df.to_csv(RESULTS / "labels_open.csv.gz", index=False, compression="gzip")
 
     seed = lb.seed_label_table()
     base = lb.merge_labels(seed, lb.wallet_labels(open_df))   # deposit labels excluded
     base.to_csv(cache / "labels_base.csv.gz", index=False, compression="gzip")
     fp = lb.label_fingerprint(base)
 
+    wal, dep = rep["addresses_per_root_wallet"], rep["addresses_per_root_deposit"]
+    seed_n = seed.entity.value_counts().to_dict()
+    base_w = base.entity.value_counts().to_dict()
+    paper = [{"entity": e, "seed": int(seed_n.get(e, 0)), "open_wallet": int(wal.get(e, 0)),
+              "open_deposit": int(dep.get(e, 0)), "base_rows": int(base_w.get(e, 0))}
+             for e in PAPER_ENTITIES]
+
     licences = {name: rep["licence"].get(name) for name in config.LABEL_REPOS}
     summary = {"revisions": revs, "licences": licences, "discover": discover_out,
                "open_addresses": int(len(open_df)), "open_per_root": rep["addresses_per_root"],
-               "open_per_root_wallet": rep["addresses_per_root_wallet"],
-               "open_per_root_deposit": rep["addresses_per_root_deposit"],
-               "conflicts": rep["conflicts"], "conflict_examples": rep["conflict_examples"],
+               "open_per_root_wallet": wal, "open_per_root_deposit": dep,
+               "public_addresses": int(len(pub_df)), "public_per_root": pub_rep["addresses_per_root"],
+               "conflicts": rep["conflicts"], "conflicts_involving_spellbook":
+                   rep["conflicts_involving_spellbook"], "conflict_examples": rep["conflict_examples"],
+               "kind_mixed_addresses": rep["kind_mixed_addresses"],
                "sources": {k: {kk: vv for kk, vv in v.items() if kk != "files"}
                            | {"files_parsed": v["files"]} for k, v in rep["sources"].items()},
                "unmapped_exchange_names": rep["unmapped_exchange_names"],
+               "unmapped_spellbook_names": rep["unmapped_spellbook_names"],
+               "paper_entities": paper,
                "base_rows": int(len(base)), "base_fingerprint": fp,
                "binance14_ok": b14_ok}
     (cache / "labels_report.json").write_text(json.dumps(summary, indent=2, default=str))
@@ -329,34 +350,57 @@ def stage_labels() -> dict:
                               "open_per_root": summary["open_per_root"],
                               "open_per_root_wallet": summary["open_per_root_wallet"],
                               "open_per_root_deposit": summary["open_per_root_deposit"],
-                              "conflicts": summary["conflicts"], "base_rows": summary["base_rows"],
-                              "base_fingerprint": fp})
+                              "public_addresses": summary["public_addresses"],
+                              "conflicts": summary["conflicts"],
+                              "conflicts_involving_spellbook": summary["conflicts_involving_spellbook"],
+                              "sources": {k: {kk: vv for kk, vv in v.items() if kk != "files_parsed"}
+                                         for k, v in summary["sources"].items()},
+                              "paper_entities": paper,
+                              "base_rows": summary["base_rows"], "base_fingerprint": fp})
     _log(f"  open labels: {summary['open_addresses']} addresses, {summary['conflicts']} conflicts; "
-         f"base {summary['base_rows']} rows, fingerprint {fp}")
+         f"public {summary['public_addresses']}; base {summary['base_rows']} rows, fingerprint {fp}")
     return summary
 
 
 def write_labels_md(s: dict) -> None:
+    pinned = set(config.LABEL_PINNED)
+
+    def sc(src: dict, key: str, name: str) -> str:
+        return str(src.get(key, 0)) if name in pinned else "-"
+
     lines = ["# VEIN data build report", "",
-             "_Status: labels stage only; BigQuery stages pending credentials._", "",
+             "_Status: labels stage only; the BigQuery stages have not been run yet._", "",
              "Generated by `run_build_data.py --labels`. The BigQuery stages (`--check`, `--budget`, "
-             "`--selftest`, `--extract`, `--sweeps`, `--coverage`) have not been run in this "
-             "environment: there are no GCP credentials here, so no query has been billed and no "
-             "extract, sweep or coverage number has been produced yet.", "",
+             "`--selftest`, `--extract`, `--sweeps`, `--coverage`) have not been run for this build, "
+             "so no extract, sweep or coverage number has been produced yet.", "",
              "## Label sources", "",
-             "| repo | commit | licence | records read | Ethereum records mapped to an exchange | addresses |",
-             "|---|---|---|---|---|---|"]
+             "| source | commit | licence | records read | mapped to a root | addresses mapped | "
+             "wallet addresses | deposit addresses | excluded: other chain | excluded: not a wallet | "
+             "no root |",
+             "|---|---|---|---|---|---|---|---|---|---|---|"]
     for name in config.LABEL_REPOS:
         src = s["sources"].get(name, {})
         lines.append(f"| {name} | `{s['revisions'].get(name)}` | {s['licences'].get(name)} | "
                      f"{src.get('records', 0)} | {src.get('mapped_records', 0)} | "
-                     f"{src.get('mapped_addresses', 0)} |")
+                     f"{src.get('mapped_addresses', 0)} | {src.get('wallet_addresses', 0)} | "
+                     f"{src.get('deposit_addresses', 0)} | {sc(src, 'excluded_other_chain', name)} | "
+                     f"{sc(src, 'excluded_non_wallet', name)} | {sc(src, 'unmapped_names', name)} |")
     lines += ["", "Record counts are per file. eth-labels ships each account list twice (CSV and JSON) "
               "and etherscan-labels has per-category and combined copies, so the address column is the "
-              "one to read for coverage. Both repositories are MIT-licensed. The open label table is therefore also "
-              "published as `results/labels_open.csv.gz`, with the copyright notices retained in "
-              "the licence files of the source repositories (Dawson Botsford, 2022; Brian Lee "
-              "Cheow Teng, 2022).", "",
+              "one to read for coverage. `-` marks columns that do not apply to a source.", "",
+              "Licences. eth-labels and etherscan-labels are MIT-licensed (copyright notices kept in "
+              "their licence files: Dawson Botsford, 2022; Brian Lee Cheow Teng, 2022). The Dune "
+              "Spellbook list (`cex_evms_addresses.sql`, sparse clone at the pinned commit above) is "
+              "under the Business Source License 1.1, which does not allow us to redistribute it. It is "
+              "used only to build the internal label tables. `results/labels_open.csv.gz` is built from "
+              "the two MIT sources alone (`vein.labels.public_table`): it has no Spellbook rows and no "
+              "Spellbook source tags. The full table, including Spellbook rows, stays in "
+              "`data_cache/labels_open.csv.gz`, which is git-ignored.", "",
+              "Spellbook rules. Each row maps to a root by its `cex_name`, falling back to its "
+              "`distinct_name`. Rows tagged `kaia` in the name are Kaia-chain addresses and are excluded, "
+              "because the file has no chain column and the table is Ethereum. Rows whose exchange name "
+              "matches but whose name is not a trading wallet (charity, pool, deployer, router, token) "
+              "are excluded as non-wallets. Names with `Deposit` are deposit-kind.", "",
               "## Discovery output (`python -m vein.labels --discover <repo>`)", ""]
     for name, info in s["discover"].items():
         groups: dict[str, list[str]] = {}
@@ -375,21 +419,33 @@ def write_labels_md(s: dict) -> None:
             lines.append(f"| `{sig.replace('|', '/')}` | {len(files)} | `{files[0]}` |")
         lines.append("")
     lines += ["## Open label table", "",
-              f"- Addresses with one exchange root: **{s['open_addresses']}**",
-              f"- Addresses dropped as conflicts (two different roots across sources): **{s['conflicts']}**",
+              f"- Addresses with one exchange root, all sources (cache `labels_open`): **{s['open_addresses']}**",
+              f"- Public table `results/labels_open.csv.gz` (MIT sources only): **{s['public_addresses']}**",
+              f"- Addresses dropped as conflicts (two different roots across sources): **{s['conflicts']}**, "
+              f"of which {s['conflicts_involving_spellbook']} involve the Spellbook list",
+              f"- Addresses labelled both wallet and deposit (kept as deposit): {s['kind_mixed_addresses']}",
               f"- of which wallet-kind (hot, cold, funder): **{sum(s['open_per_root_wallet'].values())}**; "
-              f"deposit-kind (`Dep:` per-user addresses): **{sum(s['open_per_root_deposit'].values())}**",
+              f"deposit-kind (`Dep:` or `Deposit` per-user addresses): **{sum(s['open_per_root_deposit'].values())}**",
               f"- Seed + wallet-kind base table (`labels_base`): {s['base_rows']} rows, fingerprint `{s['base_fingerprint']}`",
               f"- Binance 14 (`0x28c6c06298d514db089934071355e5743bf21d60`) mapped to Binance: **{s['binance14_ok']}**", "",
-              "### Addresses per exchange root", "",
+              "### The 17 paper entities", "",
+              "Wallet-kind counts used for the entity table. `config seeds` are the hand-curated addresses, "
+              "`open wallet` and `open deposit` come from all open sources, and `labels_base rows` is the "
+              "entity's row count in the base table (seeds plus open wallets).", "",
+              "| entity | config seeds | open wallet | open deposit | labels_base rows |", "|---|---|---|---|---|"]
+    for p in s["paper_entities"]:
+        lines.append(f"| {p['entity']} | {p['seed']} | {p['open_wallet']} | {p['open_deposit']} | {p['base_rows']} |")
+    lines += ["", "### Addresses per exchange root", "",
               "| root | addresses |", "|---|---|"]
     for root, n in sorted(s["open_per_root"].items(), key=lambda kv: -kv[1]):
         lines.append(f"| {root} | {n} |")
     dep, wal = s["open_per_root_deposit"], s["open_per_root_wallet"]
+    sb_dep = s["sources"].get(SPELLBOOK_NAME, {}).get("deposit_addresses", 0)
     lines += ["", "### Label kind: wallets versus deposit addresses (treatment decision)", "",
               "The open repositories mix operational wallets with per-user deposit addresses "
-              "(`Binance Dep: 0x...`, `Bitget Dep: 0x...`). Deposit labels are almost all from two "
-              "exchanges: " + ", ".join(f"{k} {v}" for k, v in sorted(dep.items(), key=lambda kv: -kv[1])[:3])
+              "(`Binance Dep: 0x...`, `Bitget Dep: 0x...`), and the Spellbook list adds "
+              f"{sb_dep} deposit-kind addresses (`... Deposit N` names). Deposit labels are almost all from "
+              "two exchanges: " + ", ".join(f"{k} {v}" for k, v in sorted(dep.items(), key=lambda kv: -kv[1])[:3])
               + ". Used as entity labels they would make Bitget the best-resolved exchange by far "
               "(it would capture most retail-to-exchange volume) for reasons unrelated to size, and "
               "would bias graph centrality and every ranking. Treatment:", "",
@@ -397,7 +453,7 @@ def write_labels_md(s: dict) -> None:
               "the entity labels and the Tier-3 hot set H. Deposit-kind labels are not uploaded.",
               "2. Deposit addresses are found uniformly for every exchange by Tier-0 sweep detection "
               "(one rule, applied to every hot wallet).",
-              "3. The deposit-kind labels are kept in `results/labels_open.csv.gz` (column `kind`) as an "
+              "3. The deposit-kind labels are kept in `data_cache/labels_open.csv.gz` (column `kind`) as an "
               "independent validation set for Tier-0 (`overlap_deposit_labels` in the sweeps "
               "report), and as ground truth for the Tier-1/2 resolver validation "
               "(`labels_edges`), which must be reported as deposit-dominated.", "",
@@ -406,16 +462,21 @@ def write_labels_md(s: dict) -> None:
               "| root | wallet labels | deposit labels |", "|---|---|---|"]
     for root in sorted(set(wal) | set(dep), key=lambda r: -(wal.get(r, 0) + dep.get(r, 0)))[:15]:
         lines.append(f"| {root} | {wal.get(root, 0)} | {dep.get(root, 0)} |")
-    lines += ["", "### Unmapped names with an 'exchange' category", ""]
+    lines += ["", "### Unmapped names", ""]
     if s["unmapped_exchange_names"]:
-        lines += ["Not mapped to a root. Most are DEX or protocol contracts (routers, exchange "
-                  "proxies, old Synthetix rate oracles), so no alias was added for them.", "",
+        lines += ["Ethereum explorer labels with an 'exchange' category and no root. Most are DEX or "
+                  "protocol contracts (routers, exchange proxies, old Synthetix rate oracles), so no alias "
+                  "was added for them.", "",
                   "| name | records |", "|---|---|"]
         for name, n in s["unmapped_exchange_names"][:25]:
             lines.append(f"| {name} | {n} |")
     else:
-        lines.append("None: every name with an 'exchange' category maps to an exchange root or is excluded.")
-    lines += ["", "### Exclusions", "",
+        lines.append("None: every eth-labels name with an 'exchange' category maps to an exchange root or is excluded.")
+    sb = s["sources"].get(SPELLBOOK_NAME, {})
+    lines += ["", f"Spellbook rows with no exchange root and no known exchange name: {sb.get('unmapped_names', 0)} "
+              "(counts only, since the list is not redistributed; the distinct names are in "
+              "`data_cache/labels_report.json`).", "",
+              "### Exclusions", "",
               "- `vein.config.LABEL_EXCLUDE` (token, deployer, bridge, router, commerce, airdrop, "
               "nft, governance, pool, vault, swap, exploit, phish, fake) on name and category.",
               "- `vein.labels.NON_CEX_EXCLUDE` (charity, nonprofit, donate, industry recovery, AVS "
@@ -423,8 +484,11 @@ def write_labels_md(s: dict) -> None:
               "trading wallets.",
               "- Token-contract files (`tokens/`, `tokens.csv`, `tokens.json`) and the duplicated "
               "`combined/` folders. Non-Ethereum explorer folders (bscscan, polygonscan, arbiscan, "
-              "avalanche, ftmscan, optimism) are skipped by path because they have no chain field.", "",
-              "## Pending (needs credentials)", "",
+              "avalanche, ftmscan, optimism) are skipped by path because they have no chain field.",
+              f"- Spellbook rows tagged with another chain (`kaia`): {sb.get('excluded_other_chain', 0)}. "
+              f"Spellbook rows that name a known exchange but are not trading wallets: "
+              f"{sb.get('excluded_non_wallet', 0)}.", "",
+              "## Pending", "",
               "- `--check`: schema, partitioning and clustering of `token_transfers`, freshness "
               "(`MAX(block_timestamp) >= 2026-06-30`), USDe 2025-10-10 dedupe.",
               "- `--budget`, `--selftest`, `--extract all`, `--sweeps`, `--coverage`.", ""]

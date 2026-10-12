@@ -1,12 +1,17 @@
 """Open exchange-label table from public label repositories (BQ_SPEC section 5).
 
-Sources (both MIT-licensed, cloned shallow into data_cache/labels_src):
-  - dawsbot/eth-labels        data/csv/accounts.csv, data/json/accounts.json
-  - brianleect/etherscan-labels  data/etherscan/** (Ethereum mainnet explorer labels)
+Sources (cloned into data_cache/labels_src):
+  - dawsbot/eth-labels        data/csv/accounts.csv, data/json/accounts.json   (MIT)
+  - brianleect/etherscan-labels  data/etherscan/** (Ethereum mainnet explorer labels)  (MIT)
+  - duneanalytics/spellbook   cex_evms_addresses.sql, sparse clone at config.SPELLBOOK_COMMIT
+                              (Business Source License 1.1: used internally, never redistributed)
 
 Each raw label record (address, name, category) is reduced to an exchange root with
-normalize_exchange(). An address mapped to two different roots is a conflict and is
-dropped. The seed table (config.ENTITIES) always takes priority over open labels.
+normalize_exchange() (spellbook: spellbook_root()). An address mapped to two different roots
+is a conflict and is dropped. The seed table (config.ENTITIES) always takes priority.
+
+The redistributable table (results/labels_open.csv.gz) is built by public_table() from the
+MIT sources only, so no spellbook-derived row or source string reaches the published file.
 
 Run `python -m vein.labels --discover <repo_dir>` to see how each file is parsed.
 """
@@ -49,13 +54,47 @@ _CHAIN_COLS = ["chainid", "chain"]
 # ---------------------------------------------------------------------------
 # cloning and provenance
 # ---------------------------------------------------------------------------
+def _git(path, *args) -> str:
+    return subprocess.run(["git", "-C", str(path), *args], capture_output=True, text=True,
+                          check=True).stdout.strip()
+
+
+def _clone_pinned(url, path, commit, sparse) -> str:
+    """Sparse, blob-filtered, depth-1 clone of a single pinned commit. Only the paths in
+    `sparse` are materialised. Returns the checked-out HEAD, which must equal `commit`."""
+    path = Path(path)
+    if not (path / ".git").exists():
+        path.mkdir(parents=True, exist_ok=True)
+        _git(path, "init", "--quiet")
+        _git(path, "remote", "add", "origin", url)
+    _git(path, "config", "core.sparseCheckout", "true")
+    _git(path, "config", "core.sparseCheckoutCone", "false")
+    info = path / ".git" / "info"
+    info.mkdir(parents=True, exist_ok=True)
+    (info / "sparse-checkout").write_text("\n".join(sparse) + "\n")
+    _git(path, "fetch", "--quiet", "--depth", "1", "--filter=blob:none", "origin", commit)
+    _git(path, "checkout", "--quiet", commit)
+    head = _git(path, "rev-parse", "HEAD")
+    if head != commit:
+        raise RuntimeError(f"{path}: HEAD {head} is not the pinned commit {commit}")
+    missing = [p for p in sparse if not (path / p).exists()]
+    if missing:
+        raise RuntimeError(f"{path}: pinned checkout lacks {missing}")
+    return head
+
+
 def clone_label_repos(dest=CACHE_DIR / "labels_src") -> dict:
-    """Shallow-clone (or fast-forward) the label repos. Returns {repo: commit_sha}."""
+    """Shallow-clone (or fast-forward) the label repos, and check out pinned sources
+    (config.LABEL_PINNED) at their commit. Returns {repo: commit_sha}."""
     dest = Path(dest)
     dest.mkdir(parents=True, exist_ok=True)
     revs = {}
     for name, url in config.LABEL_REPOS.items():
         path = dest / name
+        if name in config.LABEL_PINNED:
+            pin = config.LABEL_PINNED[name]
+            revs[name] = _clone_pinned(url, path, pin["commit"], pin["sparse"])
+            continue
         if (path / ".git").exists():
             subprocess.run(["git", "-C", str(path), "pull", "--ff-only", "--quiet"], check=True)
         else:
@@ -232,6 +271,30 @@ def iter_label_records(repo_dir) -> Iterator[dict]:
         yield from recs
 
 
+SPELLBOOK = "spellbook"
+# One row of the VALUES list: (0x..., 'cex_name', 'distinct_name', 'added_by', date '...').
+# The address is a bare hex literal in the file; quotes around it are tolerated.
+_SB_ROW_RE = re.compile(
+    r"\(\s*'?(0x[0-9a-fA-F]{40})'?\s*,\s*'((?:[^']|'')*)'\s*,\s*'((?:[^']|'')*)'\s*,"
+    r"\s*'((?:[^']|'')*)'\s*,\s*date\s*'[0-9-]+'\s*\)")
+
+
+def iter_spellbook_records(path) -> Iterator[dict]:
+    """Yield {address, name, category, kind, chain, source_file} per row of Spellbook's
+    cex_evms_addresses.sql. name = distinct_name, category = cex_name. SQL comment lines are
+    skipped. `chain` is the non-Ethereum tag found in distinct_name ('' if none). The exchange
+    root is not resolved here (see spellbook_root)."""
+    path = Path(path)
+    text = "\n".join(ln for ln in path.read_text(errors="replace").splitlines()
+                     if not ln.lstrip().startswith("--"))
+    for m in _SB_ROW_RE.finditer(text):
+        addr, cex, distinct, _added_by = (g.replace("''", "'") for g in m.groups())
+        chain = re.search(config.SPELLBOOK_NON_ETH_RE, distinct, re.I)
+        yield {"address": addr.lower(), "name": distinct, "category": cex,
+               "kind": spellbook_kind(distinct), "chain": chain.group(1).lower() if chain else "",
+               "source_file": str(path)}
+
+
 # ---------------------------------------------------------------------------
 # exchange normalisation
 # ---------------------------------------------------------------------------
@@ -239,6 +302,12 @@ def label_kind(raw_name) -> str:
     """'deposit' for per-user deposit-address labels ('Binance Dep: 0x...'), else 'wallet'
     (hot, cold, funder and other operational wallets)."""
     return "deposit" if re.search(config.DEPOSIT_LABEL_RE, str(raw_name or "").lower()) else "wallet"
+
+
+def spellbook_kind(distinct_name) -> str:
+    """Spellbook deposit addresses are named '... Deposit 1' (not 'Dep:')."""
+    return "deposit" if re.search(config.SPELLBOOK_DEPOSIT_RE, str(distinct_name or ""), re.I) \
+        else "wallet"
 
 
 def with_kind(df: pd.DataFrame) -> pd.DataFrame:
@@ -260,6 +329,17 @@ def deposit_labels(df: pd.DataFrame) -> pd.DataFrame:
     return d[d["kind"] == "deposit"].reset_index(drop=True)
 
 
+def _alias_root(name) -> str | None:
+    """Exchange root from the alias table alone (no exclusion rules)."""
+    n = re.sub(r"\s+", " ", str(name or "").strip().lower())
+    if not n:
+        return None
+    for root, pat in config.EXCHANGE_ALIASES:
+        if re.search(pat, n):
+            return root
+    return None
+
+
 def normalize_exchange(name, category="") -> str | None:
     """Exchange root for a raw label, or None if the label is not a CEX wallet."""
     n = re.sub(r"\s+", " ", str(name or "").strip().lower())
@@ -268,22 +348,39 @@ def normalize_exchange(name, category="") -> str | None:
     text = f"{n} {str(category or '').lower()}"
     if re.search(config.LABEL_EXCLUDE, text) or re.search(NON_CEX_EXCLUDE, text):
         return None
-    for root, pat in config.EXCHANGE_ALIASES:
-        if re.search(pat, n):
-            return root
-    return None
+    return _alias_root(n)
+
+
+def spellbook_root(cex_name, distinct_name) -> str | None:
+    """Spellbook: the root of cex_name, falling back to distinct_name."""
+    return normalize_exchange(cex_name, distinct_name) or normalize_exchange(distinct_name, cex_name)
+
+
+def _source_records(repo_dir) -> Iterator[dict]:
+    if Path(repo_dir).name == SPELLBOOK:
+        yield from iter_spellbook_records(Path(repo_dir) / config.SPELLBOOK_SQL)
+    else:
+        yield from iter_label_records(repo_dir)
+
+
+def _root_of(rec: dict, repo: str) -> str | None:
+    if repo == SPELLBOOK:
+        return spellbook_root(rec["category"], rec["name"])
+    return normalize_exchange(rec["name"], rec["category"])
 
 
 # ---------------------------------------------------------------------------
 # tables
 # ---------------------------------------------------------------------------
 def build_open_label_table(repo_dirs) -> tuple[pd.DataFrame, dict]:
-    """One row per address with a single exchange root, plus a report dict."""
+    """One row per address with a single exchange root, plus a report dict. Rows of every
+    source go into the table; use public_table() for the redistributable subset."""
     per_addr: dict[str, Counter] = defaultdict(Counter)
+    kinds: dict[str, Counter] = defaultdict(Counter)
     raw_name: dict[str, str] = {}
     sources: dict[str, set] = defaultdict(set)
-    report: dict = {"sources": {}, "unmapped_exchange_names": Counter(), "repo_sha": {},
-                    "licence": {}}
+    report: dict = {"sources": {}, "unmapped_exchange_names": Counter(),
+                    "unmapped_spellbook_names": Counter(), "repo_sha": {}, "licence": {}}
     for rd in repo_dirs:
         repo = Path(rd).name
         report["licence"][repo] = _licence(rd)
@@ -293,45 +390,75 @@ def build_open_label_table(repo_dirs) -> tuple[pd.DataFrame, dict]:
                 text=True, check=True).stdout.strip()
         except (subprocess.CalledProcessError, FileNotFoundError):
             report["repo_sha"][repo] = None
-        st = {"records": 0, "mapped_records": 0, "mapped_addresses": set(),
-              "files": Counter()}
-        for rec in iter_label_records(rd):
+        st = {"records": 0, "mapped_records": 0, "mapped_addresses": set(), "files": Counter(),
+              "excluded_other_chain": 0, "excluded_non_wallet": 0, "unmapped_names": 0}
+        src_kinds: dict[str, set] = defaultdict(set)
+        for rec in _source_records(rd):
             st["records"] += 1
             st["files"][Path(rec["source_file"]).name] += 1
-            root = normalize_exchange(rec["name"], rec["category"])
+            if rec.get("chain"):
+                st["excluded_other_chain"] += 1
+                continue
+            root = _root_of(rec, repo)
             if root is None:
-                if "exchange" in rec["category"].lower():
+                if repo == SPELLBOOK:
+                    if _alias_root(rec["category"]) or _alias_root(rec["name"]):
+                        st["excluded_non_wallet"] += 1      # known exchange, not a wallet
+                    else:
+                        st["unmapped_names"] += 1
+                        report["unmapped_spellbook_names"][rec["category"]] += 1
+                elif "exchange" in rec["category"].lower():
                     report["unmapped_exchange_names"][rec["name"] or rec["category"]] += 1
                 continue
+            kind = rec.get("kind") or label_kind(rec["name"])
+            a = rec["address"]
             st["mapped_records"] += 1
-            st["mapped_addresses"].add(rec["address"])
-            per_addr[rec["address"]][root] += 1
-            sources[rec["address"]].add(repo)
-            raw_name.setdefault(rec["address"], rec["name"])
+            st["mapped_addresses"].add(a)
+            src_kinds[a].add(kind)
+            per_addr[a][root] += 1
+            kinds[a][kind] += 1
+            sources[a].add(repo)
+            raw_name.setdefault(a, rec["name"])
         st["mapped_addresses"] = len(st["mapped_addresses"])
+        st["wallet_addresses"] = sum("wallet" in k for k in src_kinds.values())
+        st["deposit_addresses"] = sum("deposit" in k for k in src_kinds.values())
         st["files"] = dict(st["files"])
         report["sources"][repo] = st
 
     conflicts = {a: dict(c) for a, c in per_addr.items() if len(c) > 1}
-    rows = []
+    rows, mixed_kind = [], 0
     for a, c in per_addr.items():
         if len(c) != 1:
             continue
         root = next(iter(c))
+        # An address labelled both wallet and deposit is treated as deposit: the conservative
+        # choice, since deposit labels are kept out of the entity and hot-wallet tables.
+        kind = "deposit" if kinds[a]["deposit"] else "wallet"
+        mixed_kind += int(kinds[a]["deposit"] > 0 and kinds[a]["wallet"] > 0)
         rows.append({"address": a, "entity": root, "src": "label", "etype": "CEX",
                      "raw_name": raw_name.get(a, ""), "source": "+".join(sorted(sources[a])),
-                     "kind": label_kind(raw_name.get(a, ""))})
+                     "kind": kind})
     df = pd.DataFrame(rows, columns=["address", "entity", "src", "etype", "raw_name", "source",
                                      "kind"])
     df = df.sort_values(["entity", "address"]).reset_index(drop=True)
     report["conflicts"] = len(conflicts)
+    report["conflicts_involving_spellbook"] = sum(SPELLBOOK in sources[a] for a in conflicts)
     report["conflict_examples"] = dict(list(conflicts.items())[:10])
+    report["kind_mixed_addresses"] = mixed_kind
     report["addresses_per_root"] = df.entity.value_counts().to_dict()
     report["addresses_per_root_wallet"] = df[df.kind == "wallet"].entity.value_counts().to_dict()
     report["addresses_per_root_deposit"] = df[df.kind == "deposit"].entity.value_counts().to_dict()
     report["addresses_total"] = int(len(df))
     report["unmapped_exchange_names"] = report["unmapped_exchange_names"].most_common(25)
+    report["unmapped_spellbook_names"] = report["unmapped_spellbook_names"].most_common(25)
     return df, report
+
+
+def public_table(repo_dirs) -> tuple[pd.DataFrame, dict]:
+    """The redistributable open label table: built from the MIT-licensed sources only.
+    Pinned sources (config.LABEL_PINNED, i.e. spellbook under BSL 1.1) contribute nothing to
+    it, so neither their rows nor their name appear in the published file."""
+    return build_open_label_table([rd for rd in repo_dirs if Path(rd).name not in config.LABEL_PINNED])
 
 
 def seed_label_table() -> pd.DataFrame:

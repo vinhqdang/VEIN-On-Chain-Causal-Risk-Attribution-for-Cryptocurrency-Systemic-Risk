@@ -154,7 +154,20 @@ SWEEP_PARAMS = dict(tau=0.8, max_other_hot_share=0.05, max_out_cp=3, k_in=1, min
                     max_fwd=1.25, max_in_from_hot_share=0.5, min_timed_share=0.8,
                     h_hours=24, min_sweep_usd=1000.0)
 LABEL_REPOS = {"eth-labels": "https://github.com/dawsbot/eth-labels.git",
-               "etherscan-labels": "https://github.com/brianleect/etherscan-labels.git"}
+               "etherscan-labels": "https://github.com/brianleect/etherscan-labels.git",
+               "spellbook": "https://github.com/duneanalytics/spellbook.git"}
+# Third source: Dune Spellbook's curated CEX address list. Licence is Business Source License
+# 1.1, so the repo is cloned sparse at a pinned commit and its rows are never written to the
+# redistributed results/labels_open.csv.gz (see vein.labels.public_table).
+SPELLBOOK_COMMIT = "6030202f2d6ee595dc568100c62723f26e5edda5"
+SPELLBOOK_SQL = "dbt_subprojects/hourly_spellbook/models/_sector/cex/addresses/chains/cex_evms_addresses.sql"
+SPELLBOOK_SPARSE = ["LICENSE", SPELLBOOK_SQL]
+LABEL_PINNED = {"spellbook": {"commit": SPELLBOOK_COMMIT, "sparse": SPELLBOOK_SPARSE}}
+# Spellbook deposit-address labels read "... Deposit 1" (the MIT repos use "Dep:").
+SPELLBOOK_DEPOSIT_RE = r"\bdeposit\b"
+# Spellbook rows tagged with a non-Ethereum chain in distinct_name (Kaia addresses). The
+# file has no chain column, so untagged rows are taken as Ethereum addresses.
+SPELLBOOK_NON_ETH_RE = r"\b(kaia)\b"
 EXCHANGE_ALIASES = [  # (root, regex on lower-cased whitespace-collapsed name). FIRST match wins.
   ("Binance.US", r"^binance[\s.:]*us\b"), ("Binance", r"^binance\b"), ("Coinbase", r"^coinbase\b"),
   ("OKX", r"^(okx|okex)\b"), ("Bybit", r"^bybit\b"), ("Bitfinex", r"^bitfinex\b"),
@@ -175,6 +188,14 @@ EXCHANGE_ALIASES = [  # (root, regex on lower-cased whitespace-collapsed name). 
   ("Coinone", r"^coinone\b"), ("Korbit", r"^korbit\b"), ("Bitbank", r"^bitbank\b"),
   ("Coinsbit", r"^coinsbit\b"), ("BTSE", r"^btse\b"), ("DigiFinex", r"^digifinex\b"),
   ("BloFin", r"^blofin\b"), ("Delta Exchange", r"^delta\s+exchange\b"),
+  # Added after inspecting the Dune Spellbook CEX list (cex_name values with >= 15 rows that
+  # are clearly trading venues; lenders, wallets, DEX aggregators and gambling sites excluded).
+  ("CoinW", r"^coinw\b"), ("CoinDCX", r"^coindcx\b"), ("BingX", r"^bingx\b"),
+  ("MaskEX", r"^maskex\b"), ("Bit-Z", r"^bit-z\b"), ("Nobitex", r"^nobitex\b"),
+  ("Coinsquare", r"^coinsquare\b"), ("CoinSpot", r"^coinspot\b"), ("XT.com", r"^xt\.com\b"),
+  ("LBank", r"^lbank\b"), ("ZB.com", r"^zb\.com\b"), ("Hoo", r"^hoo(\.com)?\b"),
+  ("Bitpanda", r"^bitpanda\b"), ("Cobinhood", r"^cobinhood\b"), ("BitForex", r"^bitforex\b"),
+  ("WhiteBIT", r"^whitebit\b"), ("EXMO", r"^exmo\b"), ("Coinhako", r"^coinhako\b"),
 ]
 LABEL_EXCLUDE = r"\b(token|deployer|bridge|router|commerce|airdrop|nft|governance|pool|vault|swap|exploit|phish|fake)\b"
 
