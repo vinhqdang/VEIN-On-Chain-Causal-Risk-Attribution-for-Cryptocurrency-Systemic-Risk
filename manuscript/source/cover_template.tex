@@ -1,0 +1,172 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=blue}
+\usepackage{url}
+\usepackage{xurl}
+\usepackage{xcolor}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Title Page}
+\end{center}
+
+\vspace{1em}
+\noindent\textbf{Manuscript title:}\\
+Counterfactual Attribution of Crypto Systemic Stress on a Ledger-Specified Causal Graph: Methods and a Cautionary Benchmark
+
+\vspace{1em}
+\noindent\textbf{Authors (in submission-system order):}\\
+1. Quang-Vinh Dang --- British University Vietnam, Hung Yen, Vietnam
+
+\vspace{1em}
+\noindent\textbf{Corresponding author:}\\
+Quang-Vinh Dang, British University Vietnam, Hung Yen, Vietnam.
+E-mail: \href{mailto:vinh.dq4@buv.edu.vn}{vinh.dq4@buv.edu.vn}
+
+\bigskip
+\hrulefill
+
+\vspace{1.5em}
+\begin{center}
+{\LARGE\bfseries Author's Information}
+\end{center}
+
+\vspace{1em}
+\noindent\textbf{Quang-Vinh Dang.}\quad
+Quang-Vinh Dang is a Lecturer at British University Vietnam and Data/AI
+Director at SmartOSC, where he leads initiatives in multi-agent AI systems,
+large language models, and graph neural networks across banking, retail, and
+finance. He holds a Ph.D. in Computer Science from Universit\'e de Lorraine
+(LORIA), France (2018), an M.Sc. in Financial Engineering from WorldQuant
+University (2021), and completed a Post-Master programme in Software
+Technology at Eindhoven University of Technology. His research spans machine
+learning in finance, natural language processing, intrusion detection, and
+federated learning, and he has authored more than 60 peer-reviewed papers
+indexed in Scopus/SCI-E, many in Q1 journals. Prior to his current roles, he
+held data-leadership positions at Trusting Social, Be Group, GoTymeX, and
+DatVietVAC, and was a postdoctoral researcher at Inria, France.
+
+\bigskip
+\hrulefill
+
+\vspace{1.5em}
+\begin{center}
+{\LARGE\bfseries Cover Letter}
+\end{center}
+
+\vspace{1em}
+\noindent Quang-Vinh Dang\\
+British University Vietnam\\
+Hung Yen, Vietnam\\
+\href{mailto:vinh.dq4@buv.edu.vn}{vinh.dq4@buv.edu.vn}
+
+\vspace{1em}
+\noindent The Editor-in-Chief\\
+\emph{Digital Finance}
+
+\vspace{1em}
+\noindent Dear Editor-in-Chief,
+
+\vspace{0.5em}
+I am submitting the manuscript \textbf{``Counterfactual Attribution of Crypto
+Systemic Stress on a Ledger-Specified Causal Graph: Methods and a Cautionary
+Benchmark''} for consideration in \emph{Digital Finance}. Measures of crypto
+systemic risk usually infer contagion networks from price co-movement, using
+CoVaR-type or expected-shortfall statistics. The resulting graphs are estimated
+rather than observed, and the attributions built on them cannot be checked
+against the transfers that moved funds between entities. Public blockchains
+record those transfers, but the raw ledger becomes an entity-level graph only
+after addresses are resolved to institutions. The October 2025 liquidation
+cascade made this gap concrete.
+
+The manuscript treats the entity-resolved on-chain ledger as the candidate parent
+set of a linear structural causal model of entity stress. Its methodological
+contribution is a framework that is analytic throughout: an interventional tail
+measure (On-Chain Causal CoVaR) and a counterfactual loss attribution computed by
+full abduction, with flow-free network-multiplier bounds, abduction invariance of
+stress deviations, a share bound, a walk representation of the linear Shapley
+attribution with an exact $O(2^p)$ subset algorithm, and a certified ranking
+radius. The paper also shows that the choice of abduction changes the answer. On
+the same data, zero-shock abduction inflates the Binance-to-Bybit share, so
+attributions built this way need full abduction to be interpretable.
+
+The paper is also a cautionary benchmark, and I present it as one. Out of
+sample, the network equation explains little hourly stress: the pooled
+out-of-sample $R^2$ is @@OOS_NET_R2@@, against @@OOS_AR_R2@@ for an own-lag model.
+No channel's share exceeds @@MAX_SHARE@@\%. H1, that the observed graph predicts
+better than a price-estimated graph, is not supported, and edge direction is not
+distinguishable from reversal. Placebo evidence is mixed. I argue that this is
+the value of the paper for supervisors and risk teams: a ledger-specified graph
+is auditable, and auditability is not the same as explanatory power.
+
+The paper fits the scope of \emph{Digital Finance} on three counts. It addresses
+systemic risk in crypto-asset markets and how that risk is measured. It addresses
+supervisory transparency, since each attribution traces back to public ledger
+records and an explicit model. It also provides reproducible inputs: the code, the
+query definitions, and the derived result files are openly available, and the
+core data come from free public sources.
+
+This manuscript is original, has not been published previously, and is not under
+consideration at any other journal. It is single-authored, and the author declares
+no competing interests. The code and derived results are publicly available at
+\url{https://github.com/vinhqdang/VEIN-On-Chain-Causal-Risk-Attribution-for-Cryptocurrency-Systemic-Risk}.
+Thank you for considering this manuscript.
+
+\vspace{1.5em}
+\noindent Sincerely,
+
+\vspace{0.5em}
+\noindent Quang-Vinh Dang\\
+British University Vietnam
+
+\bigskip
+\hrulefill
+
+\vspace{1.5em}
+\begin{center}
+{\LARGE\bfseries Declarations}
+\end{center}
+
+\vspace{1em}
+\noindent\textbf{Ethical Approval and Consent to participate.} Not
+applicable: this study uses only public, aggregated on-chain and market data
+and involves no human subjects, human data, or animals.
+
+\vspace{0.8em}
+\noindent\textbf{Consent for publication.} Not applicable.
+
+\vspace{0.8em}
+\noindent\textbf{Availability of supporting data.} All code, query definitions and
+derived result files underlying every number, table, and figure are publicly
+available at
+\url{https://github.com/vinhqdang/VEIN-On-Chain-Causal-Risk-Attribution-for-Cryptocurrency-Systemic-Risk}.
+Raw transfers are regenerated from the public BigQuery dataset
+\texttt{bigquery-public-data.crypto\_ethereum} (token transfers), which can be
+queried in the free BigQuery sandbox. Address labels come from the eth-labels and
+etherscan-labels repositories, both MIT-licensed, and a label table built from
+these two sources alone is included. Prices are from CoinGecko and protocol TVL
+from DefiLlama. No restricted or proprietary data were used.
+
+\vspace{0.8em}
+\noindent\textbf{Competing interests.} The author declares no competing
+interests.
+
+\vspace{0.8em}
+\noindent\textbf{Funding.} No external funding supported this work.
+
+\vspace{0.8em}
+\noindent\textbf{Authors' contributions.} Q.-V.D. conceived the study,
+developed the VEIN framework and its implementation, performed the data
+collection and empirical analysis, and wrote the manuscript.
+
+\vspace{0.8em}
+\noindent\textbf{Acknowledgements.} Not applicable.
+
+\vspace{0.8em}
+\noindent\textbf{Authors' information (Optional).} See ``Author's
+Information'' above.
+
+\end{document}
