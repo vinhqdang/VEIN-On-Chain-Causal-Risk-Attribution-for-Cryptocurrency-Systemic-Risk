@@ -159,5 +159,35 @@ class StructuralCausalModel:
             U[e] = ser.values
         return U
 
+    def event_residuals(self, stress: pd.DataFrame, days,
+                        init_stress: dict | None = None) -> dict:
+        """Full abduction: invert the structural equations on the observed path.
+
+        U_{e,t} = S_{e,t} - f_e(S_{t-1}, F_t), with the lagged stress taken from
+        the observed path (init_stress for the first day when `stress` has no
+        earlier row) and the flows from set_flows(). Replaying simulate() with
+        these shocks and the observed stress of the intervened entities
+        reproduces the observed stress of every other entity exactly.
+
+        Unlike abduct(), this does not rely on the pre-event residuals, which
+        are zero on the event window (legacy_zero behaviour).
+        """
+        idx = stress.index
+        U = {e: np.zeros(len(days)) for e in self.stress_cols}
+        for ti, day in enumerate(days):
+            day = pd.Timestamp(day)
+            pos = idx.get_loc(day)
+            if pos > 0:
+                prev = stress.iloc[pos - 1].to_dict()
+            elif init_stress is not None:
+                prev = dict(init_stress)
+            else:
+                raise ValueError("event_residuals needs a stress row before the first day or init_stress")
+            flow_t = {(p, e): self.flow_on(p, e, day)
+                      for e in self.stress_cols for p in self.coef_[e]["parents"]}
+            for e in self.stress_cols:
+                U[e][ti] = float(stress.loc[day, e]) - self._f(e, prev, flow_t)
+        return U
+
     def residual_std(self) -> dict:
         return {e: float(self.resid_[e].std() or 0.0) for e in self.stress_cols}

@@ -98,6 +98,7 @@ def main():
 
     print("[4] OC-CoVaR systemic ranking (H3) ...")
     hi = {e: float(np.quantile(stress[e].values, 0.95)) for e in stress.columns}
+    export_hourly_scm(scm, stress, flows, ev, hi, init_stress, precrisis)
     oc = risk.systemic_ranking(scm, ev, init_stress, hi, n_sims=150, seed=7)
     out["oc_covar_ranking"] = oc[["entity", "exported_risk"]].to_dict("records")
 
@@ -174,6 +175,38 @@ def main():
     (RESULTS / "final_results.json").write_text(json.dumps(out, indent=2, default=float))
     write_report(out)
     print("Done. Wrote results/FINAL_REPORT.md")
+
+
+def export_hourly_scm(scm, stress, flows, ev, s_star, init_stress, precrisis):
+    """Archive the hourly SCM so the analytic checks can be re-run offline.
+
+    Writes the coefficients in the schema of results/results.json
+    ("scm_coefficients", with "intercept" in place of the in-memory "b"), the
+    residual std, s*, the pre-event and pre-crisis levels, the event-window
+    stress and the event-window flow per edge. Needs the Dune data, so it is
+    produced by a local rerun of this script, not by the archived results.
+    """
+    coef = {e: {"parents": list(c["parents"]),
+                "w_stress": [float(x) for x in c["w_stress"]],
+                "w_flow": [float(x) for x in c["w_flow"]],
+                "intercept": float(c["b"])}
+            for e, c in scm.coef_.items()}
+    fl = flows[(flows.day >= ev[0]) & (flows.day <= ev[-1])]
+    edges = fl.groupby(["from_entity", "to_entity", "day"]).usd_volume.sum().reset_index()
+    payload = {
+        "resolution": "hourly",
+        "event_window": [str(ev[0]), str(ev[-1])],
+        "scm_coefficients": coef,
+        "scm_residual_std": scm.residual_std(),
+        "s_star": s_star,
+        "init_stress": init_stress,
+        "precrisis": precrisis,
+        "event_stress": {str(t): {e: float(v) for e, v in row.items()}
+                         for t, row in stress.loc[ev].iterrows()},
+        "event_flows": [{"from": r.from_entity, "to": r.to_entity, "hour": str(r.day),
+                         "usd_volume": float(r.usd_volume)} for r in edges.itertuples()],
+    }
+    (RESULTS / "hourly_scm_export.json").write_text(json.dumps(payload, indent=2, default=float))
 
 
 def write_report(out):
