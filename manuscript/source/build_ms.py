@@ -586,23 +586,23 @@ def tbl_abduction():
     v2 = J(V2)["counterfactual_attribution"]
     sel = {"i": "Binance", "j": "Bybit"}
     rows = []
-    rows.append(("Earlier extract (v1)", "Earlier extract", "zero-shock",
+    rows.append(("v1 (earlier extract)", "zero-shock",
                  cell("ABD", V1, ["counterfactual_attribution", sel, "L_observed"], "num", 2),
                  cell("ABD", V1, ["counterfactual_attribution", sel, "attribution"], "num", 2),
                  cell("ABD", V1, ["counterfactual_attribution", sel, "attribution_share"], "pct", 1)))
-    rows.append(("Zero-shock, same data", "Current (BigQuery)", "zero-shock",
+    rows.append(("v3 (current build)", "zero-shock",
                  cell("ABD", ABD, ["modes", {"abduction": "legacy_zero"}, "bybit_L_observed"], "num", 2),
                  cell("ABD", ABD, ["modes", {"abduction": "legacy_zero"}, "binance_to_bybit", "attribution"], "num", 2),
                  cell("ABD", ABD, ["modes", {"abduction": "legacy_zero"}, "binance_to_bybit", "share"], "pct", 1)))
-    rows.append(("Full abduction", "Current (BigQuery)", "full",
+    rows.append(("v3 (current build)", "full",
                  cell("ABD", ABD, ["modes", {"abduction": "full"}, "bybit_L_observed"], "num", 2),
                  cell("ABD", ABD, ["modes", {"abduction": "full"}, "binance_to_bybit", "attribution"], "num", 2),
                  cell("ABD", ABD, ["modes", {"abduction": "full"}, "binance_to_bybit", "share"], "pct", 1)))
-    rows.append(("Full abduction, earlier BigQuery extract (v2)", "Earlier BigQuery", "full",
+    rows.append(("v2 (earlier BigQuery build)", "full",
                  cell("ABD", V2, ["counterfactual_attribution", sel, "L_observed"], "num", 2),
                  cell("ABD", V2, ["counterfactual_attribution", sel, "attribution"], "num", 2),
                  cell("ABD", V2, ["counterfactual_attribution", sel, "attribution_share"], "pct", 1)))
-    return "\n".join(f"{a} & {b} & {c} & {d} & {e} & {f} \\\\" for a, b, c, d, e, f in rows)
+    return "\n".join(f"{a} & {b} & {c} & {d} & {e} \\\\" for a, b, c, d, e in rows)
 
 
 def tbl_channels():

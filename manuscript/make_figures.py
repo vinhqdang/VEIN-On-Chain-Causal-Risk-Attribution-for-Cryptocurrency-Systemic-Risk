@@ -47,12 +47,13 @@ def fig_usde():
         days = ["Oct 8", "Oct 9", "Oct 10", "Oct 11", "Oct 12", "Oct 13"]
         vol = [1.405, 0.745, 3.090, 8.828, 1.328, 0.688]   # $B, erc20 USDe transfers (Dune, v1)
         source = "Dune, decoded ERC-20"
-    fig, ax = plt.subplots(figsize=(5.4, 3.0))
+    fig, ax = plt.subplots(figsize=(3.4, 3.0))
     bars = ax.bar(days, vol, color=[GREY, GREY, RED, RED, GREY, GREY][:len(vol)])
-    ax.set_ylabel("USDe on-chain transfer volume (USD bn)")
-    ax.set_title(f"Ethena USDe transfer volume, Oct 2025 ({source})")
+    ax.set_ylabel("USDe transfer volume (USD bn)", fontsize=8)
+    ax.set_title("USDe transfers, October 2025", fontsize=9)
+    ax.tick_params(labelsize=7)
     for b, v in zip(bars, vol):
-        ax.text(b.get_x() + b.get_width() / 2, v + 0.15, f"{v:.2f}", ha="center", fontsize=8)
+        ax.text(b.get_x() + b.get_width() / 2, v + 0.15, f"{v:.2f}", ha="center", fontsize=7)
     ax.set_ylim(0, 9.8)
     fig.tight_layout(); fig.savefig(FIG / "fig_usde_spike.pdf"); plt.close(fig)
 
@@ -179,7 +180,7 @@ def fig_attribution():
         ax.barh(names, vals, color=RED)
         ax.errorbar(vals, range(len(names)), xerr=[np.clip(lo, 0, None), np.clip(hi, 0, None)],
                     fmt="none", ecolor="black", capsize=2, lw=0.8)
-        title = "Counterfactual loss attribution (Pearl Level-3), hourly, 95% CI"
+        title = "Counterfactual loss attribution, hourly, 95% CI"
     else:
         d = load("final_results.json").get("counterfactual_attribution", [])[:8][::-1]
         if not d:
@@ -188,8 +189,8 @@ def fig_attribution():
         names = [f"{x['i']}→{x['j']}" for x in d]
         vals = [x["attribution_share"] * 100 for x in d]
         ax.barh(names, vals, color=RED)
-        title = "Counterfactual loss attribution (Pearl Level-3), hourly"
-    ax.set_xlabel("counterfactual attribution share (\\% of $j$'s realised distress)")
+        title = "Counterfactual loss attribution, hourly"
+    ax.set_xlabel("share of $j$'s realised distress (%)")
     ax.set_title(title)
     fig.tight_layout(); fig.savefig(FIG / "fig_attribution.pdf"); plt.close(fig)
 
@@ -215,7 +216,7 @@ def fig_rank_ci():
     ax.set_xlim(0.5, len(ents) + 0.5)
     ax.set_xlabel("rank of exported risk (1 = largest)")
     ax.set_title("Ranking uncertainty: 95% bootstrap rank intervals")
-    ax.legend(frameon=False, fontsize=8, loc="lower right")
+    ax.legend(frameon=False, fontsize=8, loc="upper right")
     fig.tight_layout(); fig.savefig(FIG / "fig_rank_ci.pdf"); plt.close(fig)
 
 
@@ -306,14 +307,15 @@ def fig_stress():
     assert diff < 1e-9, f"stress differs from hourly_scm_export.json event_stress by {diff}"
     win = S[(S.index >= pd.Timestamp("2025-10-08")) & (S.index <= pd.Timestamp("2025-10-13 23:00"))]
     show = [e for e in ["Binance", "Bybit", "Ethena", "retail"] if e in win.columns]
-    fig, ax = plt.subplots(figsize=(6.0, 3.6))
+    fig, ax = plt.subplots(figsize=(4.4, 3.2))
     for e, c in zip(show, [BLUE, RED, GREEN, GREY]):
         ax.plot(win.index, win[e], label=e, color=c, lw=1.3)
     ax.axvspan(pd.Timestamp("2025-10-10"), pd.Timestamp("2025-10-11 23:00"),
                color="orange", alpha=0.12, label="event window")
     ax.set_ylabel("stress $S_{i,t}$ (z-score)")
-    ax.set_title("Hourly entity stress around the October 2025 cascade")
-    ax.legend(frameon=False, ncol=5, fontsize=8, loc="upper center", bbox_to_anchor=(0.5, -0.22))
+    ax.set_title("Hourly entity stress, October 2025", fontsize=9)
+    ax.tick_params(labelsize=7)
+    ax.legend(frameon=False, ncol=3, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.30))
     fig.autofmt_xdate()
     fig.tight_layout(); fig.savefig(FIG / "fig_stress.pdf"); plt.close(fig)
 

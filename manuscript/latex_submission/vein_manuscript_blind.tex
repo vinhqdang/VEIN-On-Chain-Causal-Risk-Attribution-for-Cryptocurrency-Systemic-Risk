@@ -18,6 +18,8 @@
 \usepackage{enumitem}%
 \usepackage{xurl}%
 \hypersetup{hypertexnames=false}%
+\newsavebox{\tabbox}%
+\newcommand{\fitbox}{\ifdim\wd\tabbox>\linewidth\resizebox{\linewidth}{!}{\usebox{\tabbox}}\else\usebox{\tabbox}\fi}%
 
 \theoremstyle{thmstyleone}%
 \newtheorem{theorem}{Theorem}%
@@ -101,47 +103,40 @@ model-implied loss and inflates them. On the same data the Binance-to-Bybit shar
 6.3\% under full abduction to 65.3\% under zero-shock abduction. A share
 is bounded by how much of the target's stress the network term explains.
 \item \emph{A reproducible empirical benchmark} on free public data (BigQuery \texttt{crypto\_ethereum}
-and MIT-licensed label repositories), with uncertainty quantified throughout, and with a
-pre-specified out-of-sample comparison against an own-lag baseline.
+and MIT-licensed label repositories), with uncertainty quantified throughout, and with an
+out-of-sample comparison against an own-lag baseline.
 \end{enumerate}
 
-The findings are stated plainly. Hourly stress is mostly persistence: in-sample $R^2$ is at most
+Hourly stress is better predicted by its own lag than by the network: in-sample $R^2$ is at most
 0.273, and out of sample the network changes squared error by $-$0.3\% relative to an
 own-lag model (interval [$-$2.0\%, 1.4\%]). No channel's share
-exceeds 15.2\% (interval upper bound 19.5\%). The top pair in the ranking is
-retail and MakerSky, but their order is not resolved, and both routes run through the unresolved
-retail aggregate. Ranks three to six are not resolved in pairwise order. The observed graph does
-not clearly beat price-estimated graphs, so H1 is not supported, and edge direction is not
-distinguishable from reversal. The time-shift placebo passes, while the rolling calm-window placebo
-fails in the October 2025 and FTX episodes. The transmitter-absorber check passes for Binance and
-fails for Ethena. The ledger structure is auditable but explains limited stress at hourly scale.
-Attribution therefore has to use full abduction and report uncertainty. The remainder of the paper
-sets out the framework (Section~\ref{sec:method}), the data (Section~\ref{sec:data}), the results
-(Section~\ref{sec:results}) and the discussion (Section~\ref{sec:discussion}).
+exceeds 15.2\% (interval upper bound 19.5\%). Retail and MakerSky head the ranking, but
+their order is unresolved and both routes run through the unresolved retail aggregate. Ranks three to six
+are not resolved in pairwise order. The observed graph does not clearly beat price-estimated graphs, so H1 is
+not supported, and edge direction is not distinguishable from reversal. The time-shift placebo passes, while the
+rolling calm-window placebo fails in the October 2025 and FTX episodes. The transmitter-absorber check passes for
+Binance and fails for Ethena. The ledger structure is auditable but explains limited stress at hourly scale, so
+attribution has to use full abduction and report uncertainty. Section~\ref{sec:method} sets out the framework,
+Section~\ref{sec:data} the data, Section~\ref{sec:results} the results and Section~\ref{sec:discussion} the discussion.
 
 \section{Related Work and Positioning}
 \label{sec:related}
 
-\emph{Associational measures.} $\Delta$CoVaR \citep{adrian2016covar} is the change in
+\emph{Associational and estimated-graph measures.} $\Delta$CoVaR \citep{adrian2016covar} is the change in
 system value-at-risk when an institution moves from its median state to distress. The
 SRISK and MES family \citep{acharya2017measuring} and connectedness measures
-\citep{diebold2014network,billio2012econometric} describe spillovers in returns. They
-describe co-movement rather than mechanism, which is the gap the causal survey of
-\citet{kumar2025causalreview} also documents.
-
-\emph{Estimated causal graphs.} Causal-NECO VaR \citep{rigana2024neco} learns the graph
+\citep{diebold2014network,billio2012econometric} describe co-movement rather than mechanism, which is the gap the causal
+survey of \citet{kumar2025causalreview} also documents. Causal-NECO VaR \citep{rigana2024neco} learns the graph
 with the PC-stable algorithm \citep{colombo2014order} and computes a Gaussian VaR from the
 resulting structural model \citep{rigana2023new,spirtes2000causation}. It operates at
 Pearl Levels~1--2 on foreign-exchange data and estimates its graph. The time-varying
-directed-information graph of \citet{etesami2023tvdig} is the nearest crypto application.
-Directed information generalises Granger causality \citep{granger1969} but is not a Pearl
-SCM with do-operator semantics, and both approaches are built from returns. CoRisk
-\citep{giudici2018corisk} decomposes risk on a correlation network. Crypto composite
-indices \citep{farzulla2026asri} and TradFi--DeFi mappings \citep{aufiero2025mapping}
-either estimate networks from prices or describe the on-chain graph without a causal
-model.
+directed-information graph of \citet{etesami2023tvdig} is the nearest crypto application. Directed information
+generalises Granger causality \citep{granger1969} but is not a Pearl SCM with do-operator semantics, and both approaches are
+built from returns. CoRisk \citep{giudici2018corisk} decomposes risk on a correlation network. Crypto composite
+indices \citep{farzulla2026asri} and TradFi--DeFi mappings \citep{aufiero2025mapping} either estimate networks from prices or
+describe the on-chain graph without a causal model.
 
-\emph{Shapley attribution and causal Shapley values.} \citet{tarashev2016attributing}
+\emph{Shapley attribution.} \citet{tarashev2016attributing}
 allocate system-wide risk to institutions with the Shapley value, and
 \citet{drehmann2013measuring} measure the systemic importance of interconnected banks.
 These allocations use exposures or portfolio losses rather than a causal model of
@@ -154,20 +149,15 @@ interventions on a ledger-specified graph.
 \citep{eisenberg2001systemic,acemoglu2015systemic,glasserman2016contagion} motivate the
 network as the object of study. VEIN uses reduced-form linear propagation instead of a
 clearing mechanism. On-chain data have been used to study Tether issuance \citep{griffin2020bitcoin}, arbitrage
-and capital flows \citep{makarov2020trading}, reconstruct the Terra/Luna run \citep{liu2023anatomy},
-measure DeFi liquidations \citep{qin2021liquidations}, and for prediction and forensics
-\citep{akcora2018bitcoin,meiklejohn2013fistful,weber2019antimoney}. None treats the graph as a
-structural causal model for a systemic-risk measure.
-
-Recent crypto work is descriptive or price-based. \citet{sankaewtong2026tracing} trace USDC depeg
-contagion through transactions without interventional semantics, \citet{zhang2026defi} use
-correlations of total-value-locked series, and counterfactual analysis has so far reached
-credit-portfolio losses \citep{xu2025counterfactual}. The claimed novelty is narrow:
-an observed, ledger-specified graph used as the parent set of a structural causal model,
-combined with a counterfactual Shapley attribution of systemic loss. To our knowledge no
-published work combines these two elements. Because this is a negative existence claim,
-it is bounded by our search coverage. The paper also contributes a negative benchmark: it measures,
-out of sample against an own-lag baseline, how much ledger-specified propagation explains.
+and capital flows \citep{makarov2020trading}, the Terra/Luna run \citep{liu2023anatomy},
+DeFi liquidations \citep{qin2021liquidations}, and prediction and forensics
+\citep{akcora2018bitcoin,meiklejohn2013fistful,weber2019antimoney}. Recent crypto work is descriptive or price-based:
+\citet{sankaewtong2026tracing} trace USDC depeg contagion through transactions without interventional semantics,
+\citet{zhang2026defi} use correlations of total-value-locked series, and counterfactual analysis has so far reached
+credit-portfolio losses \citep{xu2025counterfactual}. None treats the ledger graph as a structural causal model for a
+systemic-risk measure. To our knowledge, no published work combines an observed, ledger-specified graph as the parent set of a
+structural causal model with a counterfactual Shapley attribution of systemic loss. The paper also measures, out of
+sample against an own-lag baseline, how much ledger-specified propagation explains.
 
 \section{The VEIN Framework}
 \label{sec:method}
@@ -234,8 +224,8 @@ forward. On-Chain Causal CoVaR is
 \OCCoVaR_q\big(j \,\big|\, \doop(S_i=s^\ast)\big)
    \;=\; \VaR_q\!\Big(L_j \,\Big|\, \doop(S_i=s^\ast)\Big),
 \end{equation}
-estimated by Monte-Carlo propagation with shock paths drawn as joint rows of fitted residuals
-(Section~\ref{subsec:uncertainty}). The marginal
+estimated by Monte-Carlo propagation. Each simulated shock path is a circular block draw of joint fitted-residual rows
+with 24-hour blocks, so all entities share the drawn hours (Section~\ref{subsec:uncertainty}). The marginal
 contribution contrasts the distressed intervention with the median state,
 \begin{equation}
 \label{eq:deltaoccovar}
@@ -276,7 +266,7 @@ hinge. The denominator $L_j^{\mathrm{fact}}$, however, shrinks to the part of st
 generates without shocks, which pushes shares towards one. Section~\ref{subsec:attribution} quantifies this.
 \end{remark}
 
-\begin{algorithm}[t]
+\begin{algorithm}[tbp]
 \caption{VEIN end-to-end pipeline}
 \label{alg:vein}
 \begin{algorithmic}[1]
@@ -433,7 +423,7 @@ non-candidate entity is held at its pre-crisis level, so Proposition~\ref{prop:C
 describe them. The walk representation is verified numerically on synthetic paths only
 (Appendix~\ref{app:bounds}). Proposition~\ref{prop:C}(d) gives the closed form of the hinge game whenever the hinge is inactive.
 
-\begin{algorithm}[t]
+\begin{algorithm}[tbp]
 \caption{Exact subset Shapley attribution}
 \label{alg:shapley}
 \begin{algorithmic}[1]
@@ -458,8 +448,7 @@ evaluations, which is the comparison used in Appendix~\ref{app:bounds}.
 \begin{enumerate}[label=(\alph*),leftmargin=*]
 \item \emph{Monte Carlo error.} 20 independent repeats of 500 simulations are used.
 The standard error at the point setting (2{,}000 paths) is the repeat standard deviation scaled by
-$\sqrt{\text{MC\_NSIMS}/\text{N\_SIMS}}$. This is a definition, and the reported Monte-Carlo errors are
-recorded as \texttt{mc\_se}. Monte-Carlo error is negligible against the bootstrap widths reported below.
+$\sqrt{500/2{,}000}$. Monte-Carlo error is negligible against the bootstrap widths reported below.
 \item \emph{Coefficient uncertainty.} We use a joint circular-block pairs bootstrap of fit-window rows.
 All entities share the drawn hours, which preserves cross-sectional dependence. The block length is
 24 hours and $B=300$. Each replicate refits the ridge equations with the same penalty
@@ -476,7 +465,8 @@ bootstrap \citep{kunsch1989jackknife} gives the end steps less weight, and with 
 move the interval away from the sample mean. With two 24-hour blocks the intervals are indicative only.
 \item \emph{Explained variance.} We report in-sample $R^2$ together with an optimism correction, the mean
 over replicates of ($R^2$ on the own resample minus $R^2$ on the original rows), subtracted from the point
-estimate \citep{efron1983estimating}. Out-of-sample one-step $R^2$ uses an expanding-window ridge refit
+estimate \citep{efron1983estimating}. The interval for the corrected value is the percentile interval of the point estimate minus the
+replicate optimism. Out-of-sample one-step $R^2$ uses an expanding-window ridge refit
 before each event hour, $R^2_{OS}(m)=1-\mathrm{SSE}(m)/\mathrm{SSE}(\text{expanding mean})$, pooled over
 entity-hours of z-scored stress, following the out-of-sample convention of \citet{campbell2008predicting}.
 The network gain over the own lag is $1-\mathrm{SSE}(m)/\mathrm{SSE}(\mathrm{AR})$. The models are
@@ -571,16 +561,16 @@ Lido$\to$Aave edge. Ethena's fit-window gross flow is US\$0.10bn. In FTX and SVB
 and Lido uses the discount component only. Figure~\ref{fig:usde} shows the USDe volume around the event and the
 hourly stress states, with the event window shaded.
 
-\begin{figure}[t]
+\begin{figure}[tbp]
 \centering
-\begin{minipage}{0.38\linewidth}\centering
+\begin{minipage}{0.36\linewidth}\centering
 \includegraphics[width=\linewidth]{fig_usde_spike.pdf}
 \end{minipage}\hfill
-\begin{minipage}{0.60\linewidth}\centering
+\begin{minipage}{0.62\linewidth}\centering
 \includegraphics[width=\linewidth]{fig_stress.pdf}
 \end{minipage}
-\caption{Left: on-chain USDe transfer volume around the October~2025 cascade (decoded transfers from the
-BigQuery \texttt{crypto\_ethereum} token-transfers view). Right: hourly entity stress states $S_{i,t}$, including
+\caption{Left: on-chain USDe transfer volume around the October~2025 cascade (BigQuery \texttt{crypto\_ethereum}
+token transfers). Right: hourly stress $S_{i,t}$ of four entities, including
 the peg component of the Ethena curve (shaded: the 10--11~October event window).}
 \label{fig:usde}
 \end{figure}
@@ -589,9 +579,7 @@ the peg component of the Ethena curve (shaded: the 10--11~October event window).
 \label{subsec:coverage}
 Named-to-named (distinct entities) flow is 3.0\% of entity-touching panel-token flow in October. Across
 the six extracts the range is 0.6--3.0\%. In the model's own panel, named-to-named flow is
-2.8\% of US\$570bn. The graph is therefore dominated by named-entity--retail edges. The
-all-token share of both-resolved flow reported in the repository coverage file is not quoted here: it includes
-same-entity transfers and is diluted by WETH.
+2.8\% of US\$570bn. The graph is therefore dominated by named-entity--retail edges.
 
 As a cross-check, BigQuery daily USDe volume is compared with an earlier independent extraction. The two match within the
 2\% tolerance on all six days, and the largest relative difference is 0.06\%. The volume peaks
@@ -615,21 +603,14 @@ zero.
 Out of sample, the network equation has pooled $R^2_{OS}=0.005$ [$-$0.017, 0.019], against
 0.161 [0.056, 0.222] for the own lag. Adding the network to the own lag changes squared error by
 $-$0.3\% [$-$2.0\%, 1.4\%], and the network alone changes squared error by
-$-$18.6\% [$-$27.1\%, $-$6.2\%]. The large entity-level gains are for retail
+$-$18.6\% [$-$27.1\%, $-$6.2\%], so it is worse than the own lag. The large entity-level gains are for retail
 (29.4\%) and Coinbase (11.6\%). The other entities lie between
 $-$16.3\% and 1.6\%. Aave has the largest benchmark squared error, about 17.6\% of
 the total, so it carries the most weight in the pooled score. Its own-lag $R^2_{OS}$ is 0.759. Pooled weights
 follow benchmark squared error, so the equal-weight means are also reported: 0.081 for the own lag and
 $-$0.003 for the network. The evidence rests on one window, two 24-hour blocks and one network specification.
 
-\begin{table}[t]
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\caption{Explained stress by entity, hourly October 2025. In-sample $R^2$ and its optimism-corrected value
-with 95\% interval are from the bootstrap; out-of-sample $R^2_{OS}$ is from expanding-window one-step prediction
-Rows are sorted by in-sample $R^2$.}
-\label{tab:explained}
+\begin{lrbox}{\tabbox}\footnotesize\setlength{\tabcolsep}{3pt}%
 \begin{tabular}{@{}lccccc@{}}
 \toprule
 \textbf{Entity} & \textbf{In-sample $R^2$} & \textbf{Optimism-corrected [95\% CI]} & \textbf{$R^2_{OS}$ AR} & \textbf{$R^2_{OS}$ network} & \textbf{AR+net vs AR (\%)}\\
@@ -653,7 +634,15 @@ Lido & 0.000 & $-$0.002 [$-$0.011, 0.000] & $-$0.005 & 0.000 & 0.0 \\
 Pooled (out of sample) & -- & -- & 0.161 & 0.005 & $-$0.3 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{lrbox}
+\begin{tableorg}[tbp]
+\centering
+\caption{Explained stress by entity, hourly October 2025. In-sample $R^2$ and its optimism-corrected value
+with 95\% interval are from the bootstrap; out-of-sample $R^2_{OS}$ is from expanding-window one-step prediction.
+Rows are sorted by in-sample $R^2$.}
+\label{tab:explained}
+\fitbox
+\end{tableorg}
 
 \subsection{Counterfactual attribution and the abduction lesson}
 \label{subsec:attribution}
@@ -667,40 +656,38 @@ Binance$\to$OKX (6.7\% [0.4\%, 11.2\%]) have intervals above zero. The Kraken$\t
 zero (6.8\% [$-$9.2\%, 12.4\%]). The documented Ethena$\to$Aave$\to$Binance mechanism is not detected: Ethena$\to$Aave
 is $-$1.1\% [$-$4.1\%, 2.3\%] and Ethena$\to$Binance is 0.4\% [$-$2.7\%, 3.2\%].
 
-Table~\ref{tab:abduction} is the abduction lesson. On the earlier extract (v1), zero-shock abduction gives a
+Table~\ref{tab:abduction} is the abduction lesson. Here v1 and v2 label earlier data builds (v2 is an earlier
+BigQuery build) and v3 is the build used throughout this paper. On v1, zero-shock abduction gives a
 Binance$\to$Bybit share of 98.1\% (L$_{\text{obs}}$ = 3.49). On the current data, the same
 zero-shock abduction gives 65.3\% (L$_{\text{obs}}$ = 3.84), while full abduction gives
 6.3\% (L$_{\text{obs}}$ = 21.66). The zero-shock share is inflated because its denominator is a
 model-implied loss that omits the idiosyncratic shocks: Corollary~\ref{cor:share} and the Remark in
 Section~\ref{subsec:risk} explain the mechanism. The zero-shock maximum over pairs is degenerate, with a tiny
-denominator, and is not quoted. The earlier extract and the current one differ in data as well as in the
-abduction mode, so only the same-data comparison isolates the abduction effect.
+denominator, and is not quoted. The v1 and v3 rows differ in data as well as in the
+abduction mode, so only the same-data comparison isolates the abduction effect. Under full abduction the share is similar on the
+v2 and v3 builds.
 
-\begin{table}[t]
+\begin{lrbox}{\tabbox}\footnotesize\setlength{\tabcolsep}{3pt}%
+\begin{tabular}{@{}llccc@{}}
+\toprule
+\textbf{Data build} & \textbf{Abduction} & \textbf{$L_{\mathrm{obs}}$(Bybit)} & \textbf{Attribution} & \textbf{Share (\%)}\\
+\midrule
+v1 (earlier extract) & zero-shock & 3.49 & 3.42 & 98.1 \\
+v3 (current build) & zero-shock & 3.84 & 2.51 & 65.3 \\
+v3 (current build) & full & 21.66 & 1.37 & 6.3 \\
+v2 (earlier BigQuery build) & full & 21.66 & 1.45 & 6.7 \\
+\bottomrule
+\end{tabular}
+\end{lrbox}
+\begin{tableorg}[tbp]
 \centering
-\footnotesize
 \caption{Abduction lesson for Binance$\to$Bybit. Attribution is the drop in Bybit's loss; the share is attribution
 divided by $L_{\mathrm{obs}}$, which is the realised hinge loss under full abduction and the model-implied loss under zero-shock abduction.}
 \label{tab:abduction}
-\begin{tabular}{@{}llllll@{}}
-\toprule
-\textbf{Specification} & \textbf{Data} & \textbf{Abduction} & \textbf{$L_{\mathrm{obs}}$(Bybit)} & \textbf{Attribution} & \textbf{Share}\\
-\midrule
-Earlier extract (v1) & Earlier extract & zero-shock & 3.49 & 3.42 & 98.1 \\
-Zero-shock, same data & Current (BigQuery) & zero-shock & 3.84 & 2.51 & 65.3 \\
-Full abduction & Current (BigQuery) & full & 21.66 & 1.37 & 6.3 \\
-Full abduction, earlier BigQuery extract (v2) & Earlier BigQuery & full & 21.66 & 1.45 & 6.7 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\fitbox
+\end{tableorg}
 
-\begin{table}[t]
-\centering
-\footnotesize
-\caption{Leading counterfactual loss-attribution channels $\Delta_i^{CF}(j)$, hourly October 2025. The top ten are chosen on the point
-estimate, followed by four named-to-named channels. Intervals are not selection-adjusted. The maximum over all pairs is
-15.2\% [13.2\%, 19.5\%].}
-\label{tab:channels}
+\begin{lrbox}{\tabbox}\footnotesize\setlength{\tabcolsep}{3pt}%
 \begin{tabular}{@{}llcccc@{}}
 \toprule
 \textbf{Channel $i\!\to\! j$} & \textbf{Type} & \textbf{Attribution} & \textbf{Share (\%)} & \textbf{95\% CI of share (\%)} & \textbf{$P(\text{attribution}>0)$}\\
@@ -722,11 +709,19 @@ Ethena$\to$Binance & named$\to$named & 0.08 & 0.4 & [$-$2.7, 3.2] & 0.59 \\
 Lido$\to$Aave & named$\to$named & $-$0.01 & 0.0 & [$-$0.1, 0.0] & 0.12 \\
 \bottomrule
 \end{tabular}
-\end{table}
-
-\begin{figure}[t]
+\end{lrbox}
+\begin{tableorg}[tbp]
 \centering
-\includegraphics[width=0.60\linewidth]{fig_attribution.pdf}
+\caption{Leading counterfactual loss-attribution channels $\Delta_i^{CF}(j)$, hourly October 2025. The top ten are chosen on the point
+estimate, followed by four named-to-named channels. Intervals are not selection-adjusted. The maximum over all pairs is
+15.2\% [13.2\%, 19.5\%].}
+\label{tab:channels}
+\fitbox
+\end{tableorg}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=0.70\linewidth]{fig_attribution.pdf}
 \caption{Top eight counterfactual channels by point share, with 95\% bootstrap intervals (300 replicates). The intervals are not
 selection-adjusted.}
 \label{fig:attribution}
@@ -746,23 +741,16 @@ its source further.
 Table~\ref{tab:rank} reports the ranking and Figure~\ref{fig:rank} reports the rank intervals and pairwise probabilities.
 Retail and MakerSky are the top pair: $P(\text{top-3})=0.98$ for retail and $0.88$ for MakerSky. Their
 order is unresolved, with $P(\text{retail above MakerSky})=0.80$. Ranks three to six are unresolved in
-pairwise order, with pairwise probabilities between 0.34 and 0.66 (class D over the top-six
-pairwise matrix). Binance is ranked 7th, with rank interval [2, 9]. The five
+pairwise order, with pairwise probabilities between 0.34 and 0.66. Binance is ranked 7th, with rank interval [2, 9]. The five
 lowest-ranked entities (ranks 11--15) all have $P(\text{top-5})=0$. The Spearman correlation between replicate and
 point rankings is 0.903 [0.793, 0.968].
 
 The retail aggregate matters for the ranking. Without retail, the ranking is led by Binance (17.67), Crypto.com
 (14.81) and Kraken (14.33), and MakerSky drops out of the top six
-(\texttt{revision.json}, no-retail specification). Exported-risk levels scale with the number of entities, so only ranks
+(point estimates from the archived no-retail run). Exported-risk levels scale with the number of entities, so only ranks
 are comparable across runs.
 
-\begin{table}[t]
-\centering
-\footnotesize
-\caption{Exported-risk ranking, hourly October 2025, with bootstrap intervals (300 replicates; the resolution of
-$P(\cdot)$ is $1/300$). Rank intervals are percentile intervals. Spearman correlation between replicate and point
-rankings: 0.903 [0.793, 0.968].}
-\label{tab:rank}
+\begin{lrbox}{\tabbox}\footnotesize\setlength{\tabcolsep}{3pt}%
 \begin{tabular}{@{}llcccccc@{}}
 \toprule
 \textbf{Rank} & \textbf{Entity} & \textbf{Exported risk} & \textbf{MC s.e.} & \textbf{95\% CI of risk} & \textbf{Rank CI} & \textbf{$P(\text{top-1})$} & \textbf{$P(\text{top-3})$}\\
@@ -784,9 +772,17 @@ rankings: 0.903 [0.793, 0.968].}
 15 & Ceffu & 0.55 & 0.02 & [0.00, 1.58] & [13, 15] & 0.00 & 0.00 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{lrbox}
+\begin{tableorg}[tbp]
+\centering
+\caption{Exported-risk ranking, hourly October 2025, with bootstrap intervals (300 replicates; the resolution of
+$P(\cdot)$ is $1/300$). Rank intervals are percentile intervals. Spearman correlation between replicate and point
+rankings: 0.903 [0.793, 0.968].}
+\label{tab:rank}
+\fitbox
+\end{tableorg}
 
-\begin{figure}[t]
+\begin{figure}[tbp]
 \centering
 \begin{minipage}{0.48\linewidth}\centering
 \includegraphics[width=\linewidth]{fig_rank_ci.pdf}
@@ -813,22 +809,16 @@ target and have low power. We conclude that H1 is not supported. The observed gr
 estimated graphs.
 
 \paragraph{H2: direction.} On the October run the true, reversed and symmetric graphs have RMSE 1.7841, 1.7871 and
-1.7862. The reversed-minus-true interval is [$-$0.0006, 0.0093], which includes zero. The intraday A3 window
-gives a mixed picture. Reversal is not distinguishable from the true graph (interval [$-$0.0035, 0.0166]), but the symmetric graph is
-worse than the true graph, with an interval [0.0003, 0.0250] that excludes zero. For the two earlier episodes,
-the direction results are inconclusive (Section~\ref{subsec:multievent}). Splitting the October run by edge type, reversing the 86 custodial edges gives an RMSE of 1.7905, and reversing the 4 composability
-edges gives 1.7806 (true graph 1.7841). The directional signal sits on the custodial edges. The composability result is anecdotal given four edges.
-Direction is therefore not distinguishable from reversal at the entity-aggregate hourly level. The symmetric graph is therefore not uniformly as good as the true graph, since in the intraday window it is worse
-(Table~\ref{tab:diagnostics}).
+1.7862. The reversed-minus-true interval is [$-$0.0006, 0.0093], which includes zero, as does the symmetric-minus-true
+interval (Table~\ref{tab:diagnostics}). In the intraday A3 window, reversal is not distinguishable from the true graph
+(interval [$-$0.0035, 0.0166]). The symmetric graph is worse than the true graph, with an interval [0.0003, 0.0250]
+whose lower bound is barely above zero. Table~\ref{tab:diagnostics} contains ten uncorrected comparisons, and we do not read this one as evidence for
+direction. For the two earlier episodes the direction results are inconclusive (Section~\ref{subsec:multievent}).
+Splitting the October run by edge type, reversing the 86 custodial edges gives an RMSE of 1.7905, and reversing the
+4 composability edges gives 1.7806 (true graph 1.7841). No intervals are computed for this split, and the
+composability result rests on four edges. Direction is not distinguishable from reversal at the entity-aggregate hourly level.
 
-\begin{table}[t]
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\caption{Graph-source and direction comparisons. Mean difference is alternative minus base in squared error per entity-hour
-cell (positive values favour the base). Base is the observed graph for H1 and the true-direction graph otherwise. Status is
-the bootstrap verdict: base better (interval entirely above zero), alternative better (entirely below zero), or inconclusive.}
-\label{tab:diagnostics}
+\begin{lrbox}{\tabbox}\footnotesize\setlength{\tabcolsep}{3pt}%
 \begin{tabular}{@{}llcccccl@{}}
 \toprule
 \textbf{Comparison} & \textbf{Window} & \textbf{$n$} & \textbf{RMSE base} & \textbf{RMSE alt} & \textbf{Mean diff} & \textbf{95\% CI} & \textbf{Status}\\
@@ -848,14 +838,22 @@ Reversed vs true & USDC/SVB, Mar 2023 & 1{,}344 & 1.6514 & 1.6551 & 0.0033 & [$-
 Symmetric vs true & USDC/SVB, Mar 2023 & 1{,}344 & 1.6514 & 1.6528 & 0.0024 & [$-$0.0011, 0.0064] & inconclusive \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{lrbox}
+\begin{tableorg}[tbp]
+\centering
+\caption{Graph-source and direction comparisons. Mean difference is alternative minus base in squared error per entity-hour
+cell (positive values favour the base). Base is the observed graph for H1 and the true-direction graph otherwise. Status is
+the bootstrap verdict: base better (interval entirely above zero), alternative better (entirely below zero), or inconclusive.}
+\label{tab:diagnostics}
+\fitbox
+\end{tableorg}
 
 \subsection{Placebos and external validity}
 \label{subsec:placebo}
-Figure~\ref{fig:placebo} shows the time-shift distribution. The structural-zero check holds by construction: there are
+The structural-zero check holds by construction: there are
 196 connected and 14 unconnected pairs, and every unconnected pair has zero attribution. This is an
 implementation check, not evidence. The rolling calm-window placebo gives $p=0.286$ over 20 windows, so it fails.
-The time-shift placebo gives $p=0.0099$ (floor $1/(B+1)=0.0099$), so it passes. The fitted network carries timing
+The time-shift placebo gives $p=0.0099$ (floor $1/(B+1)=0.0099$), so it passes ($B=100$ shifted refits, seed 11). The fitted network carries timing
 information, but the event-window attribution is not unusual relative to calm windows. The FTX rolling placebo gives
 $p=0.188$ (fails) and the SVB rolling placebo gives $p=0.032$ (passes). These are uncorrected.
 
@@ -864,13 +862,6 @@ concordance is 0.50 on the point estimate (0.65 averaged over the bootstrap repl
 8.15. The probability that all transmitters rank above all absorbers is 0.14. Binance passes the check, but Ethena fails
 at rank 14. All four entities have non-degenerate stress, so the check is not vacuous.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.52\linewidth]{fig_placebo.pdf}
-\caption{Time-shift placebo distribution (B=100 shifted refits, seed 11) with the observed statistic. The rolling
-calm-window placebo, not shown, has $p=0.286$ over 20 windows and fails.}
-\label{fig:placebo}
-\end{figure}
 
 \subsection{Multi-event validation}
 \label{subsec:multievent}
@@ -887,13 +878,7 @@ In SVB the true-direction graph has the lowest RMSE, the symmetric graph is clos
 The earlier episodes have 912 and 888 fit rows, and the daily robustness runs have 38 and
 37 fit rows against a required minimum of 125. The daily runs are therefore underpowered and are not reported.
 
-\begin{table}[t]
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\caption{Multi-event validation (hourly). Top three exporters with rank interval and $P(\text{top-3})$, the rolling
-calm-window placebo $p$-value with the number of windows, and the direction verdict for reversal and symmetry.}
-\label{tab:events}
+\begin{lrbox}{\tabbox}\footnotesize\setlength{\tabcolsep}{3pt}%
 \begin{tabular}{@{}lp{0.42\linewidth}ccc@{}}
 \toprule
 \textbf{Event} & \textbf{Top three exporters (rank CI; $P$(top-3))} & \textbf{Rolling $p$ (windows)} & \textbf{Reversed} & \textbf{Symmetric}\\
@@ -903,17 +888,25 @@ FTX, Nov 2022 & FTX rank [1, 3], $P$ = 1.00; retail rank [1, 3], $P$ = 0.98; Bin
 USDC/SVB, Mar 2023 & retail rank [1, 2], $P$ = 1.00; Binance rank [1, 5], $P$ = 0.85; Coinbase rank [2, 7], $P$ = 0.53 & 0.032 (30) & inconclusive & inconclusive \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{lrbox}
+\begin{tableorg}[tbp]
+\centering
+\caption{Multi-event validation (hourly). Top three exporters with rank interval and $P(\text{top-3})$, the rolling
+calm-window placebo $p$-value with the number of windows, and the direction verdict for reversal and symmetry.}
+\label{tab:events}
+\fitbox
+\end{tableorg}
 
 \subsection{Robustness}
 \label{subsec:robustness}
-The top-$k$ check compares the main specification with $k=10$ and $k=15$. The Spearman correlation over the common entities is
+The top-$k$, edge-dropping, latent-shock and coefficient-noise checks use archived runs (\texttt{topk\_sensitivity.json},
+\texttt{revision*.json}) that predate the circular-block shock draws, so they are point comparisons without bootstrap intervals. The top-$k$ check compares the main specification with $k=10$ and $k=15$. The Spearman correlation over the common entities is
 0.984 ($k=10$) and 0.986 ($k=15$), and the top-three overlap is 3 and 3 entities. The top channel,
 MakerSky$\to$retail, has share 15.6\%, 15.2\% and 16.4\% at $k=10$, $12$ and $15$.
 
-For confounding, the robustness values range from 0.089 to 0.231 across the 15 edges of the hourly graph, with
+For confounding, the robustness values range from 0.089 to 0.231 across the 15 edges with the largest $t$-statistics of the 90 in the hourly graph, with
 MakerSky$\to$retail at 0.231. These values are moderate, not large. Dropping the 22 lowest-RV edges leaves the Spearman
-correlation at 0.989. A latent common shock of moderate and strong size gives Spearman correlations of 0.986 and 0.904,
+correlation at 0.989. A latent common shock of strength 0.3 and 0.6 gives Spearman correlations of 0.986 and 0.904,
 with a top-three overlap of 0.67. Coefficient noise (15\% relative standard deviation) changes the Binance$\to$Bybit share
 by a standard deviation of 0.65 percentage points, and the share stays positive in every draw. The bootstrap width dominates.
 
@@ -925,8 +918,8 @@ $\Delta$CoVaR over six mapped entities is 0.371 (n=6). This is not distinguishab
 \label{sec:discussion}
 
 \paragraph{What the ledger buys.} The observed transaction graph is auditable. Every edge maps to inspectable transfers, structural
-zeros are exact, and attributions are reproducible from public data. It is not sufficient. At hourly scale stress is mostly
-persistence plus idiosyncratic shocks, and the ledger-specified network adds nothing detectable out of sample.
+zeros are exact, and attributions are reproducible from public data. It is not sufficient. At hourly scale the own lag and idiosyncratic
+shocks account for more of stress than the network does, and the ledger-specified network adds nothing detectable out of sample.
 
 \paragraph{Implications for supervisors and risk teams.} Ledger graphs are useful as an audit layer and a hypothesis generator, not as a
 standalone contagion estimate. Any ``share of distress'' statement should use full abduction, because zero-shock abduction inflates
@@ -990,22 +983,12 @@ the event-window shocks, joint residual rows and the sample quantile $s^\ast=$ t
 (600 hours). Each bootstrap replicate uses 500 simulations. The coefficient-perturbation checks multiply
 every stress and flow coefficient by $1+\eta$ with $\eta\sim N(0,0.15^2)$. The H1 bootstrap uses $B=2{,}000$ circular blocks.
 
-The hourly backtest of the rolling VaR ($n=886$) gives Kupiec tests \citep{kupiec1995techniques} of $p=0.031$ for BTC and
-$p=0.111$ for ETH. The conditional-coverage test \citep{christoffersen1998evaluating} gives $p=0.014$ for BTC and $p=0.051$ for ETH.
-The daily backtest ($n=810$) gives Kupiec $p=0.239$ (BTC) and $p=0.578$ (ETH). These tests concern the price-based
-baselines only.
-
 \section{Entity-resolution validation}\label{app:resolution}
 
 Table~\ref{tab:tier0} reports the Tier-0 validation per extract. The Tier-0 rule is the deposit-sweep rule of
 Section~\ref{subsec:resolution}, with the tightened parameters used only for FTX.
 
-\begin{table}[t]
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\caption{Tier-0 validation against the holdout deposit labels. Recall by count and by volume and the precision are for the chosen rule.}
-\label{tab:tier0}
+\begin{lrbox}{\tabbox}\footnotesize\setlength{\tabcolsep}{3pt}%
 \begin{tabular}{@{}lllcccccc@{}}
 \toprule
 \textbf{Extract} & \textbf{Rule} & \textbf{$\tau$} & \textbf{Holdout} & \textbf{Overlap} & \textbf{Wrong root} & \textbf{Precision} & \textbf{Recall (count)} & \textbf{Recall (volume)}\\
@@ -1016,35 +999,21 @@ USDC/SVB (hourly) & default & 0.8 & 25{,}080 & 31 & 0 & 1.00 & 34.1 & 3.2 \\
 Daily core & default & 0.8 & 25{,}080 & 64 & 0 & 1.00 & 55.2 & 0.1 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{lrbox}
+\begin{tableorg}[tbp]
+\centering
+\caption{Tier-0 validation against the holdout deposit labels. Recall by count and by volume and the precision are for the chosen rule.}
+\label{tab:tier0}
+\fitbox
+\end{tableorg}
 
 The Tier-1 classifier and the embedding are validated against CEX-labelled addresses in the USDe window
 (8--14~October 2025). After the mint/burn sentinel is excluded, the window has 7{,}019 addresses, of which 41 are CEX-labelled
 (base rate 0.6\%). The held-out ROC-AUC is 0.89, and the average precision is 0.17. At the best-$F_1$
 threshold the classifier's precision and recall by address count are 0.13 and 0.58. By USD volume, precision is
-0.92 and recall is only 0.15. Table~\ref{tab:resval} reports these values, and the Tier-2 cluster homogeneity is 0.10.
+0.92 and recall is only 0.15. The Tier-2 cluster homogeneity is 0.10.
 The ground truth is small and deposit-dominated, so these numbers are a weak check. Tier-3 label matching therefore remains the
 production resolver.
-
-\begin{table}[t]
-\centering
-\footnotesize
-\caption{Entity-resolution validation for the Tier-1 classifier and Tier-2 embedding (USDe window; mint/burn sentinel excluded).}
-\label{tab:resval}
-\begin{tabular}{@{}lc@{}}
-\toprule
-\textbf{Metric} & \textbf{Value}\\
-\midrule
-Addresses (USDe window, sentinel excluded) & 7{,}019 \\
-CEX-labelled addresses (base rate, \%) & 41 / 0.6 \\
-Held-out ROC-AUC & 0.89 \\
-Average precision & 0.17 \\
-Best-$F_1$ precision / recall (by count) & 0.13 / 0.58 \\
-Precision / recall at the same threshold (by USD volume) & 0.92 / 0.15 \\
-Tier-2 cluster homogeneity & 0.10 \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \section{Proofs}\label{app:proofs}
 
@@ -1112,11 +1081,11 @@ $\tau_{ji}(t)$ is a sum over walks from $i$ to $j$ of length at most $t$ avoidin
 The numbers come from \texttt{results/analytics.json}, which uses the daily SCM with $T=7$ and 15 entities; the
 spectral radius is $\rho(A)=0.569$. $B^+$ is $\Lambda_i(T)$ per unit $s^\ast$ (Corollary~\ref{cor:bound}), so the stored
 exported risk must satisfy $\mathcal{E}(i)\le s^\ast B^+$, and the implied minimum $s^\ast$ is $\mathcal{E}/B^+$. The
-infinite-horizon multiplier (Corollary~\ref{cor:bound}(ii)) is a reference quantity, not a bound. These checks were not
+infinite-horizon multiplier is a reference quantity, not a bound. These checks were not
 run on the hourly coefficients, which are archived in \texttt{hourly\_scm\_export.json}.
 
 There are 0 violations of the bound. 5 entities have $B^+=0$ and stored $\mathcal{E}=0$; the bound is vacuous for them
-because their coefficients are all zero. This is a one-directional sanity check, not out-of-sample validation. Table~\ref{tab:bounds} lists the bounded entities. Coefficients are archived to four decimals, so the implied minimum
+because their coefficients are all zero. This is a one-directional sanity check, not out-of-sample validation. Table~\ref{tab:bounds} lists the bounded entities; the other 5 have $B^+=0$. Coefficients are archived to four decimals, so the implied minimum
 $s^\ast$ values are approximate.
 
 The certified ranking radius (Lemma~\ref{lem:radius}) applies to the ranking by $\Lambda_i(T)$ under relative coefficient
@@ -1126,16 +1095,9 @@ The certificate does not cover the exported-risk ranking $\mathcal{E}$, flows, s
 
 The closed-form walk decomposition agrees with subset enumeration to within $10^{-15}$ on a synthetic deviation path (seed
 7), and the subset and permutation computations agree to the same precision. Subset enumeration needs 8{,}192 oracle calls
-against 80{,}951{,}270{,}400 for permutations at $p=13$, the retail parent set. The exact subset computation for retail took 0.22 s on the
-machine used; timing is machine-dependent.
+against 80{,}951{,}270{,}400 for permutations at $p=13$, the retail parent set. The exact subset computation for retail took 0.22 s on one machine.
 
-Table~\ref{tab:bounds} gives the flow-free bounds for the daily specification, for the bounded entities. The remaining 5 entities have $B^+=0$ and are not listed.
-
-\begin{table}[t]
-\centering
-\footnotesize
-\caption{Flow-free bounds on exported risk, daily specification ($T=7$), bounded entities only.}
-\label{tab:bounds}
+\begin{lrbox}{\tabbox}\footnotesize\setlength{\tabcolsep}{3pt}%
 \begin{tabular}{@{}lcccc@{}}
 \toprule
 \textbf{Entity} & \textbf{Stored $\mathcal{E}$} & \textbf{$B^+$ per unit $s^\ast$} & \textbf{Implied min.\ $s^\ast$} & \textbf{$\infty$-horizon multiplier}\\
@@ -1152,10 +1114,17 @@ Binance & 0.001 & 0.005 & 0.28 & 0.001 \\
 FalconX & 0.000 & 0.058 & 0.00 & 0.014 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{lrbox}
+\begin{tableorg}[tbp]
+\centering
+\caption{Flow-free bounds on exported risk, daily specification ($T=7$), bounded entities only.}
+\label{tab:bounds}
+\fitbox
+\end{tableorg}
 
 \end{appendices}
 
-\bibliography{references}
+{\footnotesize\linespread{1.05}\selectfont
+\bibliography{references}}
 
 \end{document}

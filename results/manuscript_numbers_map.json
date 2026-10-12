@@ -97,7 +97,7 @@
   },
   {
    "id": "MAX_SHARE_HI",
-   "tex_anchor": "15.2\\% (interval upper bound 19.5\\%). The top pair",
+   "tex_anchor": "15.2\\% (interval upper bound 19.5\\%). Retail and MakerSky",
    "printed": "19.5",
    "fmt": "pct",
    "file": "uncertainty.json",
@@ -149,6 +149,17 @@
     "r2_in_sample",
     "retail",
     "point"
+   ]
+  },
+  {
+   "id": "BLOCK_LEN",
+   "tex_anchor": "joint fitted-residual rows with 24-hour blocks, so all",
+   "printed": "24",
+   "fmt": "num",
+   "file": "final_results.json",
+   "path": [
+    "settings",
+    "block_len"
    ]
   },
   {
@@ -234,17 +245,6 @@
    "path": [
     "settings",
     "n_sims"
-   ]
-  },
-  {
-   "id": "BLOCK_LEN",
-   "tex_anchor": "The block length is 24 hours and B=300",
-   "printed": "24",
-   "fmt": "num",
-   "file": "final_results.json",
-   "path": [
-    "settings",
-    "block_len"
    ]
   },
   {
@@ -1005,7 +1005,7 @@
   },
   {
    "id": "OOS_GAIN_NET",
-   "tex_anchor": "changes squared error by -18.6\\% [-27.1\\%, -6.2\\%]. The",
+   "tex_anchor": "changes squared error by -18.6\\% [-27.1\\%, -6.2\\%], so",
    "printed": "-18.6",
    "fmt": "pct",
    "file": "oos_r2.json",
@@ -1022,7 +1022,7 @@
   },
   {
    "id": "OOS_GAIN_NET_LO",
-   "tex_anchor": "squared error by -18.6\\% [-27.1\\%, -6.2\\%]. The large",
+   "tex_anchor": "squared error by -18.6\\% [-27.1\\%, -6.2\\%], so it",
    "printed": "-27.1",
    "fmt": "pct",
    "file": "oos_r2.json",
@@ -1035,7 +1035,7 @@
   },
   {
    "id": "OOS_GAIN_NET_HI",
-   "tex_anchor": "error by -18.6\\% [-27.1\\%, -6.2\\%]. The large entity-level",
+   "tex_anchor": "error by -18.6\\% [-27.1\\%, -6.2\\%], so it is",
    "printed": "-6.2",
    "fmt": "pct",
    "file": "oos_r2.json",
@@ -4632,7 +4632,7 @@
   },
   {
    "id": "RANK_BINANCE",
-   "tex_anchor": "matrix). Binance is ranked 7th, with rank interval",
+   "tex_anchor": "0.66. Binance is ranked 7th, with rank interval",
    "printed": "7",
    "fmt": "num",
    "file": "uncertainty.json",
@@ -7086,7 +7086,7 @@
   },
   {
    "id": "F_RMT_HI",
-   "tex_anchor": "reversed-minus-true interval is [-0.0006, 0.0093], which includes zero.",
+   "tex_anchor": "reversed-minus-true interval is [-0.0006, 0.0093], which includes zero,",
    "printed": "0.0093",
    "fmt": "num",
    "file": "final_results.json",
@@ -7104,7 +7104,7 @@
   },
   {
    "id": "A3_RMT_LO",
-   "tex_anchor": "the true graph (interval [-0.0035, 0.0166]), but the",
+   "tex_anchor": "the true graph (interval [-0.0035, 0.0166]). The symmetric",
    "printed": "-0.0035",
    "fmt": "num",
    "file": "intraday_a3.json",
@@ -7122,7 +7122,7 @@
   },
   {
    "id": "A3_RMT_HI",
-   "tex_anchor": "true graph (interval [-0.0035, 0.0166]), but the symmetric",
+   "tex_anchor": "true graph (interval [-0.0035, 0.0166]). The symmetric graph",
    "printed": "0.0166",
    "fmt": "num",
    "file": "intraday_a3.json",
@@ -7140,7 +7140,7 @@
   },
   {
    "id": "A3_SMT_LO",
-   "tex_anchor": "graph, with an interval [0.0003, 0.0250] that excludes",
+   "tex_anchor": "graph, with an interval [0.0003, 0.0250] whose lower",
    "printed": "0.0003",
    "fmt": "num",
    "file": "intraday_a3.json",
@@ -7158,7 +7158,7 @@
   },
   {
    "id": "A3_SMT_HI",
-   "tex_anchor": "with an interval [0.0003, 0.0250] that excludes zero.",
+   "tex_anchor": "with an interval [0.0003, 0.0250] whose lower bound",
    "printed": "0.0250",
    "fmt": "num",
    "file": "intraday_a3.json",
@@ -7220,7 +7220,7 @@
   },
   {
    "id": "ET_TRUE",
-   "tex_anchor": "gives 1.7806 (true graph 1.7841). The directional signal",
+   "tex_anchor": "gives 1.7806 (true graph 1.7841). No intervals are",
    "printed": "1.7841",
    "fmt": "num",
    "file": "revision.json",
@@ -8318,6 +8318,18 @@
    ]
   },
   {
+   "id": "TS_SEED",
+   "tex_anchor": "B=100 shifted refits, seed 11). The fitted network",
+   "printed": "11",
+   "fmt": "num",
+   "file": "final_results.json",
+   "path": [
+    "placebo",
+    "time_shift",
+    "seed"
+   ]
+  },
+  {
    "id": "ME_FTX_ROLL_P",
    "tex_anchor": "FTX rolling placebo gives p=0.188 (fails) and the",
    "printed": "0.188",
@@ -8406,18 +8418,6 @@
      "entity": "Ethena"
     },
     "rank"
-   ]
-  },
-  {
-   "id": "TS_SEED",
-   "tex_anchor": "for the attribution, and 11 for the time-shift",
-   "printed": "11",
-   "fmt": "num",
-   "file": "final_results.json",
-   "path": [
-    "placebo",
-    "time_shift",
-    "seed"
    ]
   },
   {
@@ -9348,110 +9348,6 @@
    ]
   },
   {
-   "id": "BT_N",
-   "tex_anchor": "the rolling VaR ( n=886 ) gives Kupiec",
-   "printed": "886",
-   "fmt": "num",
-   "file": "final_results.json",
-   "path": [
-    "backtests",
-    "BTC",
-    "kupiec",
-    "n"
-   ]
-  },
-  {
-   "id": "BT_BTC_KUP",
-   "tex_anchor": "gives Kupiec tests of p=0.031 for BTC and",
-   "printed": "0.031",
-   "fmt": "num",
-   "file": "final_results.json",
-   "path": [
-    "backtests",
-    "BTC",
-    "kupiec",
-    "p_value"
-   ]
-  },
-  {
-   "id": "BT_ETH_KUP",
-   "tex_anchor": "p=0.031 for BTC and p=0.111 for ETH. The",
-   "printed": "0.111",
-   "fmt": "num",
-   "file": "final_results.json",
-   "path": [
-    "backtests",
-    "ETH",
-    "kupiec",
-    "p_value"
-   ]
-  },
-  {
-   "id": "BT_BTC_CC",
-   "tex_anchor": "The conditional-coverage test gives p=0.014 for BTC and",
-   "printed": "0.014",
-   "fmt": "num",
-   "file": "final_results.json",
-   "path": [
-    "backtests",
-    "BTC",
-    "christoffersen",
-    "p_value_cc"
-   ]
-  },
-  {
-   "id": "BT_ETH_CC",
-   "tex_anchor": "p=0.014 for BTC and p=0.051 for ETH. The",
-   "printed": "0.051",
-   "fmt": "num",
-   "file": "final_results.json",
-   "path": [
-    "backtests",
-    "ETH",
-    "christoffersen",
-    "p_value_cc"
-   ]
-  },
-  {
-   "id": "BTD_N",
-   "tex_anchor": "The daily backtest ( n=810 ) gives Kupiec",
-   "printed": "810",
-   "fmt": "num",
-   "file": "results.json",
-   "path": [
-    "backtests",
-    "BTC",
-    "kupiec",
-    "n"
-   ]
-  },
-  {
-   "id": "BTD_BTC_KUP",
-   "tex_anchor": "n=810 ) gives Kupiec p=0.239 (BTC) and p=0.578",
-   "printed": "0.239",
-   "fmt": "num",
-   "file": "results.json",
-   "path": [
-    "backtests",
-    "BTC",
-    "kupiec",
-    "p_value"
-   ]
-  },
-  {
-   "id": "BTD_ETH_KUP",
-   "tex_anchor": "Kupiec p=0.239 (BTC) and p=0.578 (ETH). These tests",
-   "printed": "0.578",
-   "fmt": "num",
-   "file": "results.json",
-   "path": [
-    "backtests",
-    "ETH",
-    "kupiec",
-    "p_value"
-   ]
-  },
-  {
    "id": "T0OCT25HOURLY_0419",
    "tex_anchor": "tab:tier0 sweeps validation oct25_hourly holdout_addresses",
    "printed": "25080",
@@ -9939,7 +9835,7 @@
   },
   {
    "id": "T1_VREC",
-   "tex_anchor": "and recall is only 0.15. Table reports these",
+   "tex_anchor": "and recall is only 0.15. The Tier-2 cluster",
    "printed": "0.15",
    "fmt": "num",
    "file": "results.json",
@@ -10096,7 +9992,7 @@
   },
   {
    "id": "AN_TIME",
-   "tex_anchor": "computation for retail took 0.22 s on the",
+   "tex_anchor": "computation for retail took 0.22 s on one",
    "printed": "0.22",
    "fmt": "num",
    "file": "analytics.json",
@@ -10957,7 +10853,7 @@
   },
   {
    "id": "PW_MIN_3TO6",
-   "tex_anchor": "with pairwise probabilities between 0.34 and 0.66 (class",
+   "tex_anchor": "with pairwise probabilities between 0.34 and 0.66. Binance",
    "printed": "0.34",
    "source_class": "D",
    "file": "uncertainty.json",
@@ -10966,7 +10862,7 @@
   },
   {
    "id": "PW_MAX_3TO6",
-   "tex_anchor": "probabilities between 0.34 and 0.66 (class D over",
+   "tex_anchor": "probabilities between 0.34 and 0.66. Binance is ranked",
    "printed": "0.66",
    "source_class": "D",
    "file": "uncertainty.json",
