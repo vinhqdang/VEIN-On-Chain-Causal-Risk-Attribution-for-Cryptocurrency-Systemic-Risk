@@ -150,3 +150,60 @@ def test_load_daily_scm_shapes():
     assert S["A"].shape == (n, n)
     assert S["T"] == 7
     assert set(S["stored_E"]) == set(S["entities"])
+
+
+# 8. Prop A through the real code path: risk.delta_oc_covar on an SCM with
+#    non-zero flow coefficients (common random numbers, hinge loss) respects
+#    the flow-free bounds built from the lagged stress coefficients alone
+def test_prop_a_bounds_hold_for_risk_delta_oc_covar():
+    import pandas as pd
+    from vein import risk
+    from vein.scm import StructuralCausalModel
+
+    graph = {"nodes": ["X", "Y", "Z"], "parents": {"X": [], "Y": ["X"], "Z": ["X", "Y"]}}
+    scm = StructuralCausalModel(graph)
+    scm.stress_cols = ["X", "Y", "Z"]
+    scm.coef_ = {
+        "X": {"parents": [], "w_stress": np.array([]), "w_flow": np.array([]), "b": 0.3, "names": []},
+        "Y": {"parents": ["X"], "w_stress": np.array([0.6]), "w_flow": np.array([0.2]), "b": -0.1, "names": []},
+        "Z": {"parents": ["X", "Y"], "w_stress": np.array([0.2, -0.4]),
+              "w_flow": np.array([0.1, 0.3]), "b": 0.05, "names": []},
+    }
+    rng = np.random.default_rng(7)
+    days = pd.date_range("2025-10-01", periods=6, freq="D")
+    scm.resid_ = {e: pd.Series(rng.normal(size=40)) for e in scm.stress_cols}
+    flows = pd.DataFrame([{"from_entity": a, "to_entity": b, "day": d,
+                           "usd_volume": float(rng.uniform(1e3, 1e6))}
+                          for d in days for a, b in [("X", "Y"), ("X", "Z"), ("Y", "Z")]])
+    scm.set_flows(flows)
+    init = {"X": 0.2, "Y": -0.3, "Z": 0.1}
+    s_star = 1.5
+    ix = {"X": 0, "Y": 1, "Z": 2}
+    A = np.zeros((3, 3))
+    for e, c in scm.coef_.items():
+        for p, w in zip(c["parents"], c["w_stress"]):
+            A[ix[e], ix[p]] = w
+    for i in ["X", "Y"]:
+        b = an.oc_bounds(A, ix[i], len(days), s_star)
+        for j in ["X", "Y", "Z"]:
+            if j == i:
+                continue
+            for joint in (False, True):
+                d = risk.delta_oc_covar(scm, i, j, days, init, {i: s_star},
+                                        n_sims=200, seed=3, joint=joint)
+                assert b["lower"][ix[j]] - 1e-9 <= d <= b["upper"][ix[j]] + 1e-9
+
+
+# 9. Certified radius is a valid bound: random perturbations within eps of each
+#    coefficient move Lambda_i by no more than R_i(eps)
+def test_ranking_radius_bounds_perturbation():
+    rng = np.random.default_rng(7)
+    n, T = 6, 5
+    A = _random_A(rng, n, 0.6)
+    A[rng.random((n, n)) < 0.3] = 0.0
+    for eps in (0.1, 0.5, 1.0):
+        for i in range(n):
+            R = an.ranking_radius(A, i, T, eps)
+            for _ in range(200):
+                At = A * (1.0 + eps * rng.uniform(-1, 1, size=A.shape))
+                assert abs(an.ranking_mass(At, i, T) - an.ranking_mass(A, i, T)) <= R + 1e-10
