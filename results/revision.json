@@ -3,25 +3,25 @@
   "data_backend": "bigquery",
   "H1": {
     "observed": {
-      "wrmse": 1.1646871888912926,
-      "rmse": 0.510541885838841,
-      "mae": 0.24747812995256474,
-      "dir_acc": 0.7743055555555556,
+      "wrmse": 1.5545042103322824,
+      "rmse": 0.8454940250510499,
+      "mae": 0.5645026067013734,
+      "dir_acc": 0.5,
       "n": 288
     },
     "granger": {
-      "wrmse": 1.1821762761171515,
-      "rmse": 0.519262165685162,
-      "mae": 0.2511433905387918,
-      "dir_acc": 0.7638888888888888,
+      "wrmse": 1.5594828925742081,
+      "rmse": 0.8423399410468079,
+      "mae": 0.5621223522497234,
+      "dir_acc": 0.5347222222222222,
       "n": 288
     },
-    "mean_werr_diff_granger_minus_observed": 0.01471103184162426,
+    "mean_werr_diff_granger_minus_observed": 0.010438634713998156,
     "boot_ci95_diff": [
-      -0.005263823640728036,
-      0.05179662766941671
+      -0.0019921434809247575,
+      0.04337884549768822
     ],
-    "prob_observed_better": 0.915,
+    "prob_observed_better": 0.9585,
     "bootstrap": {
       "scheme": "paired_moving_block",
       "block_len": 8,
@@ -30,16 +30,16 @@
     }
   },
   "lagged_flow": {
-    "observed_wrmse": 1.1640868843500067,
-    "granger_wrmse": 1.177961676951333,
-    "observed_dir_acc": 0.78125
+    "observed_wrmse": 1.549589012216049,
+    "granger_wrmse": 1.5571374861020333,
+    "observed_dir_acc": 0.5208333333333334
   },
   "edge_type_falsification": {
-    "true": 1.724579177454591,
-    "reverse_composability": 1.724579177454591,
-    "reverse_custodial": 1.7036781805806434,
+    "true": 1.784062540210849,
+    "reverse_composability": 1.7805987271888721,
+    "reverse_custodial": 1.7905267224476908,
     "n_composability_edges": 4,
-    "n_custodial_edges": 96
+    "n_custodial_edges": 86
   },
   "shapley": {
     "target": "Bybit",
@@ -49,58 +49,58 @@
       "Bitfinex"
     ],
     "shapley_values": {
-      "Binance": 1.354597116224942,
-      "Coinbase": 0.0661946759994952,
-      "Bitfinex": -0.3990547828190489
+      "Binance": 1.4883957829025303,
+      "Coinbase": 0.11706887648596027,
+      "Bitfinex": -0.36888465627128636
     },
-    "sum_shapley": 1.0217370094053884,
-    "total_effect": 1.0217370094053884,
+    "sum_shapley": 1.2365800031172043,
+    "total_effect": 1.2365800031172043,
     "additive_residual": 0.0
   },
   "attribution_sensitivity": {
     "Binance->Bybit": {
-      "base_share": 0.06709608139620084,
-      "mean": 0.06605726176793576,
-      "sd": 0.004634398295185704,
+      "base_share": 0.06326449283407744,
+      "mean": 0.06346263693371161,
+      "sd": 0.00645618243505455,
       "frac_positive": 1.0
     },
     "Ethena->Aave": {
-      "base_share": 0.0,
-      "mean": 0.0,
-      "sd": 0.0,
+      "base_share": -0.011447653796198314,
+      "mean": -0.011318868393625673,
+      "sd": 0.0016814226935234784,
       "frac_positive": 0.0
     }
   },
   "no_retail_ranking": [
     {
       "entity": "Binance",
-      "exported_risk": 21.284446252697172
-    },
-    {
-      "entity": "Kraken",
-      "exported_risk": 20.962781896965975
+      "exported_risk": 17.944190954839204
     },
     {
       "entity": "Crypto.com",
-      "exported_risk": 19.108300277616312
+      "exported_risk": 15.571733327584202
+    },
+    {
+      "entity": "Kraken",
+      "exported_risk": 14.926278724089599
     },
     {
       "entity": "Coinbase",
-      "exported_risk": 16.738415106187762
+      "exported_risk": 11.353741456625478
+    },
+    {
+      "entity": "OKX",
+      "exported_risk": 10.120574402647435
     },
     {
       "entity": "Bitfinex",
-      "exported_risk": 15.06642063639828
-    },
-    {
-      "entity": "Bullish",
-      "exported_risk": 12.19426806332892
+      "exported_risk": 9.947846341468384
     }
   ],
   "resolution_coverage": {
-    "total_usd": 449692816967.1178,
-    "frac_volume_named_both_sides": 0.01629376405392614,
+    "total_usd": 569713789502.8787,
+    "frac_volume_named_both_sides": 0.028433185088452804,
     "frac_volume_touching_named": 1.0,
-    "n_named_entities": 15
+    "n_named_entities": 14
   }
 }

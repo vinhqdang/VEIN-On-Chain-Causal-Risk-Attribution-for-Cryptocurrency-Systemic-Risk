@@ -6,10 +6,138 @@
     "2025-09-15",
     "2025-10-25"
   ],
-  "n_entities": 17,
+  "stress_components": {
+    "Aave": {
+      "used": [
+        "flow",
+        "drawdown:AAVE"
+      ],
+      "dropped": {},
+      "fit_std": 0.7681065284345563
+    },
+    "Binance": {
+      "used": [
+        "flow"
+      ],
+      "dropped": {},
+      "fit_std": 0.6623965687443808
+    },
+    "Bitfinex": {
+      "used": [
+        "flow"
+      ],
+      "dropped": {},
+      "fit_std": 0.9842294310275459
+    },
+    "Bybit": {
+      "used": [
+        "flow"
+      ],
+      "dropped": {},
+      "fit_std": 0.7980922846737425
+    },
+    "Ceffu": {
+      "used": [
+        "flow"
+      ],
+      "dropped": {},
+      "fit_std": 0.7261298110595655
+    },
+    "Coinbase": {
+      "used": [
+        "flow"
+      ],
+      "dropped": {},
+      "fit_std": 0.7072215106619731
+    },
+    "Copper": {
+      "used": [
+        "flow"
+      ],
+      "dropped": {},
+      "fit_std": 0.7822206695619336
+    },
+    "Crypto.com": {
+      "used": [
+        "flow"
+      ],
+      "dropped": {},
+      "fit_std": 0.788343205754974
+    },
+    "Ethena": {
+      "used": [
+        "flow",
+        "peg:USDe"
+      ],
+      "dropped": {},
+      "fit_std": 0.7062099917733811
+    },
+    "HTX": {
+      "used": [
+        "flow"
+      ],
+      "dropped": {},
+      "fit_std": 0.830577509862594
+    },
+    "Kraken": {
+      "used": [
+        "flow"
+      ],
+      "dropped": {},
+      "fit_std": 0.7693252699619302
+    },
+    "Lido": {
+      "used": [
+        "discount:stETH/ETH",
+        "lido_redeem"
+      ],
+      "dropped": {},
+      "fit_std": 0.7618449555877681
+    },
+    "MakerSky": {
+      "used": [
+        "flow",
+        "peg:DAI"
+      ],
+      "dropped": {},
+      "fit_std": 0.6487822985492784
+    },
+    "OKX": {
+      "used": [
+        "flow"
+      ],
+      "dropped": {},
+      "fit_std": 0.7345437620497003
+    },
+    "retail": {
+      "used": [
+        "flow"
+      ],
+      "dropped": {},
+      "fit_std": 0.7701047439692885
+    }
+  },
+  "n_entities": 15,
   "n_fit_hours": 600,
   "n_event_hours": 48,
-  "graph_edges": 100,
+  "graph_edges": 90,
+  "fit_gross_usd": {
+    "Aave": 69581773986.03766,
+    "Binance": 68200517209.74559,
+    "Bitfinex": 17731456771.741657,
+    "Bybit": 18259471348.858635,
+    "Ceffu": 4310752962.62661,
+    "Coinbase": 116046388877.23703,
+    "Copper": 6314962286.323015,
+    "Crypto.com": 6401192841.557744,
+    "Ethena": 102916319.22876702,
+    "HTX": 12149004942.467325,
+    "Kraken": 7406741879.824895,
+    "Lido": 0.0,
+    "MakerSky": 22673176930.217567,
+    "OKX": 20394531856.30612,
+    "retail": 350671409340.77783
+  },
   "settings": {
     "abduction": "full",
     "bootstrap": "joint_moving_block",
@@ -22,101 +150,121 @@
       "2025-10-09 23:00:00"
     ],
     "s_star_window_rows": 600,
-    "s_star_excludes_event_window": true
+    "s_star_excludes_event_window": true,
+    "n_sims": 2000,
+    "seed": 7,
+    "ranking_engine": "fastscm",
+    "mc_error": {
+      "n_rep": 20,
+      "n_sims": 500,
+      "seed0": 1000
+    },
+    "h1_bootstrap": {
+      "B": 2000,
+      "block_len": 24,
+      "seed": 7
+    }
   },
   "oc_covar_ranking": [
     {
       "entity": "retail",
-      "exported_risk": 101.1193967111547
-    },
-    {
-      "entity": "Coinbase",
-      "exported_risk": 43.99612774562696
-    },
-    {
-      "entity": "Kraken",
-      "exported_risk": 37.013890842423194
-    },
-    {
-      "entity": "Binance",
-      "exported_risk": 35.78904984004252
-    },
-    {
-      "entity": "Bitfinex",
-      "exported_risk": 34.142685051080626
-    },
-    {
-      "entity": "OKX",
-      "exported_risk": 24.27286126558998
-    },
-    {
-      "entity": "Crypto.com",
-      "exported_risk": 22.4306542240373
-    },
-    {
-      "entity": "HTX",
-      "exported_risk": 20.36398421311519
-    },
-    {
-      "entity": "Bybit",
-      "exported_risk": 19.364703608659596
-    },
-    {
-      "entity": "Bullish",
-      "exported_risk": 13.735597888268607
-    },
-    {
-      "entity": "FalconX",
-      "exported_risk": 11.654412910196495
-    },
-    {
-      "entity": "Copper",
-      "exported_risk": 4.29481194286058
-    },
-    {
-      "entity": "Ethena",
-      "exported_risk": 3.5668188193646433
-    },
-    {
-      "entity": "Ceffu",
-      "exported_risk": 0.8219558386783223
-    },
-    {
-      "entity": "Aave",
-      "exported_risk": 0.0
+      "exported_risk": 44.96592236698115,
+      "mc_se": 0.4358439214126146
     },
     {
       "entity": "MakerSky",
-      "exported_risk": 0.0
+      "exported_risk": 37.864038843363076,
+      "mc_se": 0.3368255743353048
+    },
+    {
+      "entity": "Coinbase",
+      "exported_risk": 26.373521060241696,
+      "mc_se": 0.30034999140687485
+    },
+    {
+      "entity": "Bitfinex",
+      "exported_risk": 25.726058796032067,
+      "mc_se": 0.2212284943866546
+    },
+    {
+      "entity": "Kraken",
+      "exported_risk": 23.97296275627749,
+      "mc_se": 0.2781642012598648
+    },
+    {
+      "entity": "Crypto.com",
+      "exported_risk": 23.796380374207686,
+      "mc_se": 0.3599066227012824
+    },
+    {
+      "entity": "Binance",
+      "exported_risk": 22.540353489730776,
+      "mc_se": 0.28614773565870816
+    },
+    {
+      "entity": "OKX",
+      "exported_risk": 19.052968790208386,
+      "mc_se": 0.28224710119555324
+    },
+    {
+      "entity": "HTX",
+      "exported_risk": 13.467417146263516,
+      "mc_se": 0.22239647587420114
+    },
+    {
+      "entity": "Bybit",
+      "exported_risk": 13.107059370440663,
+      "mc_se": 0.15363622402174199
+    },
+    {
+      "entity": "Copper",
+      "exported_risk": 4.398229299341441,
+      "mc_se": 0.13043330169645279
     },
     {
       "entity": "Lido",
-      "exported_risk": 0.0
+      "exported_risk": 3.3689448184051436,
+      "mc_se": 0.11085427350107818
+    },
+    {
+      "entity": "Aave",
+      "exported_risk": 2.943500684026718,
+      "mc_se": 0.1130647285797381
+    },
+    {
+      "entity": "Ethena",
+      "exported_risk": 0.6911852890967971,
+      "mc_se": 0.03026721496036912
+    },
+    {
+      "entity": "Ceffu",
+      "exported_risk": 0.5602187513794874,
+      "mc_se": 0.017481711719140786
     }
   ],
   "H1": {
     "scores": [
       {
         "model": "observed_onchain",
-        "rmse": 1.16468718889129,
-        "corr": 0.2875018479366635,
+        "rmse": 1.5545042103322828,
+        "corr": 0.14313483722243162,
         "n": 288
       },
       {
         "model": "estimated_granger",
-        "rmse": 1.1821762761171482,
-        "corr": 0.21669127318826326,
+        "rmse": 1.5594828925742068,
+        "corr": 0.17365653494874486,
         "n": 288
       },
       {
         "model": "estimated_partial_corr",
-        "rmse": 1.1652718126643216,
-        "corr": 0.28211279575568743,
+        "rmse": 1.5599260598576574,
+        "corr": 0.1572832332851809,
         "n": 288
       }
     ],
-    "H1_supported": true,
-    "rmse_gap_vs_best_estimated": 0.0005846237730315895,
+    "H1_point_better": true,
+    "rmse_gap_vs_best_estimated": 0.004978682241923993,
     "comparison_nodes": [
       "Aave",
       "Binance",
@@ -126,234 +274,448 @@
       "retail"
     ],
     "edge_counts": {
-      "observed": 8,
+      "observed": 13,
       "granger": 14,
       "partial_corr": 10
-    }
+    },
+    "bootstrap": {
+      "granger": {
+        "mean_diff": -0.0053235701142856605,
+        "ci95": [
+          -0.015006493409505797,
+          -0.0038618331882729535
+        ],
+        "prob_observed_better": 0.0015,
+        "status": "estimated_better",
+        "block_len": 24,
+        "replicates": 2000,
+        "ci95_weighted": [
+          0.012349234456027525,
+          0.03566559549494504
+        ],
+        "ci95_block8": [
+          -0.0219656868810355,
+          0.008864938060467812
+        ],
+        "status_weighted": "observed_better",
+        "status_block8": "inconclusive"
+      },
+      "partial_corr": {
+        "mean_diff": -0.0030757437476104463,
+        "ci95": [
+          -0.017675751502598796,
+          -0.005393343072862627
+        ],
+        "prob_observed_better": 0.0,
+        "status": "estimated_better",
+        "block_len": 24,
+        "replicates": 2000,
+        "ci95_weighted": [
+          -0.0029743861204471547,
+          0.015877461979326424
+        ],
+        "ci95_block8": [
+          -0.023322861644602108,
+          0.007584116516654035
+        ],
+        "status_weighted": "inconclusive",
+        "status_block8": "inconclusive"
+      }
+    },
+    "H1_supported": false
   },
   "counterfactual_attribution": [
     {
       "i": "Binance",
       "j": "Bybit",
-      "L_observed": 21.660655525278493,
-      "L_counterfactual": 20.20731041905934,
-      "attribution": 1.4533451062191531,
-      "attribution_share": 0.06709608139620084
-    },
-    {
-      "i": "Binance",
-      "j": "retail",
-      "L_observed": 13.883846439919964,
-      "L_counterfactual": 13.046721164076937,
-      "attribution": 0.837125275843027,
-      "attribution_share": 0.060294910309297026
+      "L_observed": 21.6606555252785,
+      "L_counterfactual": 20.2903051390181,
+      "attribution": 1.3703503862604016,
+      "attribution_share": 0.06326449283407744
     },
     {
       "i": "Binance",
       "j": "OKX",
-      "L_observed": 10.640953832002975,
-      "L_counterfactual": 9.813560983033458,
-      "attribution": 0.8273928489695166,
-      "attribution_share": 0.07775551534497864
-    },
-    {
-      "i": "Binance",
-      "j": "Coinbase",
-      "L_observed": 12.30678708924821,
-      "L_counterfactual": 11.547617256192048,
-      "attribution": 0.7591698330561627,
-      "attribution_share": 0.06168708595921102
-    },
-    {
-      "i": "Binance",
-      "j": "Bullish",
-      "L_observed": 9.17086737847357,
-      "L_counterfactual": 8.458642126645922,
-      "attribution": 0.7122252518276486,
-      "attribution_share": 0.07766171098487674
+      "L_observed": 10.640953832002973,
+      "L_counterfactual": 9.923211747519321,
+      "attribution": 0.7177420844836515,
+      "attribution_share": 0.06745091613169317
     },
     {
       "i": "Binance",
       "j": "Kraken",
-      "L_observed": 18.00236683155528,
-      "L_counterfactual": 17.42590936419772,
-      "attribution": 0.5764574673575567,
-      "attribution_share": 0.032021204364479375
+      "L_observed": 18.002366831555314,
+      "L_counterfactual": 17.531651335127012,
+      "attribution": 0.47071549642830135,
+      "attribution_share": 0.026147422771277563
     },
     {
       "i": "Binance",
       "j": "Crypto.com",
-      "L_observed": 14.854138877337387,
-      "L_counterfactual": 14.323108535275459,
-      "attribution": 0.5310303420619285,
-      "attribution_share": 0.035749655126229435
+      "L_observed": 14.854138877337384,
+      "L_counterfactual": 14.389001435473315,
+      "attribution": 0.46513744186406925,
+      "attribution_share": 0.031313659156217984
+    },
+    {
+      "i": "Binance",
+      "j": "Coinbase",
+      "L_observed": 12.306787089248218,
+      "L_counterfactual": 11.885886906489642,
+      "attribution": 0.4209001827585759,
+      "attribution_share": 0.034200655273080485
+    },
+    {
+      "i": "Binance",
+      "j": "retail",
+      "L_observed": 14.409020416406182,
+      "L_counterfactual": 14.075183780787267,
+      "attribution": 0.3338366356189155,
+      "attribution_share": 0.023168586480647044
     },
     {
       "i": "Binance",
       "j": "Ethena",
       "L_observed": 13.556958557987254,
-      "L_counterfactual": 13.287150317498089,
-      "attribution": 0.26980824048916574,
-      "attribution_share": 0.019901826750824195
-    },
-    {
-      "i": "Ethena",
-      "j": "retail",
-      "L_observed": 13.883846439919964,
-      "L_counterfactual": 13.632594041079138,
-      "attribution": 0.2512523988408262,
-      "attribution_share": 0.01809674285350815
+      "L_counterfactual": 13.373739712689424,
+      "attribution": 0.18321884529783006,
+      "attribution_share": 0.013514745546661301
     },
     {
       "i": "Ethena",
       "j": "Binance",
-      "L_observed": 18.859787433477962,
-      "L_counterfactual": 18.71137178631349,
-      "attribution": 0.14841564716447309,
-      "attribution_share": 0.007869423114547984
+      "L_observed": 18.85978743347794,
+      "L_counterfactual": 18.78160059141001,
+      "attribution": 0.07818684206792881,
+      "attribution_share": 0.004145690525076631
+    },
+    {
+      "i": "Ethena",
+      "j": "Bybit",
+      "L_observed": 21.6606555252785,
+      "L_counterfactual": 21.61984515006904,
+      "attribution": 0.0408103752094604,
+      "attribution_share": 0.0018840784925384056
+    },
+    {
+      "i": "Binance",
+      "j": "Copper",
+      "L_observed": 9.821138248366552,
+      "L_counterfactual": 9.79229523341264,
+      "attribution": 0.02884301495391206,
+      "attribution_share": 0.002936830153949744
     }
   ],
   "falsification": [
     {
       "model": "true_direction",
-      "rmse": 1.7245791774545904,
-      "corr": 0.09063886921263213,
-      "n": 816
+      "rmse": 1.7840625402108494,
+      "corr": 0.11155391198675774,
+      "n": 720
     },
     {
       "model": "reversed_edges",
-      "rmse": 1.7036781805806425,
-      "corr": 0.11956634891405134,
-      "n": 816
+      "rmse": 1.7870754387216883,
+      "corr": 0.09875795190029191,
+      "n": 720
     },
     {
       "model": "symmetric",
-      "rmse": 1.716398788927523,
-      "corr": 0.10416536051835851,
-      "n": 816
+      "rmse": 1.7862003027044135,
+      "corr": 0.10690918394101083,
+      "n": 720
     }
   ],
+  "falsification_ci": {
+    "reversed_minus_true": {
+      "mean_diff": 0.004161285453798228,
+      "ci95": [
+        0.001631767483862639,
+        0.01035650533982202
+      ],
+      "prob_observed_better": 0.9995,
+      "status": "observed_better",
+      "block_len": 24,
+      "replicates": 2000
+    },
+    "symmetric_minus_true": {
+      "mean_diff": 0.0028904863035828644,
+      "ci95": [
+        0.004254467823884556,
+        0.00793363676340853
+      ],
+      "prob_observed_better": 1.0,
+      "status": "observed_better",
+      "block_len": 24,
+      "replicates": 2000
+    }
+  },
   "external_validity": {
     "transmitter_scores": {
-      "Binance": 35.78904984004252,
-      "Ethena": 3.5668188193646433
+      "Binance": 22.540353489730776,
+      "Ethena": 0.6911852890967971
     },
     "absorber_scores": {
-      "Lido": 0.0,
-      "Aave": 0.0
+      "Aave": 2.943500684026718,
+      "Lido": 3.3689448184051436
     },
-    "separation": 19.677934329703582,
-    "pairwise_concordance": 1.0,
+    "separation": 8.459546638197857,
+    "pairwise_concordance": 0.5,
     "detail": {
-      "Binance": 35.78904984004252,
-      "Lido": 0.0,
-      "Ethena": 3.5668188193646433,
-      "Aave": 0.0
+      "Binance": 22.540353489730776,
+      "Ethena": 0.6911852890967971,
+      "Aave": 2.943500684026718,
+      "Lido": 3.3689448184051436
+    },
+    "nondegenerate": true,
+    "vacuous": false,
+    "nondegenerate_by_entity": {
+      "Ethena": true,
+      "Binance": true,
+      "Aave": true,
+      "Lido": true
     }
   },
   "placebo": {
-    "n_connected_pairs": 197,
-    "n_unconnected_pairs": 75,
-    "mean_abs_attr_connected": 0.2501532089225841,
-    "mean_abs_attr_unconnected": 0.0,
-    "max_abs_attr_unconnected": 0.0,
-    "passes": true
-  },
-  "temporal_placebo": {
-    "mean_abs_attr_calm": 0.05489637564549184,
-    "max_abs_attr_calm": 0.8879861310507593
+    "structural_zero_check": {
+      "note": "holds by construction (Prop.), not evidence",
+      "n_connected_pairs": 196,
+      "n_unconnected_pairs": 14,
+      "mean_abs_attr_connected": 0.21457579168064406,
+      "mean_abs_attr_unconnected": 0.0,
+      "max_abs_attr_unconnected": 0.0,
+      "passes": true
+    },
+    "rolling_temporal": {
+      "event_stat": 0.2145757916806441,
+      "calm_stats": [
+        0.15673638820668853,
+        0.06371664042322013,
+        0.051609132639547514,
+        0.27036752732142155,
+        0.33234562904726916,
+        0.13232693623331854,
+        0.14251730159722512,
+        0.13322882264733163,
+        0.08745221481510057,
+        0.05739627782480428,
+        0.3105706755654887,
+        0.402797301676866,
+        0.15320950922806653,
+        0.11659176491969667,
+        0.14093633641919778,
+        0.10121749439983442,
+        0.08351236005336571,
+        0.19232773117328958,
+        0.23418474776534465,
+        0.10083031247952737
+      ],
+      "n_windows": 20,
+      "n_connected_pairs": 196,
+      "p_value": 0.2857142857142857,
+      "passes": false
+    },
+    "time_shift": {
+      "real_stat": 0.2145757916806441,
+      "placebo_stats": [
+        0.14537952084372932,
+        0.11852980023990525,
+        0.13905271462288285,
+        0.14626868585633684,
+        0.12304968956330163,
+        0.12881138885588472,
+        0.12220084574491208,
+        0.12960049475744312,
+        0.10334497757726473,
+        0.15631912031472311,
+        0.12374208767166199,
+        0.1661923885593084,
+        0.11740645679372648,
+        0.0995968067038301,
+        0.1468811502578261,
+        0.11843340477600225,
+        0.14248574433950553,
+        0.1276672344845246,
+        0.1749957354762633,
+        0.1355593872230534,
+        0.12993973053940538,
+        0.14527264591857234,
+        0.1385626314145584,
+        0.14910619644696874,
+        0.11054409112834988,
+        0.14778140897300157,
+        0.14261446351192844,
+        0.1279252821651377,
+        0.15493226118205664,
+        0.14126398057652176,
+        0.15401114915286546,
+        0.11021028672011902,
+        0.13795410194206842,
+        0.12039355629239375,
+        0.12884536273995265,
+        0.12149244055731834,
+        0.12854340319785745,
+        0.10953332656419354,
+        0.15578600044839194,
+        0.1515818556005792,
+        0.11896584818368967,
+        0.13355537388926367,
+        0.12156395658284289,
+        0.14555898045510493,
+        0.12949932483310353,
+        0.11839399464139125,
+        0.11652395651932168,
+        0.13180408702516136,
+        0.13805708061541108,
+        0.12680976919195114,
+        0.117899211479421,
+        0.13657228951806308,
+        0.11505646770929133,
+        0.15317944430483393,
+        0.1590317668521011,
+        0.1394187022420398,
+        0.1561551383178847,
+        0.13174912545222003,
+        0.16373477875166123,
+        0.13479633842103603,
+        0.1326521840993222,
+        0.14910480968368167,
+        0.1506118990604285,
+        0.12039924176425673,
+        0.12437695614832511,
+        0.14365393072836583,
+        0.15050621252213361,
+        0.11102587572423117,
+        0.16927518399006478,
+        0.12767186114292473,
+        0.12820248986809782,
+        0.1330889130761529,
+        0.16104256386299143,
+        0.16294721962290012,
+        0.12328794130954038,
+        0.11834518992921858,
+        0.1209212412946097,
+        0.15589896838219627,
+        0.11041365571786964,
+        0.13008872406817973,
+        0.1296093545870628,
+        0.150162375652405,
+        0.13395330871126349,
+        0.1159028559696613,
+        0.15110322524819816,
+        0.13676519305388543,
+        0.12653098497629472,
+        0.13314131253300993,
+        0.14066451281198397,
+        0.11957318447412656,
+        0.12831881148542806,
+        0.14371235781906175,
+        0.1352445216243045,
+        0.15664434680099418,
+        0.14375189823729342,
+        0.11112190310371067,
+        0.1195633580461166,
+        0.1400129399753315,
+        0.12764956042555994,
+        0.1468425870718024
+      ],
+      "p_value": 0.009900990099009901,
+      "passes": true,
+      "B": 100,
+      "seed": 11
+    }
   },
   "confounding_sensitivity": {
     "edges": [
       {
+        "edge": "MakerSky->retail",
+        "coef": 0.27734201267912645,
+        "t_stat": 8.106318585910856,
+        "robustness_value": 0.23121231987138363
+      },
+      {
         "edge": "retail->Coinbase",
-        "coef": 0.25488009778030335,
-        "t_stat": 8.153717126720254,
-        "robustness_value": 0.2321732915477762
+        "coef": 0.21610457451759968,
+        "t_stat": 6.801002215767503,
+        "robustness_value": 0.19783397598429636
       },
       {
-        "edge": "Coinbase->retail",
-        "coef": 0.18874398893502214,
-        "t_stat": 6.2024885927397095,
-        "robustness_value": 0.18243615430714863
-      },
-      {
-        "edge": "Kraken->retail",
-        "coef": 0.1730314933818312,
-        "t_stat": 5.65792969137277,
-        "robustness_value": 0.16789252258621593
-      },
-      {
-        "edge": "retail->Bullish",
-        "coef": 0.15376800367401106,
-        "t_stat": 4.979033084210063,
-        "robustness_value": 0.14909164287549515
-      },
-      {
-        "edge": "FalconX->Coinbase",
-        "coef": 0.13527004889747757,
-        "t_stat": 4.707436394259141,
-        "robustness_value": 0.14171783683693262
+        "edge": "Bitfinex->retail",
+        "coef": 0.13735423049755663,
+        "t_stat": 5.8346336647812,
+        "robustness_value": 0.17264126782967465
       },
       {
         "edge": "Bitfinex->Coinbase",
-        "coef": 0.10790722544631959,
-        "t_stat": 4.505063429896976,
-        "robustness_value": 0.1360708171214096
+        "coef": 0.11834004409563412,
+        "t_stat": 4.87457512029719,
+        "robustness_value": 0.1462816675802408
       },
       {
-        "edge": "Binance->retail",
-        "coef": 0.1318710374669051,
-        "t_stat": 4.318333725860307,
-        "robustness_value": 0.1309548164834513
-      },
-      {
-        "edge": "Binance->Kraken",
-        "coef": 0.13470096750675017,
-        "t_stat": 4.265423457107795,
-        "robustness_value": 0.12927055123779568
+        "edge": "Kraken->retail",
+        "coef": 0.1289211666581758,
+        "t_stat": 4.192964351069399,
+        "robustness_value": 0.12741187721472502
       },
       {
         "edge": "Binance->Bybit",
-        "coef": 0.14610417540993598,
-        "t_stat": 4.221351889941741,
-        "robustness_value": 0.1280262687588034
-      },
-      {
-        "edge": "retail->Bitfinex",
-        "coef": 0.1714862713696527,
-        "t_stat": 4.106254680859559,
-        "robustness_value": 0.12458415878188268
-      },
-      {
-        "edge": "retail->HTX",
-        "coef": 0.13651733076763936,
-        "t_stat": 3.9498905485225784,
-        "robustness_value": 0.11996662616892194
-      },
-      {
-        "edge": "Bullish->Coinbase",
-        "coef": 0.12552689777594128,
-        "t_stat": 3.843495494954392,
-        "robustness_value": 0.11734051325647944
+        "coef": 0.14426688721676634,
+        "t_stat": 4.157985639691782,
+        "robustness_value": 0.12623401169199014
       },
       {
         "edge": "retail->Kraken",
-        "coef": 0.12062302469693947,
-        "t_stat": 3.7842349815864145,
-        "robustness_value": 0.1155851248852206
+        "coef": 0.12306519167958407,
+        "t_stat": 3.9644428554458937,
+        "robustness_value": 0.12067667945499513
       },
       {
-        "edge": "retail->Copper",
-        "coef": 0.12395070174947179,
-        "t_stat": 3.7329486313782034,
-        "robustness_value": 0.11360801088153488
+        "edge": "Coinbase->retail",
+        "coef": 0.12061541161546516,
+        "t_stat": 3.9530526904289514,
+        "robustness_value": 0.12059028677157693
       },
       {
-        "edge": "retail->Binance",
-        "coef": 0.12065596412918343,
-        "t_stat": 3.6657153123200277,
-        "robustness_value": 0.11223607988995536
+        "edge": "Binance->Kraken",
+        "coef": 0.1248190643174088,
+        "t_stat": 3.94651690412471,
+        "robustness_value": 0.12016590327793286
+      },
+      {
+        "edge": "Binance->retail",
+        "coef": 0.11825659757967356,
+        "t_stat": 3.852391906448696,
+        "robustness_value": 0.11771174718737966
+      },
+      {
+        "edge": "MakerSky->Coinbase",
+        "coef": 0.13525486875761727,
+        "t_stat": 3.761466756320658,
+        "robustness_value": 0.11493210300821574
+      },
+      {
+        "edge": "retail->OKX",
+        "coef": 0.10733304062778383,
+        "t_stat": 3.2859310643376825,
+        "robustness_value": 0.10107822257360596
+      },
+      {
+        "edge": "Binance->Crypto.com",
+        "coef": 0.10955553925551324,
+        "t_stat": 3.1173419827048447,
+        "robustness_value": 0.09605857062367229
+      },
+      {
+        "edge": "retail->Crypto.com",
+        "coef": 0.1036383256181299,
+        "t_stat": 2.9795028470626037,
+        "robustness_value": 0.09201621741608361
+      },
+      {
+        "edge": "retail->Aave",
+        "coef": 0.10216327298833608,
+        "t_stat": 2.884668746058434,
+        "robustness_value": 0.08913509790039158
       }
     ],
     "note": "RV is the partial-R^2 a hidden confounder needs in both parent and child to nullify the edge; larger = harder to overturn."
@@ -361,15 +723,15 @@
   "resolution_robustness": {
     "common_entities": [
       "retail",
-      "Binance",
-      "Ethena",
-      "Aave",
       "MakerSky",
-      "Lido"
+      "Binance",
+      "Lido",
+      "Aave",
+      "Ethena"
     ],
     "n_common": 6,
-    "spearman": 0.8064516129032258,
-    "p_value": 0.05256621127186068
+    "spearman": 0.6,
+    "p_value": 0.208
   },
   "baselines": {
     "delta_covar": [
@@ -452,13 +814,13 @@
   "ranking_agreement": {
     "entities": [
       "retail",
-      "Binance",
-      "Ethena",
-      "Aave",
       "MakerSky",
-      "Lido"
+      "Binance",
+      "Lido",
+      "Aave",
+      "Ethena"
     ],
-    "spearman_oc_vs_deltacovar": 0.5161002296110789
+    "spearman_oc_vs_deltacovar": 0.2571428571428572
   },
   "backtests": {
     "BTC": {

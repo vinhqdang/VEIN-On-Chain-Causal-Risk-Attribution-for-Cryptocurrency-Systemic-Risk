@@ -2226,50 +2226,80 @@
   },
   "coverage_summary": {
     "oct25_hourly": {
-      "total_usd": 5435474610947.834,
+      "total_usd": 5435474610947.846,
       "shares": {
-        "both_resolved": 0.03945572299356216,
-        "one_side": 0.08514484349337653,
-        "neither": 0.8638973687444643,
-        "mint_burn": 0.01150206476859702
+        "both_resolved": 0.04421273860431253,
+        "both_resolved_distinct": 0.003340491089707319,
+        "both_resolved_same_entity": 0.04087224751460521,
+        "one_side": 0.11738409857300225,
+        "neither": 0.8269010980540884,
+        "mint_burn": 0.011502064768596996
       }
     },
     "ftx_hourly": {
-      "total_usd": 555112448660.9858,
+      "total_usd": 555112448660.9854,
       "shares": {
-        "both_resolved": 0.10027050603864812,
-        "one_side": 0.16128910598239035,
-        "neither": 0.6964389879255374,
-        "mint_burn": 0.042001400053424114
+        "both_resolved": 0.10054080262515411,
+        "both_resolved_distinct": 0.004320102357302812,
+        "both_resolved_same_entity": 0.09622070026785129,
+        "one_side": 0.19431722307987312,
+        "neither": 0.6631405742415486,
+        "mint_burn": 0.04200140005342414
       }
     },
     "svb_hourly": {
-      "total_usd": 560127674787.7473,
+      "total_usd": 560127674787.7463,
       "shares": {
-        "both_resolved": 0.0930631445898423,
-        "one_side": 0.17668054617270734,
-        "neither": 0.7014760660317764,
-        "mint_burn": 0.02878024320567393
+        "both_resolved": 0.09308390133237945,
+        "both_resolved_distinct": 0.002852331081665922,
+        "both_resolved_same_entity": 0.09023157025071352,
+        "one_side": 0.27280992862519265,
+        "neither": 0.6053259268367537,
+        "mint_burn": 0.02878024320567398
       }
     },
     "core_daily": {
-      "total_usd": 646404136562.6743,
+      "total_usd": 646404136562.6967,
       "shares": {
-        "both_resolved": 0.08480068354658875,
-        "one_side": 0.07588755497135297,
-        "neither": 0.7573553473401449,
-        "mint_burn": 0.08195641414191333
+        "both_resolved": 0.08544895870761282,
+        "both_resolved_distinct": 0.00134830491691585,
+        "both_resolved_same_entity": 0.08410065379069694,
+        "one_side": 0.24368049938672884,
+        "neither": 0.5889141277637477,
+        "mint_burn": 0.0819564141419107
+      }
+    },
+    "ftx_ext": {
+      "total_usd": 1182233065246.662,
+      "shares": {
+        "both_resolved": 0.07915386257832337,
+        "both_resolved_distinct": 0.0034991138711433743,
+        "both_resolved_same_entity": 0.07565474870717999,
+        "one_side": 0.16414966419646895,
+        "neither": 0.7182218720839235,
+        "mint_burn": 0.038474601141284266
+      }
+    },
+    "svb_ext": {
+      "total_usd": 1186712954382.2869,
+      "shares": {
+        "both_resolved": 0.09326312199818752,
+        "both_resolved_distinct": 0.003615769057677575,
+        "both_resolved_same_entity": 0.08964735294050993,
+        "one_side": 0.22228629534577754,
+        "neither": 0.6453999457299254,
+        "mint_burn": 0.039050636926109314
       }
     }
   },
   "ledger": {
-    "cumulative_billed_gib": 270.2900390625,
+    "cumulative_billed_gib": 327.4033203125,
     "by_month_gib": {
-      "2026-10": 270.2900390625
+      "2026-10": 327.4033203125
     },
-    "n_entries": 80,
-    "n_dry_runs": 45,
-    "n_queries_billed": 35,
+    "n_entries": 152,
+    "n_dry_runs": 87,
+    "n_queries_billed": 65,
     "n_cache_hits": 0
   },
   "extract_rows": {
@@ -2293,6 +2323,10 @@
       "rows": 230940,
       "bytes": 17159399
     },
+    "x_ftx_ext_c00": {
+      "rows": 10836722,
+      "bytes": 801917428
+    },
     "x_ftx_hourly_c00": {
       "rows": 4226301,
       "bytes": 312746274
@@ -2300,6 +2334,14 @@
     "x_oct25_hourly_c00": {
       "rows": 25443752,
       "bytes": 1882932897
+    },
+    "x_oct25_lido_c00": {
+      "rows": 79922,
+      "bytes": 5994150
+    },
+    "x_svb_ext_c00": {
+      "rows": 11825053,
+      "bytes": 875053922
     },
     "x_svb_hourly_c00": {
       "rows": 4332357,

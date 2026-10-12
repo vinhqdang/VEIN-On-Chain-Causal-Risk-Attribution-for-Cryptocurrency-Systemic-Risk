@@ -2,11 +2,11 @@
   "spec": "daily (results/results.json)",
   "source": "results/results.json",
   "T": 7,
-  "n_entities": 17,
-  "spectral_radius": 0.24404597474464845,
+  "n_entities": 15,
+  "spectral_radius": 0.5690881341992519,
   "bounds": [
     {
-      "entity": "Aave",
+      "entity": "HTX",
       "stored_E": 0.0,
       "B_plus_per_unit": 0.0,
       "implied_min_s_star": null,
@@ -14,7 +14,7 @@
       "status": "zero_predicted_zero_observed"
     },
     {
-      "entity": "MakerSky",
+      "entity": "Bitfinex",
       "stored_E": 0.0,
       "B_plus_per_unit": 0.0,
       "implied_min_s_star": null,
@@ -24,33 +24,17 @@
     {
       "entity": "FalconX",
       "stored_E": 0.0,
-      "B_plus_per_unit": 0.11187160738729843,
+      "B_plus_per_unit": 0.05758700643666749,
       "implied_min_s_star": 0.0,
-      "infinite_horizon_multiplier": 0.023000019001176774,
+      "infinite_horizon_multiplier": 0.014108423027691443,
       "status": "bounded"
     },
     {
-      "entity": "Bybit",
-      "stored_E": 0.6816806033054237,
-      "B_plus_per_unit": 0.7103810731835136,
-      "implied_min_s_star": 0.9595984874013166,
-      "infinite_horizon_multiplier": 0.1212629570182946,
-      "status": "bounded"
-    },
-    {
-      "entity": "Coinbase",
-      "stored_E": 0.0,
-      "B_plus_per_unit": 0.0,
-      "implied_min_s_star": null,
-      "infinite_horizon_multiplier": 0.0,
-      "status": "zero_predicted_zero_observed"
-    },
-    {
-      "entity": "Binance",
-      "stored_E": 0.005437944799627559,
-      "B_plus_per_unit": 0.014808975085291507,
-      "implied_min_s_star": 0.3672060198837532,
-      "infinite_horizon_multiplier": 0.00229319997700786,
+      "entity": "Aave",
+      "stored_E": 5.9157610324705345,
+      "B_plus_per_unit": 3.906200476829818,
+      "implied_min_s_star": 1.5144540244569398,
+      "infinite_horizon_multiplier": 0.6822313448493811,
       "status": "bounded"
     },
     {
@@ -62,15 +46,31 @@
       "status": "zero_predicted_zero_observed"
     },
     {
-      "entity": "Ethena",
-      "stored_E": 0.035224066737020054,
-      "B_plus_per_unit": 0.21271457505175959,
-      "implied_min_s_star": 0.16559310394433022,
-      "infinite_horizon_multiplier": 0.03776113013192218,
+      "entity": "Lido",
+      "stored_E": 6.1852968378292115,
+      "B_plus_per_unit": 3.1510772779152907,
+      "implied_min_s_star": 1.9629149945574544,
+      "infinite_horizon_multiplier": 0.6746856084464151,
       "status": "bounded"
     },
     {
-      "entity": "HTX",
+      "entity": "Ethena",
+      "stored_E": 0.07620891519551076,
+      "B_plus_per_unit": 0.24281541568561818,
+      "implied_min_s_star": 0.3138553414342571,
+      "infinite_horizon_multiplier": 0.04127757331794823,
+      "status": "bounded"
+    },
+    {
+      "entity": "MakerSky",
+      "stored_E": 1.2799188479461907,
+      "B_plus_per_unit": 1.7804804122408564,
+      "implied_min_s_star": 0.7188615157722096,
+      "infinite_horizon_multiplier": 0.37275473661284064,
+      "status": "bounded"
+    },
+    {
+      "entity": "Coinbase",
       "stored_E": 0.0,
       "B_plus_per_unit": 0.0,
       "implied_min_s_star": null,
@@ -78,11 +78,27 @@
       "status": "zero_predicted_zero_observed"
     },
     {
-      "entity": "Copper",
-      "stored_E": 0.09821093240367174,
-      "B_plus_per_unit": 2.06562982162822,
-      "implied_min_s_star": 0.04754527233067228,
-      "infinite_horizon_multiplier": 0.35147658597341863,
+      "entity": "Ceffu",
+      "stored_E": 0.01613795501642601,
+      "B_plus_per_unit": 0.0369064070059011,
+      "implied_min_s_star": 0.4372670310021144,
+      "infinite_horizon_multiplier": 0.009053075286621123,
+      "status": "bounded"
+    },
+    {
+      "entity": "Binance",
+      "stored_E": 0.0007235461888295269,
+      "B_plus_per_unit": 0.004612642902083226,
+      "implied_min_s_star": 0.15686152259971153,
+      "infinite_horizon_multiplier": 0.0009323236455148516,
+      "status": "bounded"
+    },
+    {
+      "entity": "Bybit",
+      "stored_E": 0.024988606981924733,
+      "B_plus_per_unit": 0.03429686072696684,
+      "implied_min_s_star": 0.7285974999535967,
+      "infinite_horizon_multiplier": 0.006810941881109326,
       "status": "bounded"
     },
     {
@@ -94,55 +110,23 @@
       "status": "zero_predicted_zero_observed"
     },
     {
-      "entity": "Bullish",
-      "stored_E": 0.0,
-      "B_plus_per_unit": 0.0,
-      "implied_min_s_star": null,
-      "infinite_horizon_multiplier": 0.0,
-      "status": "zero_predicted_zero_observed"
-    },
-    {
-      "entity": "Ceffu",
-      "stored_E": 0.05481856445052635,
-      "B_plus_per_unit": 0.09890310023383696,
-      "implied_min_s_star": 0.5542653801642075,
-      "infinite_horizon_multiplier": 0.020365779138296312,
+      "entity": "Copper",
+      "stored_E": 0.0021050282149701616,
+      "B_plus_per_unit": 0.3653053941656607,
+      "implied_min_s_star": 0.005762379227325512,
+      "infinite_horizon_multiplier": 0.060874691796470586,
       "status": "bounded"
-    },
-    {
-      "entity": "Bitfinex",
-      "stored_E": 0.0,
-      "B_plus_per_unit": 0.0,
-      "implied_min_s_star": null,
-      "infinite_horizon_multiplier": 0.0,
-      "status": "zero_predicted_zero_observed"
-    },
-    {
-      "entity": "Lido",
-      "stored_E": 11.464615097787316,
-      "B_plus_per_unit": 3.7836000000000007,
-      "implied_min_s_star": 3.0300811655004,
-      "infinite_horizon_multiplier": 0.6306,
-      "status": "bounded"
-    },
-    {
-      "entity": "Crypto.com",
-      "stored_E": 0.0,
-      "B_plus_per_unit": 0.0,
-      "implied_min_s_star": null,
-      "infinite_horizon_multiplier": 0.0,
-      "status": "zero_predicted_zero_observed"
     },
     {
       "entity": "retail",
-      "stored_E": 0.36617177932497547,
-      "B_plus_per_unit": 0.5197112476571386,
-      "implied_min_s_star": 0.7045677402128201,
-      "infinite_horizon_multiplier": 0.08823413498393992,
+      "stored_E": 7.92436309145152,
+      "B_plus_per_unit": 4.41425186509807,
+      "implied_min_s_star": 1.795176925473297,
+      "infinite_horizon_multiplier": 0.7367495765686658,
       "status": "bounded"
     }
   ],
-  "n_zero_predicted": 9,
+  "n_zero_predicted": 5,
   "n_violations": 0,
   "shapley_verification": {
     "seed": 7,
@@ -174,22 +158,28 @@
       {
         "target": "Aave",
         "players": [
+          "HTX",
+          "retail",
           "Ethena",
           "Lido"
         ],
-        "p": 2,
+        "p": 4,
         "phi_closed_form": {
-          "Ethena": -0.20427710786380227,
-          "Lido": -1.9090855929358992
+          "HTX": 0.0,
+          "retail": 1.479254669716661,
+          "Ethena": 0.07932338710265023,
+          "Lido": -1.1451665016967851
         },
         "phi_subsets": {
-          "Ethena": -0.2042771078638022,
-          "Lido": -1.9090855929358992
+          "HTX": 0.0,
+          "retail": 1.4792546697166609,
+          "Ethena": 0.07932338710265027,
+          "Lido": -1.1451665016967856
         },
-        "max_abs_diff_closed_vs_subsets": 5.551115123125783e-17,
-        "efficiency_residual": 0.0,
-        "max_abs_diff_subsets_vs_permutations": 0.0,
-        "hinge_max_abs_diff_vs_linear": 0.0265148893786345
+        "max_abs_diff_closed_vs_subsets": 4.440892098500626e-16,
+        "efficiency_residual": 1.6653345369377348e-16,
+        "max_abs_diff_subsets_vs_permutations": 2.220446049250313e-16,
+        "hinge_max_abs_diff_vs_linear": 0.11838285738609011
       },
       {
         "target": "Bybit",
@@ -203,45 +193,25 @@
         ],
         "p": 6,
         "phi_closed_form": {
-          "Binance": 0.07793023787753658,
+          "Binance": 4.9106166039467e-05,
           "Coinbase": 0.0,
-          "Copper": -0.18371035913277495,
+          "Copper": 0.08557084472116493,
           "HTX": 0.0,
           "OKX": 0.0,
-          "retail": -0.02398690884169958
+          "retail": 0.11987465181299753
         },
         "phi_subsets": {
-          "Binance": 0.0779302378775366,
+          "Binance": 4.910616603947e-05,
           "Coinbase": 0.0,
-          "Copper": -0.18371035913277503,
+          "Copper": 0.08557084472116488,
           "HTX": 0.0,
           "OKX": 0.0,
-          "retail": -0.023986908841699597
+          "retail": 0.11987465181299752
         },
-        "max_abs_diff_closed_vs_subsets": 8.326672684688674e-17,
-        "efficiency_residual": 5.551115123125783e-17,
-        "max_abs_diff_subsets_vs_permutations": 3.0531133177191805e-16,
-        "hinge_max_abs_diff_vs_linear": 0.06109763786999009
-      },
-      {
-        "target": "Crypto.com",
-        "players": [
-          "Binance",
-          "retail"
-        ],
-        "p": 2,
-        "phi_closed_form": {
-          "Binance": 0.0,
-          "retail": 0.0
-        },
-        "phi_subsets": {
-          "Binance": 0.0,
-          "retail": 0.0
-        },
-        "max_abs_diff_closed_vs_subsets": 0.0,
-        "efficiency_residual": 0.0,
-        "max_abs_diff_subsets_vs_permutations": 0.0,
-        "hinge_max_abs_diff_vs_linear": 0.0
+        "max_abs_diff_closed_vs_subsets": 4.163336342344337e-17,
+        "efficiency_residual": 2.7755575615628914e-17,
+        "max_abs_diff_subsets_vs_permutations": 4.718447854656915e-16,
+        "hinge_max_abs_diff_vs_linear": 0.06970330987690453
       },
       {
         "target": "OKX",
@@ -276,10 +246,15 @@
         "hinge_max_abs_diff_vs_linear": 0.0
       }
     ],
-    "skipped": [],
-    "walk_vs_subsets_max": 8.326672684688674e-17,
-    "subsets_vs_permutations_max": 3.0531133177191805e-16,
-    "efficiency_max": 5.551115123125783e-17
+    "skipped": [
+      {
+        "target": "Crypto.com",
+        "reason": "not an entity"
+      }
+    ],
+    "walk_vs_subsets_max": 4.440892098500626e-16,
+    "subsets_vs_permutations_max": 4.718447854656915e-16,
+    "efficiency_max": 1.6653345369377348e-16
   },
   "evaluation_counts": [
     {
@@ -342,72 +317,70 @@
     "target": "retail",
     "p": 13,
     "n_evaluations": 8192,
-    "seconds": 0.20185365899988028,
+    "seconds": 0.2350617609999972,
     "machine_dependent": true,
-    "closed_vs_subsets_max": 4.218847493575595e-15
+    "closed_vs_subsets_max": 4.440892098500626e-15
   },
   "certified_radius": {
     "Lambda": {
-      "Aave": 0.0,
-      "MakerSky": 0.0,
-      "FalconX": 0.11187160738729843,
-      "Bybit": 0.7103810731835136,
-      "Coinbase": 0.0,
-      "Binance": 0.014808975085291508,
-      "Kraken": 0.0,
-      "Ethena": 0.2127145750517596,
       "HTX": 0.0,
-      "Copper": 2.06562982162822,
-      "OKX": 0.0,
-      "Bullish": 0.0,
-      "Ceffu": 0.09890310023383694,
       "Bitfinex": 0.0,
-      "Lido": 3.7836000000000003,
-      "Crypto.com": 0.0,
-      "retail": 0.5197112476571386
+      "FalconX": 0.05758700643666749,
+      "Aave": 3.9062004768298184,
+      "Kraken": 0.0,
+      "Lido": 3.151077277915291,
+      "Ethena": 0.2428154156856182,
+      "MakerSky": 1.7804804122408562,
+      "Coinbase": 0.0,
+      "Ceffu": 0.03690640700590111,
+      "Binance": 0.004612642902083226,
+      "Bybit": 0.034296860726966846,
+      "OKX": 0.0,
+      "Copper": 0.36530539416566066,
+      "retail": 4.414251865098069
     },
     "ranking": [
-      "Lido",
-      "Copper",
-      "Bybit",
       "retail",
-      "Ethena"
+      "Aave",
+      "Lido",
+      "MakerSky",
+      "Copper"
     ],
     "pairs": [
       {
         "pair": [
+          "retail",
+          "Aave"
+        ],
+        "gap": 0.5080513882682505,
+        "eps_star": 0.047482805767256824,
+        "at_least_one": false
+      },
+      {
+        "pair": [
+          "Aave",
+          "Lido"
+        ],
+        "gap": 0.7551231989145273,
+        "eps_star": 0.06430951208351164,
+        "at_least_one": false
+      },
+      {
+        "pair": [
           "Lido",
+          "MakerSky"
+        ],
+        "gap": 1.370596865674435,
+        "eps_star": 0.13370338488861455,
+        "at_least_one": false
+      },
+      {
+        "pair": [
+          "MakerSky",
           "Copper"
         ],
-        "gap": 1.7179701783717802,
-        "eps_star": 0.25553985535394325,
-        "at_least_one": false
-      },
-      {
-        "pair": [
-          "Copper",
-          "Bybit"
-        ],
-        "gap": 1.3552487484447064,
-        "eps_star": 0.33295155047007513,
-        "at_least_one": false
-      },
-      {
-        "pair": [
-          "Bybit",
-          "retail"
-        ],
-        "gap": 0.19066982552637501,
-        "eps_star": 0.07564769492729939,
-        "at_least_one": false
-      },
-      {
-        "pair": [
-          "retail",
-          "Ethena"
-        ],
-        "gap": 0.306996672605379,
-        "eps_star": 0.05836241197377012,
+        "gap": 1.4151750180751956,
+        "eps_star": 0.3050270553496393,
         "at_least_one": false
       }
     ]

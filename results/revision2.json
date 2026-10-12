@@ -3,36 +3,36 @@
   "data_backend": "bigquery",
   "nonflow_H1": {
     "contemporaneous": {
-      "observed_wrmse": 1.6840184272784038,
-      "granger_wrmse": 1.3586950287519928,
-      "observed_dir_acc": 0.6701388888888888,
+      "observed_wrmse": 1.628311987584123,
+      "granger_wrmse": 1.358709675800242,
+      "observed_dir_acc": 0.71875,
       "granger_dir_acc": 0.78125,
       "observed_better": false
     },
     "lagged": {
-      "observed_wrmse": 1.682072986983124,
-      "granger_wrmse": 1.3586960105576023,
-      "observed_dir_acc": 0.6666666666666666,
+      "observed_wrmse": 1.6309611270010698,
+      "granger_wrmse": 1.3587303462157345,
+      "observed_dir_acc": 0.7013888888888888,
       "granger_dir_acc": 0.78125,
       "observed_better": false
     }
   },
   "nonflow_falsification": {
-    "true": 1.0296337473525041,
-    "reversed": 1.132107503321219,
-    "symmetric": 0.9463538339899268
+    "true": 1.0913902943762457,
+    "reversed": 1.003547234108176,
+    "symmetric": 1.001743256954486
   },
   "ranking_stability": {
     "base_top5": [
       "retail",
-      "OKX",
-      "Coinbase",
+      "HTX",
+      "Aave",
       "Bybit",
-      "HTX"
+      "OKX"
     ],
-    "mean_spearman_vs_base": 0.9890640394088669,
-    "min_spearman": 0.9704433497536944,
-    "mean_top3_overlap": 0.92,
+    "mean_spearman_vs_base": 0.9638571428571425,
+    "min_spearman": 0.9107142857142855,
+    "mean_top3_overlap": 0.7866666666666667,
     "n_perturbations": 25
   }
 }

@@ -3,48 +3,45 @@
   "data_backend": "bigquery",
   "base_top5": [
     "retail",
+    "MakerSky",
     "Coinbase",
-    "Kraken",
     "Binance",
-    "Bitfinex"
+    "Kraken"
   ],
   "n_edges_with_rv": 15,
   "drop_low_rv": {
-    "n_total_edges": 100,
-    "n_dropped": 25,
+    "n_total_edges": 90,
+    "n_dropped": 22,
     "dropped": [
-      "Copper->OKX",
-      "Bybit->OKX",
       "Bitfinex->Bybit",
-      "Bullish->Bybit",
-      "Coinbase->HTX",
-      "Copper->Bybit",
-      "Bullish->retail",
-      "Copper->Bullish",
-      "Bitfinex->Binance",
-      "FalconX->Binance",
-      "Bybit->Bullish",
-      "FalconX->retail",
       "Crypto.com->Bitfinex",
-      "Copper->retail",
-      "OKX->FalconX",
-      "Kraken->Binance",
-      "Lido->Aave",
-      "Bybit->Coinbase",
-      "HTX->OKX",
-      "OKX->Bybit",
-      "Coinbase->Binance",
-      "Ethena->Aave",
-      "OKX->Ceffu",
+      "HTX->Binance",
       "Bybit->Kraken",
-      "Crypto.com->Coinbase"
+      "Kraken->Binance",
+      "Coinbase->OKX",
+      "MakerSky->Bybit",
+      "OKX->Ceffu",
+      "Coinbase->Binance",
+      "Coinbase->HTX",
+      "Copper->retail",
+      "HTX->Kraken",
+      "Kraken->Coinbase",
+      "Copper->OKX",
+      "retail->Bybit",
+      "OKX->Bybit",
+      "Bitfinex->Binance",
+      "Bybit->OKX",
+      "HTX->Aave",
+      "MakerSky->Binance",
+      "Copper->Bybit",
+      "HTX->Crypto.com"
     ],
-    "ranking_spearman_vs_base": 0.9926108374384235,
+    "ranking_spearman_vs_base": 0.9892857142857142,
     "top5_after_drop": [
       "retail",
-      "Coinbase",
+      "MakerSky",
       "Binance",
-      "Kraken",
+      "Coinbase",
       "Bitfinex"
     ],
     "top3_overlap": 0.6666666666666666
@@ -52,25 +49,25 @@
   "latent_shock": {
     "moderate": {
       "strength": 0.3,
-      "ranking_spearman_vs_base": 0.9366948928936221,
+      "ranking_spearman_vs_base": 0.9857142857142854,
       "top5": [
         "retail",
         "Coinbase",
         "Binance",
-        "Kraken",
-        "Bitfinex"
+        "MakerSky",
+        "Kraken"
       ],
       "top3_overlap": 0.6666666666666666
     },
     "strong": {
       "strength": 0.6,
-      "ranking_spearman_vs_base": 0.9563630271276088,
+      "ranking_spearman_vs_base": 0.9035714285714285,
       "top5": [
         "retail",
         "Kraken",
+        "MakerSky",
         "Binance",
-        "Bitfinex",
-        "Coinbase"
+        "Bitfinex"
       ],
       "top3_overlap": 0.6666666666666666
     }

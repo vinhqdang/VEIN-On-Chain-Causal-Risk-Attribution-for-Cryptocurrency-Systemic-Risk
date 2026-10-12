@@ -1,114 +1,900 @@
 {
   "generated": "2026-10-12",
   "data_backend": "bigquery",
+  "primary_resolution": "hour",
   "events": [
     {
       "event": "FTX_Nov2022",
+      "resolution": "hour",
       "ok": true,
-      "n_entities": 11,
-      "n_pre_days": 7,
-      "n_event_days": 4,
-      "n_edges": 44,
+      "window": [
+        "2022-10-01",
+        "2022-11-16"
+      ],
+      "event_window": [
+        "2022-11-08 00:00:00",
+        "2022-11-11 23:00:00"
+      ],
+      "entities": [
+        "Aave",
+        "Binance",
+        "Bitfinex",
+        "Coinbase",
+        "Crypto.com",
+        "FTX",
+        "FalconX",
+        "HTX",
+        "Kraken",
+        "KuCoin",
+        "Lido",
+        "MakerSky",
+        "OKX",
+        "retail"
+      ],
+      "n_entities": 14,
+      "zero_stress_dropped": [],
+      "stress_components": {
+        "Aave": {
+          "used": [
+            "flow",
+            "drawdown:AAVE"
+          ],
+          "dropped": {},
+          "fit_std": 0.7854049276249985
+        },
+        "Binance": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7890367701632544
+        },
+        "Bitfinex": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.6610285199853226
+        },
+        "Coinbase": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7970935701090824
+        },
+        "Crypto.com": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.633263858557925
+        },
+        "FTX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7403645480653178
+        },
+        "FalconX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.8028321287583858
+        },
+        "HTX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7055513883665652
+        },
+        "Kraken": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.8418533959907744
+        },
+        "KuCoin": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7685863207665184
+        },
+        "Lido": {
+          "used": [
+            "discount:stETH/ETH"
+          ],
+          "dropped": {
+            "lido_redeem": "no Lido series"
+          },
+          "fit_std": 1.1577228935263224
+        },
+        "MakerSky": {
+          "used": [
+            "flow",
+            "peg:DAI"
+          ],
+          "dropped": {},
+          "fit_std": 0.6583165984918308
+        },
+        "OKX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7638718464252403
+        },
+        "retail": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.796295801554559
+        }
+      },
+      "n_fit_rows": 912,
+      "n_event_rows": 96,
+      "n_edges": 81,
+      "k_max": 25,
+      "min_rows_required": 240,
+      "block_len": 24,
       "oc_ranking": [
         {
-          "entity": "retail",
-          "exported_risk": 1.5575017729364182
+          "entity": "FTX",
+          "exported_risk": 82.84447520724714,
+          "rank_point": 1,
+          "rank_ci95": [
+            1.0,
+            3.0
+          ],
+          "p_top3": 1.0
         },
         {
-          "entity": "FTX",
-          "exported_risk": 0.6172991341786009
+          "entity": "retail",
+          "exported_risk": 73.04840466088463,
+          "rank_point": 2,
+          "rank_ci95": [
+            1.0,
+            3.0
+          ],
+          "p_top3": 0.99
         },
         {
           "entity": "Binance",
-          "exported_risk": 0.241527852922633
+          "exported_risk": 49.02049664895658,
+          "rank_point": 3,
+          "rank_ci95": [
+            1.0,
+            6.0
+          ],
+          "p_top3": 0.62
+        },
+        {
+          "entity": "KuCoin",
+          "exported_risk": 36.688948207101944,
+          "rank_point": 4,
+          "rank_ci95": [
+            2.0,
+            7.0
+          ],
+          "p_top3": 0.24
         },
         {
           "entity": "Coinbase",
-          "exported_risk": 0.1975804884107486
-        },
-        {
-          "entity": "Bybit",
-          "exported_risk": 0.15308666775653545
+          "exported_risk": 32.11872601478604,
+          "rank_point": 5,
+          "rank_ci95": [
+            3.0,
+            9.0
+          ],
+          "p_top3": 0.11
         },
         {
           "entity": "OKX",
-          "exported_risk": 0.10365509090793568
+          "exported_risk": 23.653041125439756,
+          "rank_point": 6,
+          "rank_ci95": [
+            5.0,
+            10.0
+          ],
+          "p_top3": 0.005
         }
       ],
+      "oc_ranking_settings": {
+        "n_sims": 1000,
+        "seed": 7,
+        "block_len": 24,
+        "n_boot": 200,
+        "n_sims_boot": 300,
+        "seed_boot": 20251010,
+        "s_star_q": 0.95
+      },
       "falsification": [
         {
           "model": "true_direction",
-          "rmse": 1.7065011419137732,
-          "corr": 0.014610503667045723,
-          "n": 44
+          "rmse": 1.3019457881979442,
+          "corr": 0.09066064827268404,
+          "n": 1344
         },
         {
           "model": "reversed_edges",
-          "rmse": 1.4023875140470299,
-          "corr": 0.04546134314597929,
-          "n": 44
+          "rmse": 1.2986542187346262,
+          "corr": 0.09223115509090457,
+          "n": 1344
         },
         {
           "model": "symmetric",
-          "rmse": 1.8034293917978461,
-          "corr": -0.027653161505686513,
-          "n": 44
+          "rmse": 1.299502658354291,
+          "corr": 0.0972829710420991,
+          "n": 1344
         }
-      ]
+      ],
+      "falsification_ci": {
+        "reversed_minus_true": {
+          "mean_diff": -0.00047794499146597123,
+          "ci95": [
+            -0.0029057209577383314,
+            0.001133297301171557
+          ],
+          "prob_observed_better": 0.18,
+          "status": "inconclusive",
+          "block_len": 24,
+          "replicates": 500
+        },
+        "symmetric_minus_true": {
+          "mean_diff": -0.0006678567164020991,
+          "ci95": [
+            -0.0038025049628381048,
+            0.0011762744129888418
+          ],
+          "prob_observed_better": 0.112,
+          "status": "inconclusive",
+          "block_len": 24,
+          "replicates": 500
+        }
+      },
+      "placebo_rolling": {
+        "event_stat": 0.37317781249635107,
+        "calm_stats": [
+          0.24677413445808902,
+          0.17722250094606742,
+          0.130821072619022,
+          0.23553665631595905,
+          0.2944835182745,
+          0.32915288900700945,
+          0.404340320741484,
+          0.2690445099719706,
+          0.15499830654546806,
+          0.1446251675869508,
+          0.2987668357526654,
+          0.3274284083186014,
+          0.3669852358566469,
+          0.3770955167006108,
+          0.18500696421802734,
+          0.10226368585972878,
+          0.11057987044114174,
+          0.2700871832337452,
+          0.3776569285221382,
+          0.44220952982674844,
+          0.42147796837186363,
+          0.28193764826970646,
+          0.15746899411792642,
+          0.102134407618032,
+          0.27329202146423054,
+          0.2680080001542318,
+          0.30726037664781475,
+          0.3718833184569725,
+          0.18920917330789003,
+          0.13004796774588742,
+          0.14094324831499874
+        ],
+        "n_windows": 31,
+        "n_connected_pairs": 156,
+        "p_value": 0.1875,
+        "passes": false
+      },
+      "calm_window": {
+        "window": [
+          "2022-10-12 00:00:00",
+          "2022-10-13 23:00:00"
+        ],
+        "n_rows": 48,
+        "stat": 0.11361355443754985
+      },
+      "usdc_peg_min": 0.9912607556561123,
+      "daily_robustness": {
+        "event": "FTX_Nov2022",
+        "resolution": "day",
+        "ok": false,
+        "window": [
+          "2022-10-01",
+          "2022-11-16"
+        ],
+        "event_window": [
+          "2022-11-08 00:00:00",
+          "2022-11-11 23:00:00"
+        ],
+        "entities": [
+          "Aave",
+          "Binance",
+          "Bitfinex",
+          "Coinbase",
+          "Crypto.com",
+          "FTX",
+          "FalconX",
+          "HTX",
+          "Kraken",
+          "KuCoin",
+          "Lido",
+          "MakerSky",
+          "OKX",
+          "retail"
+        ],
+        "n_entities": 14,
+        "zero_stress_dropped": [],
+        "stress_components": {
+          "Aave": {
+            "used": [
+              "flow",
+              "drawdown:AAVE"
+            ],
+            "dropped": {},
+            "fit_std": 0.6848125060972773
+          },
+          "Binance": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.7752156856634752
+          },
+          "Bitfinex": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.3919906615059483
+          },
+          "Coinbase": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.6961547358979547
+          },
+          "Crypto.com": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.5412602689612905
+          },
+          "FTX": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.6905174871469161
+          },
+          "FalconX": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.6198718556870209
+          },
+          "HTX": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.8017483330382118
+          },
+          "Kraken": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.7588686913619951
+          },
+          "KuCoin": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.7823173879125672
+          },
+          "Lido": {
+            "used": [
+              "discount:stETH/ETH"
+            ],
+            "dropped": {
+              "lido_redeem": "no Lido series"
+            },
+            "fit_std": 1.102214254064942
+          },
+          "MakerSky": {
+            "used": [
+              "flow",
+              "peg:DAI"
+            ],
+            "dropped": {},
+            "fit_std": 0.6331460615277587
+          },
+          "OKX": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.6469008850680513
+          },
+          "retail": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.7089786299105866
+          }
+        },
+        "n_fit_rows": 38,
+        "n_event_rows": 4,
+        "n_edges": 54,
+        "k_max": 25,
+        "min_rows_required": 125,
+        "block_len": 3,
+        "reason": "underpowered"
+      }
     },
     {
       "event": "USDC_SVB_Mar2023",
+      "resolution": "hour",
       "ok": true,
-      "n_entities": 12,
-      "n_pre_days": 9,
-      "n_event_days": 4,
-      "n_edges": 45,
+      "window": [
+        "2023-02-01",
+        "2023-03-16"
+      ],
+      "event_window": [
+        "2023-03-10 00:00:00",
+        "2023-03-13 23:00:00"
+      ],
+      "entities": [
+        "Aave",
+        "Binance",
+        "Bitfinex",
+        "Bybit",
+        "Coinbase",
+        "Crypto.com",
+        "FalconX",
+        "HTX",
+        "Kraken",
+        "KuCoin",
+        "Lido",
+        "MakerSky",
+        "OKX",
+        "retail"
+      ],
+      "n_entities": 14,
+      "zero_stress_dropped": [],
+      "stress_components": {
+        "Aave": {
+          "used": [
+            "flow",
+            "drawdown:AAVE"
+          ],
+          "dropped": {},
+          "fit_std": 0.7555734175387475
+        },
+        "Binance": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7736909288882633
+        },
+        "Bitfinex": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.6133260381173228
+        },
+        "Bybit": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7106570636389704
+        },
+        "Coinbase": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.8338789114449945
+        },
+        "Crypto.com": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7546556257184804
+        },
+        "FalconX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.5671454014181735
+        },
+        "HTX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.835897363325739
+        },
+        "Kraken": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.707002784688336
+        },
+        "KuCoin": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7286276792156353
+        },
+        "Lido": {
+          "used": [
+            "discount:stETH/ETH"
+          ],
+          "dropped": {
+            "lido_redeem": "no Lido series"
+          },
+          "fit_std": 1.1384874301262926
+        },
+        "MakerSky": {
+          "used": [
+            "flow",
+            "peg:DAI"
+          ],
+          "dropped": {},
+          "fit_std": 0.6614394885161357
+        },
+        "OKX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7679804660267339
+        },
+        "retail": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7687042076109571
+        }
+      },
+      "n_fit_rows": 888,
+      "n_event_rows": 96,
+      "n_edges": 85,
+      "k_max": 25,
+      "min_rows_required": 240,
+      "block_len": 24,
       "oc_ranking": [
         {
           "entity": "retail",
-          "exported_risk": 1.7554137421087153
+          "exported_risk": 94.08259857671084,
+          "rank_point": 1,
+          "rank_ci95": [
+            1.0,
+            2.0
+          ],
+          "p_top3": 1.0
         },
         {
-          "entity": "OKX",
-          "exported_risk": 0.997354666195672
-        },
-        {
-          "entity": "Kraken",
-          "exported_risk": 0.904665136647356
+          "entity": "Binance",
+          "exported_risk": 58.97231273549602,
+          "rank_point": 2,
+          "rank_ci95": [
+            1.0,
+            5.0
+          ],
+          "p_top3": 0.875
         },
         {
           "entity": "Coinbase",
-          "exported_risk": 0.8594055901411988
+          "exported_risk": 47.44989939349538,
+          "rank_point": 3,
+          "rank_ci95": [
+            2.0,
+            8.0
+          ],
+          "p_top3": 0.56
         },
         {
-          "entity": "Crypto.com",
-          "exported_risk": 0.7294656054410826
+          "entity": "OKX",
+          "exported_risk": 44.4004010916321,
+          "rank_point": 4,
+          "rank_ci95": [
+            2.0,
+            7.0
+          ],
+          "p_top3": 0.41
         },
         {
           "entity": "Bybit",
-          "exported_risk": 0.6985597647609514
+          "exported_risk": 34.68959743118185,
+          "rank_point": 5,
+          "rank_ci95": [
+            3.0,
+            10.0
+          ],
+          "p_top3": 0.095
+        },
+        {
+          "entity": "KuCoin",
+          "exported_risk": 29.31974492019518,
+          "rank_point": 6,
+          "rank_ci95": [
+            3.0,
+            10.0
+          ],
+          "p_top3": 0.05
         }
       ],
+      "oc_ranking_settings": {
+        "n_sims": 1000,
+        "seed": 7,
+        "block_len": 24,
+        "n_boot": 200,
+        "n_sims_boot": 300,
+        "seed_boot": 20251010,
+        "s_star_q": 0.95
+      },
       "falsification": [
         {
           "model": "true_direction",
-          "rmse": 1.293586552350375,
-          "corr": 0.06654196479214401,
-          "n": 48
+          "rmse": 1.6514346653288114,
+          "corr": 0.2382306249607885,
+          "n": 1344
         },
         {
           "model": "reversed_edges",
-          "rmse": 1.2963959439103083,
-          "corr": 0.07021963202151976,
-          "n": 48
+          "rmse": 1.655133928682394,
+          "corr": 0.23025505556108128,
+          "n": 1344
         },
         {
           "model": "symmetric",
-          "rmse": 1.2844801306016755,
-          "corr": 0.07293728314419183,
-          "n": 48
+          "rmse": 1.652808822669151,
+          "corr": 0.23323114382454574,
+          "n": 1344
         }
-      ]
+      ],
+      "falsification_ci": {
+        "reversed_minus_true": {
+          "mean_diff": 0.0032529380712853066,
+          "ci95": [
+            -0.003004971481970547,
+            0.008456005413004465
+          ],
+          "prob_observed_better": 0.608,
+          "status": "inconclusive",
+          "block_len": 24,
+          "replicates": 500
+        },
+        "symmetric_minus_true": {
+          "mean_diff": 0.0024048686078709824,
+          "ci95": [
+            -0.0013664171628915568,
+            0.004820199220068894
+          ],
+          "prob_observed_better": 0.732,
+          "status": "inconclusive",
+          "block_len": 24,
+          "replicates": 500
+        }
+      },
+      "placebo_rolling": {
+        "event_stat": 0.5372857092300817,
+        "calm_stats": [
+          0.361548307973592,
+          0.4355489967143009,
+          0.4961662238493787,
+          0.3533299410201378,
+          0.2519913674927526,
+          0.20607247908200416,
+          0.4743960982782938,
+          0.44676749966713275,
+          0.4813893024197296,
+          0.48213955290161753,
+          0.15875414189664985,
+          0.07877000422308122,
+          0.08429633519438862,
+          0.19326323653508687,
+          0.368080419260049,
+          0.45867478065751227,
+          0.4773004995349955,
+          0.3450730929664995,
+          0.13724664764981206,
+          0.11066573965540887,
+          0.2185177276502128,
+          0.2215129806095387,
+          0.2866999542938174,
+          0.3618959193121693,
+          0.2883179965420044,
+          0.20899802361064834,
+          0.16140355492580505,
+          0.2778183850501843,
+          0.3303973216067217,
+          0.3467761348353118
+        ],
+        "n_windows": 30,
+        "n_connected_pairs": 156,
+        "p_value": 0.03225806451612903,
+        "passes": true
+      },
+      "calm_window": {
+        "window": [
+          "2023-02-22 00:00:00",
+          "2023-02-23 23:00:00"
+        ],
+        "n_rows": 48,
+        "stat": 0.10693997568630127
+      },
+      "usdc_peg_min": 0.876675,
+      "daily_robustness": {
+        "event": "USDC_SVB_Mar2023",
+        "resolution": "day",
+        "ok": false,
+        "window": [
+          "2023-02-01",
+          "2023-03-16"
+        ],
+        "event_window": [
+          "2023-03-10 00:00:00",
+          "2023-03-13 23:00:00"
+        ],
+        "entities": [
+          "Aave",
+          "Binance",
+          "Bitfinex",
+          "Bybit",
+          "Coinbase",
+          "Crypto.com",
+          "FalconX",
+          "HTX",
+          "Kraken",
+          "KuCoin",
+          "Lido",
+          "MakerSky",
+          "OKX",
+          "retail"
+        ],
+        "n_entities": 14,
+        "zero_stress_dropped": [],
+        "stress_components": {
+          "Aave": {
+            "used": [
+              "flow",
+              "drawdown:AAVE"
+            ],
+            "dropped": {},
+            "fit_std": 0.5003670955377177
+          },
+          "Binance": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.7325679234927879
+          },
+          "Bitfinex": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 1.010626668192105
+          },
+          "Bybit": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.705790872229793
+          },
+          "Coinbase": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.7889128768340027
+          },
+          "Crypto.com": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.4849871959370294
+          },
+          "FalconX": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.7410855383101014
+          },
+          "HTX": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.8452080388786808
+          },
+          "Kraken": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.7283823713791486
+          },
+          "KuCoin": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.7359301457615777
+          },
+          "Lido": {
+            "used": [
+              "discount:stETH/ETH"
+            ],
+            "dropped": {
+              "lido_redeem": "no Lido series"
+            },
+            "fit_std": 1.0173331081074881
+          },
+          "MakerSky": {
+            "used": [
+              "flow",
+              "peg:DAI"
+            ],
+            "dropped": {},
+            "fit_std": 0.49723910013826894
+          },
+          "OKX": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.7146362821876402
+          },
+          "retail": {
+            "used": [
+              "flow"
+            ],
+            "dropped": {},
+            "fit_std": 0.6929822608564143
+          }
+        },
+        "n_fit_rows": 37,
+        "n_event_rows": 4,
+        "n_edges": 51,
+        "k_max": 25,
+        "min_rows_required": 125,
+        "block_len": 3,
+        "reason": "underpowered"
+      }
     }
   ]
 }

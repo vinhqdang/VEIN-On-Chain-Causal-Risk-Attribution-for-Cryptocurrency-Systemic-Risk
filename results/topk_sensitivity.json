@@ -1,0 +1,740 @@
+{
+  "generated": "2026-10-12",
+  "data_backend": "bigquery",
+  "main_k": 12,
+  "k_values": [
+    10,
+    12,
+    15
+  ],
+  "by_k": {
+    "10": {
+      "k": 10,
+      "entities": [
+        "Aave",
+        "Binance",
+        "Bitfinex",
+        "Bybit",
+        "Coinbase",
+        "Copper",
+        "Ethena",
+        "HTX",
+        "Kraken",
+        "Lido",
+        "MakerSky",
+        "OKX",
+        "retail"
+      ],
+      "n_entities": 13,
+      "n_edges": 73,
+      "n_fit_hours": 600,
+      "n_event_hours": 48,
+      "stress_components": {
+        "Aave": {
+          "used": [
+            "flow",
+            "drawdown:AAVE"
+          ],
+          "dropped": {},
+          "fit_std": 0.7681065284345563
+        },
+        "Binance": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.6623965687443808
+        },
+        "Bitfinex": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.9842294310275459
+        },
+        "Bybit": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7980922846737427
+        },
+        "Coinbase": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7072215106619731
+        },
+        "Copper": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7822206695619336
+        },
+        "Ethena": {
+          "used": [
+            "flow",
+            "peg:USDe"
+          ],
+          "dropped": {},
+          "fit_std": 0.7062099917733811
+        },
+        "HTX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.830577509862594
+        },
+        "Kraken": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7693252699619302
+        },
+        "Lido": {
+          "used": [
+            "discount:stETH/ETH",
+            "lido_redeem"
+          ],
+          "dropped": {},
+          "fit_std": 0.7618449555877681
+        },
+        "MakerSky": {
+          "used": [
+            "flow",
+            "peg:DAI"
+          ],
+          "dropped": {},
+          "fit_std": 0.6487822985492784
+        },
+        "OKX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7345437620497003
+        },
+        "retail": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7732475937247236
+        }
+      },
+      "oc_ranking": [
+        {
+          "entity": "retail",
+          "exported_risk": 33.90104530506677
+        },
+        {
+          "entity": "MakerSky",
+          "exported_risk": 32.67927143908224
+        },
+        {
+          "entity": "Coinbase",
+          "exported_risk": 25.219342966149206
+        },
+        {
+          "entity": "Bitfinex",
+          "exported_risk": 25.195247728610088
+        },
+        {
+          "entity": "Binance",
+          "exported_risk": 20.381246592769564
+        },
+        {
+          "entity": "Kraken",
+          "exported_risk": 19.83254003378617
+        },
+        {
+          "entity": "OKX",
+          "exported_risk": 13.88965397410474
+        },
+        {
+          "entity": "Bybit",
+          "exported_risk": 13.056209260474873
+        },
+        {
+          "entity": "HTX",
+          "exported_risk": 11.299356272763976
+        },
+        {
+          "entity": "Copper",
+          "exported_risk": 5.63085448901861
+        },
+        {
+          "entity": "Lido",
+          "exported_risk": 3.3419008481467927
+        },
+        {
+          "entity": "Aave",
+          "exported_risk": 2.2520809108377655
+        },
+        {
+          "entity": "Ethena",
+          "exported_risk": 0.5415034048850096
+        }
+      ],
+      "H1_rmse": {
+        "observed_onchain": 1.5548245265514358,
+        "estimated_granger": 1.5591125797483107,
+        "estimated_partial_corr": 1.5602124526933736
+      },
+      "top_channels": [
+        {
+          "i": "MakerSky",
+          "j": "retail",
+          "share": 0.15589273489475794,
+          "attribution": 2.268365964438086
+        },
+        {
+          "i": "Kraken",
+          "j": "retail",
+          "share": 0.11935175599828535,
+          "attribution": 1.7366650298694157
+        },
+        {
+          "i": "MakerSky",
+          "j": "Coinbase",
+          "share": 0.10368640751793393,
+          "attribution": 1.2760465413722386
+        },
+        {
+          "i": "Coinbase",
+          "j": "retail",
+          "share": 0.09893054539491247,
+          "attribution": 1.4395198221945016
+        },
+        {
+          "i": "retail",
+          "j": "Coinbase",
+          "share": 0.0946139998288865,
+          "attribution": 1.1643943515562736
+        }
+      ]
+    },
+    "12": {
+      "k": 12,
+      "entities": [
+        "Aave",
+        "Binance",
+        "Bitfinex",
+        "Bybit",
+        "Ceffu",
+        "Coinbase",
+        "Copper",
+        "Crypto.com",
+        "Ethena",
+        "HTX",
+        "Kraken",
+        "Lido",
+        "MakerSky",
+        "OKX",
+        "retail"
+      ],
+      "n_entities": 15,
+      "n_edges": 90,
+      "n_fit_hours": 600,
+      "n_event_hours": 48,
+      "stress_components": {
+        "Aave": {
+          "used": [
+            "flow",
+            "drawdown:AAVE"
+          ],
+          "dropped": {},
+          "fit_std": 0.7681065284345563
+        },
+        "Binance": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.6623965687443808
+        },
+        "Bitfinex": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.9842294310275459
+        },
+        "Bybit": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7980922846737425
+        },
+        "Ceffu": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7261298110595655
+        },
+        "Coinbase": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7072215106619731
+        },
+        "Copper": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7822206695619336
+        },
+        "Crypto.com": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.788343205754974
+        },
+        "Ethena": {
+          "used": [
+            "flow",
+            "peg:USDe"
+          ],
+          "dropped": {},
+          "fit_std": 0.7062099917733811
+        },
+        "HTX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.830577509862594
+        },
+        "Kraken": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7693252699619302
+        },
+        "Lido": {
+          "used": [
+            "discount:stETH/ETH",
+            "lido_redeem"
+          ],
+          "dropped": {},
+          "fit_std": 0.7618449555877681
+        },
+        "MakerSky": {
+          "used": [
+            "flow",
+            "peg:DAI"
+          ],
+          "dropped": {},
+          "fit_std": 0.6487822985492784
+        },
+        "OKX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7345437620497003
+        },
+        "retail": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7701047439692885
+        }
+      },
+      "oc_ranking": [
+        {
+          "entity": "retail",
+          "exported_risk": 44.96592236698115
+        },
+        {
+          "entity": "MakerSky",
+          "exported_risk": 37.864038843363076
+        },
+        {
+          "entity": "Coinbase",
+          "exported_risk": 26.373521060241696
+        },
+        {
+          "entity": "Bitfinex",
+          "exported_risk": 25.726058796032067
+        },
+        {
+          "entity": "Kraken",
+          "exported_risk": 23.97296275627749
+        },
+        {
+          "entity": "Crypto.com",
+          "exported_risk": 23.796380374207686
+        },
+        {
+          "entity": "Binance",
+          "exported_risk": 22.540353489730776
+        },
+        {
+          "entity": "OKX",
+          "exported_risk": 19.052968790208386
+        },
+        {
+          "entity": "HTX",
+          "exported_risk": 13.467417146263516
+        },
+        {
+          "entity": "Bybit",
+          "exported_risk": 13.107059370440663
+        },
+        {
+          "entity": "Copper",
+          "exported_risk": 4.398229299341441
+        },
+        {
+          "entity": "Lido",
+          "exported_risk": 3.3689448184051436
+        },
+        {
+          "entity": "Aave",
+          "exported_risk": 2.943500684026718
+        },
+        {
+          "entity": "Ethena",
+          "exported_risk": 0.6911852890967971
+        },
+        {
+          "entity": "Ceffu",
+          "exported_risk": 0.5602187513794874
+        }
+      ],
+      "H1_rmse": {
+        "observed_onchain": 1.5545042103322828,
+        "estimated_granger": 1.5594828925742068,
+        "estimated_partial_corr": 1.5599260598576574
+      },
+      "top_channels": [
+        {
+          "i": "MakerSky",
+          "j": "retail",
+          "share": 0.1516764293793941,
+          "attribution": 2.1855087676152802
+        },
+        {
+          "i": "Kraken",
+          "j": "retail",
+          "share": 0.13339438719812502,
+          "attribution": 1.922082448571775
+        },
+        {
+          "i": "MakerSky",
+          "j": "Coinbase",
+          "share": 0.1092365273917097,
+          "attribution": 1.3443506849786022
+        },
+        {
+          "i": "Coinbase",
+          "j": "retail",
+          "share": 0.10289584171623266,
+          "attribution": 1.4826282840524954
+        },
+        {
+          "i": "retail",
+          "j": "Coinbase",
+          "share": 0.09755412724362629,
+          "attribution": 1.200577873664738
+        }
+      ]
+    },
+    "15": {
+      "k": 15,
+      "entities": [
+        "Aave",
+        "Binance",
+        "Bitfinex",
+        "Bitget",
+        "Bullish",
+        "Bybit",
+        "Ceffu",
+        "Coinbase",
+        "Copper",
+        "Crypto.com",
+        "Ethena",
+        "FalconX",
+        "HTX",
+        "Kraken",
+        "Lido",
+        "MakerSky",
+        "OKX",
+        "retail"
+      ],
+      "n_entities": 18,
+      "n_edges": 123,
+      "n_fit_hours": 600,
+      "n_event_hours": 48,
+      "stress_components": {
+        "Aave": {
+          "used": [
+            "flow",
+            "drawdown:AAVE"
+          ],
+          "dropped": {},
+          "fit_std": 0.7681065284345563
+        },
+        "Binance": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.6623965687443807
+        },
+        "Bitfinex": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.9842294310275459
+        },
+        "Bitget": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.8625446114523646
+        },
+        "Bullish": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.6710935282142455
+        },
+        "Bybit": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7980922846737426
+        },
+        "Ceffu": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7261298110595655
+        },
+        "Coinbase": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7072215106619736
+        },
+        "Copper": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7822206695619336
+        },
+        "Crypto.com": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7883432057549739
+        },
+        "Ethena": {
+          "used": [
+            "flow",
+            "peg:USDe"
+          ],
+          "dropped": {},
+          "fit_std": 0.7062099917733811
+        },
+        "FalconX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7691248658772041
+        },
+        "HTX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.830577509862594
+        },
+        "Kraken": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7693252699619302
+        },
+        "Lido": {
+          "used": [
+            "discount:stETH/ETH",
+            "lido_redeem"
+          ],
+          "dropped": {},
+          "fit_std": 0.7618449555877681
+        },
+        "MakerSky": {
+          "used": [
+            "flow",
+            "peg:DAI"
+          ],
+          "dropped": {},
+          "fit_std": 0.6487822985492784
+        },
+        "OKX": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7345437620497003
+        },
+        "retail": {
+          "used": [
+            "flow"
+          ],
+          "dropped": {},
+          "fit_std": 0.7705785413074719
+        }
+      },
+      "oc_ranking": [
+        {
+          "entity": "retail",
+          "exported_risk": 61.6147619534283
+        },
+        {
+          "entity": "MakerSky",
+          "exported_risk": 44.89157304515607
+        },
+        {
+          "entity": "Bitfinex",
+          "exported_risk": 34.24827637261164
+        },
+        {
+          "entity": "Coinbase",
+          "exported_risk": 32.570158035764756
+        },
+        {
+          "entity": "Kraken",
+          "exported_risk": 32.08139279588755
+        },
+        {
+          "entity": "Crypto.com",
+          "exported_risk": 30.864930375537732
+        },
+        {
+          "entity": "Binance",
+          "exported_risk": 30.16079690312746
+        },
+        {
+          "entity": "OKX",
+          "exported_risk": 21.222976516656765
+        },
+        {
+          "entity": "Bullish",
+          "exported_risk": 18.510575081250543
+        },
+        {
+          "entity": "FalconX",
+          "exported_risk": 17.202664699593505
+        },
+        {
+          "entity": "Bitget",
+          "exported_risk": 17.00357251137768
+        },
+        {
+          "entity": "Bybit",
+          "exported_risk": 16.788778197928924
+        },
+        {
+          "entity": "HTX",
+          "exported_risk": 14.39201384981099
+        },
+        {
+          "entity": "Aave",
+          "exported_risk": 4.760928448089061
+        },
+        {
+          "entity": "Copper",
+          "exported_risk": 4.211254799122628
+        },
+        {
+          "entity": "Lido",
+          "exported_risk": 3.4720581500343606
+        },
+        {
+          "entity": "Ceffu",
+          "exported_risk": 0.7785331844584142
+        },
+        {
+          "entity": "Ethena",
+          "exported_risk": 0.625548834563256
+        }
+      ],
+      "H1_rmse": {
+        "observed_onchain": 1.5513786345903136,
+        "estimated_granger": 1.5563765516819896,
+        "estimated_partial_corr": 1.5565455130094183
+      },
+      "top_channels": [
+        {
+          "i": "MakerSky",
+          "j": "retail",
+          "share": 0.16384633974524915,
+          "attribution": 2.359231628562558
+        },
+        {
+          "i": "retail",
+          "j": "Bullish",
+          "share": 0.1429621905576419,
+          "attribution": 1.3110872897402004
+        },
+        {
+          "i": "Kraken",
+          "j": "retail",
+          "share": 0.1396146613308975,
+          "attribution": 2.01031848093179
+        },
+        {
+          "i": "MakerSky",
+          "j": "Coinbase",
+          "share": 0.11380861163237477,
+          "attribution": 1.4006183522825761
+        },
+        {
+          "i": "Coinbase",
+          "j": "retail",
+          "share": 0.11113581694375033,
+          "attribution": 1.6002501783530807
+        }
+      ]
+    }
+  },
+  "vs_main": {
+    "10": {
+      "spearman_common": 0.989010989010989,
+      "n_common": 13,
+      "top3_overlap": 3,
+      "top5_overlap": 4
+    },
+    "15": {
+      "spearman_common": 0.9785714285714284,
+      "n_common": 15,
+      "top3_overlap": 2,
+      "top5_overlap": 5
+    }
+  }
+}
