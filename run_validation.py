@@ -179,9 +179,9 @@ def write_report(out: dict):
     A("|---|--:|--:|--:|")
     for s in h1["scores"]:
         A(f"| {s['model']} | {s['rmse']:.4f} | {s['corr']:.4f} | {s['n']} |")
-    if "H1_supported" in h1:
-        verdict = ("observed on-chain graph predicts better → **H1 supported**"
-                   if h1["H1_supported"] else
+    if "H1_point_better" in h1:
+        verdict = ("observed on-chain graph predicts better (point RMSE; see the bootstrap in run_best) → **H1 point-better**"
+                   if h1["H1_point_better"] else
                    "estimated graph predicts at least as well → **H1 not supported on this slice**")
         A(f"\n**Verdict:** {verdict} (RMSE gap vs best estimated: "
           f"{h1.get('rmse_gap_vs_best_estimated', float('nan')):+.4f}).\n")

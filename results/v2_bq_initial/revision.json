@@ -1,0 +1,106 @@
+{
+  "generated": "2026-10-12",
+  "data_backend": "bigquery",
+  "H1": {
+    "observed": {
+      "wrmse": 1.1646871888912926,
+      "rmse": 0.510541885838841,
+      "mae": 0.24747812995256474,
+      "dir_acc": 0.7743055555555556,
+      "n": 288
+    },
+    "granger": {
+      "wrmse": 1.1821762761171515,
+      "rmse": 0.519262165685162,
+      "mae": 0.2511433905387918,
+      "dir_acc": 0.7638888888888888,
+      "n": 288
+    },
+    "mean_werr_diff_granger_minus_observed": 0.01471103184162426,
+    "boot_ci95_diff": [
+      -0.005263823640728036,
+      0.05179662766941671
+    ],
+    "prob_observed_better": 0.915,
+    "bootstrap": {
+      "scheme": "paired_moving_block",
+      "block_len": 8,
+      "block_unit": "hours (whole time steps, all entities)",
+      "replicates": 2000
+    }
+  },
+  "lagged_flow": {
+    "observed_wrmse": 1.1640868843500067,
+    "granger_wrmse": 1.177961676951333,
+    "observed_dir_acc": 0.78125
+  },
+  "edge_type_falsification": {
+    "true": 1.724579177454591,
+    "reverse_composability": 1.724579177454591,
+    "reverse_custodial": 1.7036781805806434,
+    "n_composability_edges": 4,
+    "n_custodial_edges": 96
+  },
+  "shapley": {
+    "target": "Bybit",
+    "candidates": [
+      "Binance",
+      "Coinbase",
+      "Bitfinex"
+    ],
+    "shapley_values": {
+      "Binance": 1.354597116224942,
+      "Coinbase": 0.0661946759994952,
+      "Bitfinex": -0.3990547828190489
+    },
+    "sum_shapley": 1.0217370094053884,
+    "total_effect": 1.0217370094053884,
+    "additive_residual": 0.0
+  },
+  "attribution_sensitivity": {
+    "Binance->Bybit": {
+      "base_share": 0.06709608139620084,
+      "mean": 0.06605726176793576,
+      "sd": 0.004634398295185704,
+      "frac_positive": 1.0
+    },
+    "Ethena->Aave": {
+      "base_share": 0.0,
+      "mean": 0.0,
+      "sd": 0.0,
+      "frac_positive": 0.0
+    }
+  },
+  "no_retail_ranking": [
+    {
+      "entity": "Binance",
+      "exported_risk": 21.284446252697172
+    },
+    {
+      "entity": "Kraken",
+      "exported_risk": 20.962781896965975
+    },
+    {
+      "entity": "Crypto.com",
+      "exported_risk": 19.108300277616312
+    },
+    {
+      "entity": "Coinbase",
+      "exported_risk": 16.738415106187762
+    },
+    {
+      "entity": "Bitfinex",
+      "exported_risk": 15.06642063639828
+    },
+    {
+      "entity": "Bullish",
+      "exported_risk": 12.19426806332892
+    }
+  ],
+  "resolution_coverage": {
+    "total_usd": 449692816967.1178,
+    "frac_volume_named_both_sides": 0.01629376405392614,
+    "frac_volume_touching_named": 1.0,
+    "n_named_entities": 15
+  }
+}

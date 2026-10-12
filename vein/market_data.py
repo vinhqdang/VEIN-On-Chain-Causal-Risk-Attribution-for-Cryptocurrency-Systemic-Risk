@@ -99,13 +99,17 @@ def hourly_prices(coin_id: str, start: dt.date, end: dt.date) -> pd.Series:
     return s[~s.index.duplicated(keep="last")].rename(coin_id)
 
 
-def build_hourly_price_panel(assets: dict[str, str], start: dt.date, end: dt.date) -> pd.DataFrame:
+def build_hourly_price_panel(assets: dict[str, str], start: dt.date, end: dt.date,
+                             ffill: bool = True) -> pd.DataFrame:
+    """Hourly price panel. ffill=False keeps the observed prices (NaN where a coin has no
+    quote), which the stress builder needs to measure the observed-price share."""
     cols = {}
     for ticker, cg in assets.items():
         s = hourly_prices(cg, start, end)
         if not s.empty:
             cols[ticker] = s
-    return pd.DataFrame(cols).sort_index().ffill()
+    panel = pd.DataFrame(cols).sort_index()
+    return panel.ffill() if ffill else panel
 
 
 def defillama_tvl(slug: str) -> pd.Series:

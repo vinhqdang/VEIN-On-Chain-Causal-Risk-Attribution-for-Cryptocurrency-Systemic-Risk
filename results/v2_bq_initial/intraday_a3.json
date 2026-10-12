@@ -1,0 +1,35 @@
+{
+  "generated": "2026-10-12",
+  "data_backend": "bigquery",
+  "resolution": "hourly",
+  "window": [
+    "2025-10-01",
+    "2025-10-14"
+  ],
+  "event_hours": 48,
+  "fit_hours": 216,
+  "n_entities": 17,
+  "n_predictions": 816,
+  "rmse_relative_gap_true_vs_reversed": -0.009582526627836489,
+  "falsification": [
+    {
+      "model": "true_direction",
+      "rmse": 1.8405025143088474,
+      "corr": 0.07942603839845157,
+      "n": 816
+    },
+    {
+      "model": "reversed_edges",
+      "rmse": 1.8228658499568828,
+      "corr": 0.08894201320890073,
+      "n": 816
+    },
+    {
+      "model": "symmetric",
+      "rmse": 1.8479153472508678,
+      "corr": 0.05627067404913368,
+      "n": 816
+    }
+  ],
+  "verdict": "TIE_DIRECTION_UNINFORMATIVE"
+}

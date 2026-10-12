@@ -15,8 +15,7 @@ import json
 import numpy as np, pandas as pd
 from scipy.stats import spearmanr
 
-from vein import config, market_data as md, onchain_graph as og
-from vein import entity_resolution as er, estimated_graph as eg
+from vein import config, estimated_graph as eg, market_data as md, pipeline as pl
 from vein.scm import StructuralCausalModel
 from vein import risk
 import run_best as rb
@@ -59,13 +58,10 @@ def nonflow_stress(entities, prices, idx):
 
 def main():
     out = {"generated": dt.date.today().isoformat(), "data_backend": config.DATA_BACKEND}
-    flows = er.load_resolved_flows(rb.WIN_START, rb.WIN_END, rb.TOKENS, bucket="hour", min_addr_volume=1e3)
-    flows = er.top_k_entities(flows, k=12); flows["day"] = pd.to_datetime(flows["day"])
-    prices = md.build_hourly_price_panel(config.MARKET_ASSETS, rb.WIN_START, rb.WIN_END)
-    ents = sorted(set(flows.from_entity) | set(flows.to_entity) | set(config.ENTITIES))
+    ctx = pl.build_hourly_context(k=12)
+    flows, prices, graph, ents = ctx.flows, ctx.prices_ffill, ctx.graph, ctx.entities
     idx = pd.DatetimeIndex(sorted(flows["day"].unique()))
     stress = nonflow_stress(ents, prices, idx).sort_index()
-    graph = og.build_graph(flows, min_usd=1e5)
 
     comp = [e for e in stress.columns if e in eg.ENTITY_ASSET]
     sub_parents = {n: [p for p in graph["parents"].get(n, []) if p in comp] for n in comp}

@@ -333,3 +333,64 @@ def test_clone_pinned_checks_out_only_the_pinned_commit(tmp_path):
     # A second call re-pins the existing checkout to the other commit.
     assert lb._clone_pinned(up.as_uri(), dest, c2, sparse) == c2
     assert (dest / "sub" / "keep.sql").read_text() == "v2\n"
+
+
+# ---------------------------------------------------------------- aToken / PSM / stETH seeds
+NEW_SEEDS = {
+    "Aave": ["0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c", "0x23878914efe38d27c4d67ab83ed1b93a74d4086a",
+             "0x4f5923fc5fd4a93352581b38b7cd26943012decf", "0x4579a27af00a62c0eb156349f31b345c08386419",
+             "0x4d5f47fa6a74757f35c14fd3a6ef8e3c9bc514e8", "0xbcca60bb61934080951369a648fb03df4f96263c",
+             "0x3ed3b47dd13ec9a98b44e6204a523e766b225811", "0x030ba81f1c18d280636f32af80b9aad02cf0854e"],
+    "MakerSky": ["0x37305b1cd40574e4c5ce33f8e8306be057fd7341", "0xf6e72db5454dd049d0788e411b06cfaf16853042",
+                 "0x0a59649758aa4d66e25f08dd01271e891fe52199", "0x89b78cfa322f6c5de0abceecab66aee45393cc5a",
+                 "0xa188eec8f81263234da3622a406892f3d630f98c"],
+}
+
+
+def test_new_seeds_present_with_correct_entity():
+    seed = lb.seed_label_table()
+    lookup = dict(zip(seed.address, seed.entity))
+    for entity, addrs in NEW_SEEDS.items():
+        for a in addrs:
+            assert lookup[a] == entity
+            assert config.ALL_ADDRESSES[a] == entity
+
+
+def test_seed_addresses_are_unique_across_entities():
+    seed = lb.seed_label_table()
+    assert seed.address.is_unique
+    assert all(re.fullmatch(r"0x[0-9a-f]{40}", a) for a in seed.address)
+
+
+def test_protocol_address_is_not_an_entity_seed():
+    q = config.PROTOCOL_ADDRESSES["lido_withdrawal_queue"]
+    assert q == "0x889edc2edab5f40e902b864ad4d7ade8e412f9b1"
+    assert q not in set(lb.seed_label_table().address)
+
+
+def test_refresh_seeds_promotes_new_seed_and_keeps_other_rows():
+    seed = lb.seed_label_table()
+    cached = pd.DataFrame([
+        # an address that is now an Aave seed but was cached as an open label
+        {"address": NEW_SEEDS["Aave"][0], "entity": "Bitfinex", "src": "label", "etype": "CEX",
+         "raw_name": "Old", "source": "open", "kind": "wallet"},
+        # an unrelated sweep row must stay as it is
+        {"address": "0x" + "9" * 40, "entity": "OKX", "src": "sweep", "etype": "CEX",
+         "raw_name": "OKX", "source": "sweeps", "kind": "wallet"},
+    ])
+    merged = pd.concat([seed, cached], ignore_index=True)
+    merged = merged.drop_duplicates("address", keep="last")
+    out = lb.refresh_seeds(merged)
+    row = out[out.address == NEW_SEEDS["Aave"][0]].iloc[0]
+    assert row.src == "seed" and row.entity == "Aave"
+    other = out[out.address == "0x" + "9" * 40].iloc[0]
+    assert other.src == "sweep" and other.entity == "OKX"
+    assert out.address.is_unique
+    assert len(out) == len(set(out.address))
+
+
+def test_refresh_seeds_is_idempotent():
+    seed = lb.seed_label_table()
+    once = lb.refresh_seeds(seed)
+    twice = lb.refresh_seeds(once)
+    pd.testing.assert_frame_equal(once.reset_index(drop=True), twice.reset_index(drop=True))

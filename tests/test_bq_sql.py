@@ -158,3 +158,47 @@ def test_select_extract_rejects_day_request_for_core_token_outside_core():
     # WETH is not in core_daily, and no other extract covers 2025-01 with USDe alone.
     with pytest.raises(ValueError):
         bq_sql.select_extract(D(2025, 1, 2), D(2025, 1, 10), ["WETH"], "day")
+
+
+# ---------------------------------------------------------------- Lido / protocol additions
+QUEUE = "889edc2edab5f40e902b864ad4d7ade8e412f9b1"
+STETH = config.TOKENS["stETH"]
+
+
+def test_lido_series_sql_selects_queue_and_mints():
+    sql = bq_sql.lido_series_sql(_tables(), EXTRACT_HASH, D(2025, 10, 1), D(2025, 10, 2))
+    assert sql.startswith("-- vein:lido_series extract=abc123,def456 labels=none")
+    assert f"FROM_HEX('{QUEUE}')" in sql
+    assert "x.token='stETH'" in sql
+    assert "x.from_a = FROM_HEX(REPEAT('0',40))" in sql
+    assert "x.bucket >= TIMESTAMP('2025-10-01 00:00:00+00')" in sql
+    assert "GROUP BY 1 ORDER BY 1" in sql
+
+
+def test_extract_sql_oct25_lido_uses_steth_address_and_18_decimals():
+    sql = bq_sql.extract_sql("oct25_lido", D(2025, 9, 15), D(2025, 9, 30))
+    assert STETH in sql
+    assert f"'{STETH}' AS addr, 'stETH' AS sym, 18 AS dec" in sql
+    assert "TIMESTAMP_TRUNC(t.block_timestamp, HOUR)" in sql
+
+
+def test_select_extract_ftx_window_resolves_to_extended_extract():
+    assert bq_sql.select_extract(D(2022, 10, 1), D(2022, 11, 16), ["USDC", "USDT", "WETH"], "hour") == "ftx_ext"
+    assert bq_sql.select_extract(D(2022, 11, 1), D(2022, 11, 16), ["USDC", "USDT", "WETH"], "day") == "ftx_hourly"
+    assert bq_sql.select_extract(D(2023, 2, 1), D(2023, 3, 16), ["USDC", "USDT", "WETH"], "hour") == "svb_ext"
+
+
+def test_coverage_sql_reports_same_entity_flag():
+    c = bq_sql.coverage_sql(_tables(), LABELS, FP, EXTRACT_HASH, D(2025, 10, 1), D(2025, 10, 2))
+    assert "(lf.entity IS NOT NULL AND lf.entity = lt.entity) AS same_entity" in c
+    assert c.rstrip().endswith("GROUP BY 1,2,3,4,5")
+
+
+def test_sweep_keys_exclude_sweeps_false_extracts():
+    keys = bq_sql.sweep_keys("e2025")
+    assert "oct25_lido" not in keys
+    assert set(keys) == {"oct25_hourly", "core_daily"}
+    assert bq_sql.sweep_keys("eftx_ext") == ["ftx_ext"]
+    assert config.BQ_EXTRACTS["oct25_lido"]["sweeps"] is False
+    assert config.BQ_EXTRACTS["oct25_lido"]["protocol"] is True
+    assert all("sweeps" in v and "protocol" in v for v in config.BQ_EXTRACTS.values())

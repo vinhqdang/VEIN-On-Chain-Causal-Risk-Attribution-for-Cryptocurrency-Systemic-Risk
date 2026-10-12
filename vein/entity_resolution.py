@@ -1,4 +1,5 @@
-"""Entity resolution pipeline (algorithm.md Section 2.2).
+"""Entity resolution pipeline (algorithm.md Section 2.2). Legacy backend: the Dune SQL
+path runs only under VEIN_BACKEND=dune; the BigQuery path is vein/bq_flows.py.
 
 This is the load-bearing layer: resolution error directly corrupts pa(i), the
 causal parent-set. We implement the tiered approach from Section 2.2 with real

@@ -1,5 +1,8 @@
 """Build the observed on-chain flow graph G (algorithm.md Sections 2.2-2.3).
 
+Legacy backend: the Dune SQL path below runs only under VEIN_BACKEND=dune. The BigQuery
+path is vein/bq_flows.py.
+
 This is the heart of VEIN: the causal parent set pa(i) is *read off the ledger*,
 not statistically inferred. We aggregate real ERC-20 transfers (via Dune SQL over
 the decoded `erc20_ethereum.evt_Transfer` table) into daily directed,

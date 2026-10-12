@@ -7,10 +7,11 @@ block level while entity price feeds are effectively daily/coarse. So the fair
 where VEIN's structural advantage (real-time observed flows) is real and the
 price-estimated baselines get the best intraday data actually available.
 
-Runs at hourly granularity: observed graph + SCM, OC-CoVaR ranking (H3 vs
-Delta-CoVaR/MES), counterfactual attribution (H4), edge-reversal falsification
-(A3/H2), the H1 head-to-head (observed vs Granger/partial-corr estimated graph),
-the 4 causal-validity checks, and VaR backtests. Writes results/FINAL_REPORT.md.
+Runs at hourly granularity on the BigQuery cache (vein/pipeline.py): observed graph + SCM,
+OC-CoVaR ranking (H3 vs Delta-CoVaR/MES), counterfactual attribution (H4), edge-reversal
+falsification (A3/H2) with paired bootstrap intervals, the H1 head-to-head (observed vs
+Granger/partial-corr estimated graph, paired block bootstrap), the causal-validity placebos,
+and VaR backtests. Writes results/final_results.json and results/FINAL_REPORT.md.
 """
 from __future__ import annotations
 
@@ -18,79 +19,62 @@ import datetime as dt
 import json
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 from scipy import stats
 
 from vein import config, market_data as md, onchain_graph as og
-from vein import entity_resolution as er, benchmarks as bm
+from vein import benchmarks as bm
 from vein import validation as val, estimated_graph as eg, falsification as fz, backtest as bt
+from vein import pipeline as pl, hourly_stress as hs, fastscm as fs, uncertainty as un
 from vein.scm import StructuralCausalModel
 from vein import risk
 
 RESULTS = Path(__file__).resolve().parent / "results"
 RESULTS.mkdir(exist_ok=True)
 
-WIN_START = dt.date(2025, 9, 15)        # ~3.5 weeks of pre-event hours to fit f_i
-WIN_END = dt.date(2025, 10, 25)
-EVENT_START = pd.Timestamp("2025-10-10 00:00")
-EVENT_END = pd.Timestamp("2025-10-11 23:00")
-CALM_START = pd.Timestamp("2025-09-20 00:00")
-CALM_END = pd.Timestamp("2025-09-21 23:00")
-TOKENS = ["USDe", "sUSDe", "wBETH", "USDC", "USDT"]
-ROLL = 48
+WIN_START = pl.WIN_START                # ~3.5 weeks of pre-event hours to fit f_i
+WIN_END = pl.WIN_END
+EVENT_START = pl.EVENT_START
+EVENT_END = pl.EVENT_END
+TOKENS = pl.TOKENS
+ROLL = hs.ROLL
 ABDUCTION = "full"                  # event-window shocks from the observed path
 BOOTSTRAP = "joint_moving_block"    # one row draw shared by entities, contiguous blocks
 BLOCK_LEN = 24                      # hourly: one day of contiguous residual rows
 S_STAR_Q = 0.95                     # s* = 95th percentile of fit-window stress
+N_SIMS = 2000                       # shock paths for the point ranking
+SEED = 7
+N_REP_MC = 20                       # Monte Carlo error: 20 seeds of 500 paths
+N_SIMS_MC = 500
+B_H1 = 2000                         # paired block-bootstrap replicates (H1, falsification)
+B_TIME_SHIFT = 100
 
 
 def zscore(s, win=ROLL):
-    mu = s.rolling(win, min_periods=6).mean()
-    sd = s.rolling(win, min_periods=6).std().replace(0, np.nan)
-    return ((s - mu) / sd).fillna(0.0)
+    return hs.zscore(s, win)
 
 
 def build_hourly_stress(flows, entities, prices=None):
-    """Hourly flow-derived stress + (for Ethena) the USDe peg-deviation signal."""
-    idx = pd.DatetimeIndex(sorted(flows["day"].unique()))
-    cols = {}
-    for e in entities:
-        inf = flows[flows.to_entity == e].groupby("day").usd_volume.sum().reindex(idx, fill_value=0.0)
-        outf = flows[flows.from_entity == e].groupby("day").usd_volume.sum().reindex(idx, fill_value=0.0)
-        tot = inf + outf
-        net = ((outf - inf) / tot.rolling(ROLL, min_periods=6).mean().replace(0, np.nan)).fillna(0.0)
-        cols[e] = 0.6 * zscore(net) + 0.4 * zscore(tot)
-    panel = pd.DataFrame(cols, index=idx).fillna(0.0)
-    # augment Ethena with USDe hourly peg deviation if available
-    if prices is not None and "USDe" in prices.columns and "Ethena" in panel.columns:
-        peg = (1.0 - prices["USDe"].reindex(idx).ffill()).abs()
-        panel["Ethena"] = 0.5 * panel["Ethena"] + 0.5 * zscore(peg)
-    return panel.fillna(0.0)
+    """Panel-only wrapper around vein.hourly_stress.build_hourly_stress (legacy signature)."""
+    return hs.build_hourly_stress(flows, entities, prices)[0]
 
 
 def main():
-    out = {"generated": dt.date.today().isoformat(), "data_backend": config.DATA_BACKEND, "resolution": "hourly",
-           "window": [str(WIN_START), str(WIN_END)]}
+    out = {"generated": dt.date.today().isoformat(), "data_backend": config.DATA_BACKEND,
+           "resolution": "hourly", "window": [str(WIN_START), str(WIN_END)]}
 
-    print("[1] Hourly resolved on-chain flows (Dune) ...")
-    flows = er.load_resolved_flows(WIN_START, WIN_END, TOKENS, bucket="hour", min_addr_volume=1e3)
-    flows = er.top_k_entities(flows, k=12)
-    flows["day"] = pd.to_datetime(flows["day"])
-    etypes = er.entity_types(flows)
-    entities = sorted(set(flows.from_entity) | set(flows.to_entity) | set(config.ENTITIES))
+    print(f"[1] Hourly resolved on-chain flows ({config.DATA_BACKEND}) + prices + Lido series ...")
+    ctx = pl.build_hourly_context(k=12)
+    flows, stress, graph, prices = ctx.flows, ctx.stress, ctx.graph, ctx.prices_ffill
+    out["stress_components"] = ctx.stress_meta
 
-    print("[2] Hourly prices (DefiLlama) + returns ...")
-    prices = md.build_hourly_price_panel(config.MARKET_ASSETS, WIN_START, WIN_END)
-    returns = md.log_returns(prices)
-
-    print("[3] Stress + observed graph + SCM ...")
-    stress = build_hourly_stress(flows, entities, prices).sort_index()
-    graph = og.build_graph(flows, min_usd=1e5)
+    print("[2] Stress + observed graph + SCM ...")
     est_stress = stress[stress.index < EVENT_START]
     est_flows = flows[flows.day < EVENT_START]
+    hs.assert_nonzero_stress(stress, est_stress.index)
     scm = StructuralCausalModel(graph, alpha=1.0).fit(est_stress, est_flows)
     scm.set_flows(flows)
+    nodes = list(scm.stress_cols)
     ev = list(stress.index[(stress.index >= EVENT_START) & (stress.index <= EVENT_END)])
     init_stress = est_stress.iloc[-1].to_dict()
     precrisis = {e: float(est_stress[e].median()) for e in stress.columns}
@@ -102,15 +86,24 @@ def main():
     out["settings"] = settings
     print(f"    {len(stress.columns)} entities, {len(est_stress)} fit hours, {len(ev)} event hours, {len(graph['edges'])} edges")
 
-    print("[4] OC-CoVaR systemic ranking (H3) ...")
+    print("[3] OC-CoVaR systemic ranking (H3) ...")
     hi = risk.fit_window_s_star(stress, est_stress.index, S_STAR_Q)
+    sys = fs.from_scm(scm)
+    C_ev = fs.drift(sys, fs.log_flows(scm, ev))
+    init_vec = [init_stress[e] for e in nodes]
+    s_vec = [hi[e] for e in nodes]
+    oc = fs.systemic_ranking_fast(scm, ev, init_stress, hi, n_sims=N_SIMS, seed=SEED,
+                                  block_len=BLOCK_LEN)
+    mc = un.mc_error(sys, C_ev, init_vec, s_vec, n_rep=N_REP_MC, n_sims=N_SIMS_MC,
+                     block_len=BLOCK_LEN, seed0=1000)
+    mc_se = dict(zip(nodes, mc["se_point"]))
+    oc["mc_se"] = oc["entity"].map(mc_se)
+    out["oc_covar_ranking"] = oc[["entity", "exported_risk", "mc_se"]].to_dict("records")
     export_hourly_scm(scm, stress, flows, ev, hi, init_stress, precrisis, settings)
-    oc = risk.systemic_ranking(scm, ev, init_stress, hi, n_sims=150, seed=7,
-                               joint=True, block_len=BLOCK_LEN)
-    out["oc_covar_ranking"] = oc[["entity", "exported_risk"]].to_dict("records")
 
-    print("[5] H1 head-to-head (observed vs estimated graph, hourly) ...")
+    print("[4] H1 head-to-head (observed vs estimated graph, hourly, paired bootstrap) ...")
     comp = [e for e in stress.columns if e in eg.ENTITY_ASSET]
+    returns = md.log_returns(prices)
     rp = eg.entity_return_panel(returns, comp)
     rp_est = rp[rp.index < EVENT_START]
     gr = eg.granger_graph(rp_est, alpha=0.10)
@@ -118,15 +111,24 @@ def main():
     obs_sub = {"nodes": comp,
                "edges": [e for e in graph["edges"] if e["from"] in comp and e["to"] in comp],
                "parents": {n: [p for p in graph["parents"].get(n, []) if p in comp] for n in comp}}
-    ss, fs = stress[comp], flows[flows.from_entity.isin(comp) & flows.to_entity.isin(comp)]
+    ss = stress[comp]
+    fl_c = flows[flows.from_entity.isin(comp) & flows.to_entity.isin(comp)]
     out["H1"] = val.h1_observed_vs_estimated(
         obs_sub, {"granger": gr, "partial_corr": pc},
-        ss[ss.index < EVENT_START], fs[fs.day < EVENT_START], ss, fs, ev)
+        ss[ss.index < EVENT_START], fl_c[fl_c.day < EVENT_START], ss, fl_c, ev)
     out["H1"]["comparison_nodes"] = comp
     out["H1"]["edge_counts"] = {"observed": len(obs_sub["edges"]),
                                 "granger": len(gr["edges"]), "partial_corr": len(pc["edges"])}
+    fit_m, ev_m = val.event_masks(ss)
+    obs_err = val.onestep_errors(ss, fl_c, obs_sub["parents"], fit_m, ev_m)
+    boot = {}
+    for g, est_g in {"granger": gr, "partial_corr": pc}.items():
+        boot[g] = val.h1_bootstrap(obs_err, val.onestep_errors(ss, fl_c, est_g["parents"], fit_m, ev_m),
+                                   B=B_H1, block_len=BLOCK_LEN, seed=SEED)
+    out["H1"]["bootstrap"] = boot
+    out["H1"]["H1_supported"] = bool(all(b["status"] == "observed_better" for b in boot.values()))
 
-    print("[6] Counterfactual attribution (H4) ...")
+    print("[5] Counterfactual attribution (H4) ...")
     attrs = []
     for i in ["Ethena", "Binance"]:
         if i not in scm.stress_cols:
@@ -138,16 +140,30 @@ def main():
                     abduction=ABDUCTION))
     out["counterfactual_attribution"] = sorted(attrs, key=lambda r: -r["attribution"])[:10]
 
-    print("[7] Falsification (A3/H2) ...")
+    print("[6] Falsification (A3/H2) with paired intervals ...")
     out["falsification"] = fz.run_falsification(graph, est_stress, est_flows, stress, flows, ev).to_dict("records")
+    fit_f, ev_f = val.event_masks(stress)
+    err_true = val.onestep_errors(stress, flows, graph["parents"], fit_f, ev_f)
+    err_rev = val.onestep_errors(stress, flows, fz.reverse_graph(graph)["parents"], fit_f, ev_f)
+    err_sym = val.onestep_errors(stress, flows, fz.symmetric_graph(graph)["parents"], fit_f, ev_f)
+    out["falsification_ci"] = {
+        "reversed_minus_true": val.paired_difference_ci(err_true, err_rev, B=B_H1, block_len=BLOCK_LEN, seed=SEED),
+        "symmetric_minus_true": val.paired_difference_ci(err_true, err_sym, B=B_H1, block_len=BLOCK_LEN, seed=SEED)}
 
-    print("[8] Validation battery ...")
-    out["external_validity"] = val.external_validity(oc)
-    out["placebo"] = val.placebo_negative_controls(scm, graph, ev, stress, init_stress, precrisis)
-    calm = list(stress.index[(stress.index >= CALM_START) & (stress.index <= CALM_END)])
-    out["temporal_placebo"] = val.temporal_placebo(scm, calm, stress, init_stress, precrisis) if calm else {}
+    print("[7] Validation battery and placebos ...")
+    fit_std = {e: float(est_stress[e].std()) for e in stress.columns}
+    out["external_validity"] = val.external_validity(oc, fit_std=fit_std, s_star=hi)
+    nonzero = {e for e, sd in fit_std.items() if sd > 1e-9}
+    connected = val.connected_pairs(graph, nodes, nonzero)
+    out["placebo"] = {
+        "structural_zero_check": val.structural_zero_check(scm, graph, ev, stress, init_stress, precrisis),
+        "rolling_temporal": val.rolling_temporal_placebo(scm, stress, est_stress.index, ev, precrisis,
+                                                         connected, step=BLOCK_LEN, roll=ROLL, gap=BLOCK_LEN),
+        "time_shift": val.time_shift_placebo(scm, stress, est_flows, est_stress.index, ev, precrisis,
+                                             connected, B=B_TIME_SHIFT, seed=11)}
     out["confounding_sensitivity"] = val.confounding_sensitivity(scm, stress)
-    # resolution robustness: seed-only (Tier-0)
+
+    print("[8] Resolution robustness (Tier-0 seed-only graph) ...")
     seeds = set(config.ENTITIES)
     f0 = flows.copy()
     f0["from_entity"] = f0["from_entity"].where(f0["from_entity"].isin(seeds), "retail")
@@ -156,14 +172,15 @@ def main():
     f0 = (f0.groupby(["day", "from_entity", "to_entity"], as_index=False)
             .agg(usd_volume=("usd_volume", "sum"), n_tx=("n_tx", "sum"),
                  from_src=("from_src", "max"), to_src=("to_src", "max")))
-    et0 = er.entity_types(f0)
     g0 = og.build_graph(f0, min_usd=1e5)
-    s0 = build_hourly_stress(f0, sorted(set(f0.from_entity) | set(f0.to_entity) | seeds), prices).sort_index()
-    scm0 = StructuralCausalModel(g0, alpha=1.0).fit(s0[s0.index < EVENT_START], f0[f0.day < EVENT_START]).set_flows(f0)
-    hi0 = risk.fit_window_s_star(s0, s0.index[s0.index < EVENT_START], S_STAR_Q)
-    init0 = s0[s0.index < EVENT_START].iloc[-1].to_dict()
-    oc0 = risk.systemic_ranking(scm0, ev, init0, hi0, n_sims=150, seed=7,
-                                joint=True, block_len=BLOCK_LEN)
+    ents0 = sorted(set(f0.from_entity) | set(f0.to_entity) | seeds)
+    s0, _ = hs.build_hourly_stress(f0, ents0, ctx.prices, lido=ctx.lido, window=ctx.win)
+    s0 = s0.sort_index()
+    s0_fit = s0[s0.index < EVENT_START]
+    scm0 = StructuralCausalModel(g0, alpha=1.0).fit(s0_fit, f0[f0.day < EVENT_START]).set_flows(f0)
+    hi0 = risk.fit_window_s_star(s0, s0_fit.index, S_STAR_Q)
+    init0 = s0_fit.iloc[-1].to_dict()
+    oc0 = fs.systemic_ranking_fast(scm0, ev, init0, hi0, n_sims=N_SIMS, seed=SEED, block_len=BLOCK_LEN)
     out["resolution_robustness"] = val.resolution_robustness(oc, oc0)
 
     print("[9] Baselines (Delta-CoVaR, MES) + backtests ...")
@@ -197,7 +214,12 @@ def run_settings(fit_index):
             "s_star_quantile": S_STAR_Q,
             "s_star_window": [str(fit[0]), str(fit[-1])],
             "s_star_window_rows": int(len(fit)),
-            "s_star_excludes_event_window": bool(fit.max() < EVENT_START)}
+            "s_star_excludes_event_window": bool(fit.max() < EVENT_START),
+            "n_sims": N_SIMS,
+            "seed": SEED,
+            "ranking_engine": "fastscm",
+            "mc_error": {"n_rep": N_REP_MC, "n_sims": N_SIMS_MC, "seed0": 1000},
+            "h1_bootstrap": {"B": B_H1, "block_len": BLOCK_LEN, "seed": SEED}}
 
 
 def export_hourly_scm(scm, stress, flows, ev, s_star, init_stress, precrisis, settings):
@@ -207,8 +229,9 @@ def export_hourly_scm(scm, stress, flows, ev, s_star, init_stress, precrisis, se
     ("scm_coefficients", with "intercept" in place of the in-memory "b"), the
     residual std, s*, the pre-event and pre-crisis levels, the event-window
     stress, the event-window flow per edge, and the settings used (abduction
-    mode, bootstrap mode, block length, s* window). Needs the Dune data, so it is
-    produced by a local rerun of this script, not by the archived results.
+    mode, bootstrap mode, block length, s* window). Needs the resolved flow data
+    (BigQuery cache in data_cache/), so it is produced by a local rerun of this
+    script, not by the archived results.
     """
     coef = {e: {"parents": list(c["parents"]),
                 "w_stress": [float(x) for x in c["w_stress"]],
@@ -249,9 +272,25 @@ def write_report(out):
     A("| graph source | RMSE | timing corr | n |\n|---|--:|--:|--:|")
     for s in h1["scores"]:
         A(f"| {s['model']} | {s['rmse']:.4f} | {s['corr']:.4f} | {s['n']} |")
-    if "H1_supported" in h1:
-        A(f"\n**{'H1 SUPPORTED — observed on-chain graph wins' if h1['H1_supported'] else 'H1 not supported on this slice'}** "
-          f"(RMSE gap vs best estimated: {h1.get('rmse_gap_vs_best_estimated', float('nan')):+.4f}).\n")
+    A("\nPaired block bootstrap of squared one-step error (estimated minus observed; positive = observed better):\n")
+    A("| estimated graph | mean diff | 95% CI | status | 95% CI (weighted) | 95% CI (8-h blocks) |\n|---|--:|--:|---|--:|--:|")
+    for g, b in h1["bootstrap"].items():
+        A(f"| {g} | {b['mean_diff']:+.4f} | [{b['ci95'][0]:+.4f}, {b['ci95'][1]:+.4f}] | {b['status']} | "
+          f"[{b['ci95_weighted'][0]:+.4f}, {b['ci95_weighted'][1]:+.4f}] | "
+          f"[{b['ci95_block8'][0]:+.4f}, {b['ci95_block8'][1]:+.4f}] |")
+    A("")
+    if h1["H1_supported"]:
+        A("**H1 supported: observed graph better than every estimated graph (95% block-bootstrap CIs exclude 0)**")
+    else:
+        for g, b in h1["bootstrap"].items():
+            if b["status"] == "observed_better":
+                continue
+            ci = f"[{b['ci95'][0]:+.4f}, {b['ci95'][1]:+.4f}]"
+            if b["status"] == "inconclusive":
+                A(f"**H1 not established: CI includes 0 vs {g}** {ci}")
+            else:
+                A(f"**H1 contradicted vs {g}** {ci}")
+    A("")
 
     A("## Hypotheses & checks\n")
     ra = out.get("ranking_agreement", {})
@@ -265,17 +304,26 @@ def write_report(out):
         A(f"- **H4** (counterfactual): top channel {top['i']}→{top['j']} = "
           f"{top['attribution_share']*100:.1f}% of realized distress.")
     tr, rv = fal["true_direction"]["rmse"], fal["reversed_edges"]["rmse"]
+    fc = out["falsification_ci"]["reversed_minus_true"]
     A(f"- **A3/H2** (direction causal): true {tr:.3f} vs reversed {rv:.3f} RMSE "
-      f"→ {'direction informative' if tr < rv*0.98 else 'near-tie / direction weak'}.")
-    pb = out["placebo"]
-    A(f"- **Placebo**: unconnected-pair attribution max {pb['max_abs_attr_unconnected']:.2e} "
-      f"→ {'PASS' if pb['passes'] else 'FAIL'}.")
+      f"→ {'direction informative' if tr < rv*0.98 else 'near-tie / direction weak'}; "
+      f"reversed minus true squared error {fc['mean_diff']:+.4f}, 95% CI "
+      f"[{fc['ci95'][0]:+.4f}, {fc['ci95'][1]:+.4f}].")
+    sz = out["placebo"]["structural_zero_check"]
+    A(f"- **Structural zero** (holds by construction, not evidence): unconnected-pair attribution max "
+      f"{sz['max_abs_attr_unconnected']:.2e} → {'PASS' if sz['passes'] else 'FAIL'}.")
+    rt, ts = out["placebo"]["rolling_temporal"], out["placebo"]["time_shift"]
+    A(f"- **Rolling calm-window placebo**: event {rt['event_stat']:.4g} vs {rt['n_windows']} calm windows, "
+      f"p = {rt['p_value']:.3f} → {'PASS' if rt['passes'] else 'FAIL'}.")
+    A(f"- **Time-shift placebo**: real {ts['real_stat']:.4g} vs {ts['B']} shifted refits, "
+      f"p = {ts['p_value']:.3f} → {'PASS' if ts['passes'] else 'FAIL'}.")
     rr = out["resolution_robustness"]
     A(f"- **Resolution robustness**: Spearman {rr.get('spearman', float('nan')):.2f} "
       f"(Tier-0 vs Tier-3, {rr.get('n_common', 0)} entities).")
     ev_ = out["external_validity"]
     A(f"- **External validity** (Oct-2025 narrative): transmitter–absorber "
-      f"separation {ev_['separation']:.2f}, concordance {ev_['pairwise_concordance']:.2f}.")
+      f"separation {ev_['separation']:.2f}, concordance {ev_['pairwise_concordance']:.2f}"
+      f"; non-degenerate stress: {ev_.get('nondegenerate')}.")
     bt_ = out.get("backtests", {})
     if bt_:
         bits = [f"{a}: Kupiec p={b['kupiec']['p_value']:.2f}" for a, b in bt_.items()]
@@ -288,9 +336,9 @@ def write_report(out):
         A(f"| {e['edge']} | {e['t_stat']:.2f} | {e['robustness_value']:.3f} |")
     A("")
     A("## OC-CoVaR systemic ranking\n")
-    A("| rank | entity | exported risk |\n|--:|---|--:|")
+    A("| rank | entity | exported risk | MC s.e. |\n|--:|---|--:|--:|")
     for k, r in enumerate(oc[:8], 1):
-        A(f"| {k} | {r['entity']} | {r['exported_risk']:.3f} |")
+        A(f"| {k} | {r['entity']} | {r['exported_risk']:.3f} | {r['mc_se']:.3f} |")
     A("")
     (RESULTS / "FINAL_REPORT.md").write_text("\n".join(L))
 

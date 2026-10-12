@@ -3,7 +3,7 @@
 
 We add two earlier episodes that pre-date Ethena/USDe, so the flow tokens are the
 dollar-settlement assets present then (USDC/USDT/WETH) and entities are resolved
-via Dune's (timeless) CEX labels:
+via the open CEX labels and deposit-sweep detection:
   - FTX collapse,            7--16 November 2022
   - USDC depeg / SVB,        9--16 March 2023
 For each window we build the entity-resolved graph, a flow-based stress panel

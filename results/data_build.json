@@ -337,57 +337,99 @@
         "chunks": [
           {
             "chunk": "2025-01-01..2025-04-21",
-            "gib": 33.83
+            "gib": 33.64
           },
           {
             "chunk": "2025-04-21..2025-08-09",
-            "gib": 31.93
+            "gib": 31.74
           },
           {
             "chunk": "2025-08-09..2025-11-27",
-            "gib": 45.48
+            "gib": 45.29
           },
           {
             "chunk": "2025-11-27..2026-03-17",
-            "gib": 62.72
+            "gib": 62.54
           },
           {
             "chunk": "2026-03-17..2026-06-30",
-            "gib": 58.97
+            "gib": 58.78
           }
         ],
-        "gib": 232.93
+        "gib": 231.99,
+        "materialized": true,
+        "new_gib": 0.0
       },
       "oct25_hourly": {
         "chunks": [
           {
             "chunk": "2025-09-15..2025-10-25",
-            "gib": 15.63
+            "gib": 15.44
           }
         ],
-        "gib": 15.63
+        "gib": 15.44,
+        "materialized": true,
+        "new_gib": 0.0
       },
       "ftx_hourly": {
         "chunks": [
           {
             "chunk": "2022-11-01..2022-11-16",
-            "gib": 3.11
+            "gib": 2.92
           }
         ],
-        "gib": 3.11
+        "gib": 2.92,
+        "materialized": true,
+        "new_gib": 0.0
       },
       "svb_hourly": {
         "chunks": [
           {
             "chunk": "2023-03-01..2023-03-16",
-            "gib": 3.35
+            "gib": 3.16
           }
         ],
-        "gib": 3.35
+        "gib": 3.16,
+        "materialized": true,
+        "new_gib": 0.0
+      },
+      "oct25_lido": {
+        "chunks": [
+          {
+            "chunk": "2025-09-15..2025-10-25",
+            "gib": 15.44
+          }
+        ],
+        "gib": 15.44,
+        "materialized": false,
+        "new_gib": 15.44
+      },
+      "ftx_ext": {
+        "chunks": [
+          {
+            "chunk": "2022-10-01..2022-11-16",
+            "gib": 8.47
+          }
+        ],
+        "gib": 8.47,
+        "materialized": false,
+        "new_gib": 8.47
+      },
+      "svb_ext": {
+        "chunks": [
+          {
+            "chunk": "2023-02-01..2023-03-16",
+            "gib": 8.78
+          }
+        ],
+        "gib": 8.78,
+        "materialized": false,
+        "new_gib": 8.78
       }
     },
-    "planned_gib": 255.01,
-    "headroom_gib": 694.05
+    "planned_gib": 286.17,
+    "planned_new_gib": 32.68,
+    "headroom_gib": 421.95
   },
   "selftest": {
     "sweeps_sql_rows": 1,

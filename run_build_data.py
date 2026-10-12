@@ -11,6 +11,8 @@ Stages, run in this order by --all (each stops the run on failure):
   --extract K  materialize stage-1 extracts (K = key or 'all'); checks USDe vs Dune
   --sweeps     Tier-0 sweep detection per extract, holdout validation, epoch label tables
   --coverage   label coverage per extract -> results/coverage.json, results/COVERAGE.md
+  --labels-epochs E1,E2   rebuild the label epoch tables of the given epochs (no full sweeps)
+  --verify-protocol       check the Aave aToken / stETH symbols and the Lido queue series
 
 Outputs: results/data_build.json (merged across stages), results/DATA_BUILD.md.
 Every query is dry-run and billed through vein.bq, which enforces the byte caps and
@@ -43,6 +45,12 @@ COVERAGE_MD = RESULTS / "COVERAGE.md"
 PLANNED_CEILING_GIB = 700.0
 CORE_KEY = "core_daily"
 EXTRACT_ORDER = ["oct25_hourly", "ftx_hourly", "svb_hourly", "core_daily"]
+# Extracts reported by --coverage in addition to EXTRACT_ORDER (the 2022/2023 windows).
+COVERAGE_EXTRA = ["ftx_ext", "svb_ext"]
+NEW_GIB_CEILING = 40.0          # planned spend of not-yet-materialized extracts (--budget)
+AAVE_POOLS = {"0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2", "0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9"}
+PROTOCOL_SYMBOLS = ["aEthUSDC", "aEthUSDT", "aEthUSDe", "aEthsUSDe", "aEthWETH",
+                    "aUSDC", "aUSDT", "aWETH", "stETH"]
 # Dune USDe daily transfer volume (USD bn) for Oct 8-13 2025, from the old pipeline.
 DUNE_USDE_BN = {"2025-10-08": 1.405, "2025-10-09": 0.745, "2025-10-10": 3.090,
                 "2025-10-11": 8.828, "2025-10-12": 1.328, "2025-10-13": 0.688}
@@ -150,27 +158,50 @@ def stage_check() -> dict:
 # ---------------------------------------------------------------------------
 # --budget
 # ---------------------------------------------------------------------------
+def _materialized(key: str) -> bool:
+    """True when every chunk of the extract already carries a marker whose sql hash matches
+    the SQL the current config would run (nothing to bill)."""
+    spec = config.BQ_EXTRACTS[key]
+    chunks = bq_sql.chunks(spec["start"], spec["end"], spec["chunk_days"])
+    ids = bq_sql.extract_table_ids(key)
+    for (cs, ce), tid in zip(chunks, ids):
+        marker = bq._marker(tid)
+        if not marker.exists():
+            return False
+        if json.loads(marker.read_text()).get("sql_hash") != bq.sql_hash(bq_sql.extract_sql(key, cs, ce)):
+            return False
+    return True
+
+
 def stage_budget() -> dict:
     client = bq.get_client()
-    plan, total = {}, 0.0
+    plan, total, new_total = {}, 0.0, 0.0
     for key in config.BQ_EXTRACTS:
         spec = config.BQ_EXTRACTS[key]
+        mat = _materialized(key)
         rows = []
         for cs, ce in bq_sql.chunks(spec["start"], spec["end"], spec["chunk_days"]):
             gib = bq.dry_run_bytes(bq_sql.extract_sql(key, cs, ce), client) / bq.GIB
             rows.append({"chunk": f"{cs}..{ce}", "gib": round(gib, 2)})
             total += gib
-        plan[key] = {"chunks": rows, "gib": round(sum(r["gib"] for r in rows), 2)}
-        _log(f"  {key:14s} {plan[key]['gib']:8.2f} GiB over {len(rows)} chunks")
+            if not mat:
+                new_total += gib
+        plan[key] = {"chunks": rows, "gib": round(sum(r["gib"] for r in rows), 2),
+                     "materialized": mat, "new_gib": 0.0 if mat else round(sum(r["gib"] for r in rows), 2)}
+        _log(f"  {key:14s} {plan[key]['gib']:8.2f} GiB over {len(rows)} chunks"
+             f"{'  (materialized, skipped)' if mat else ''}")
     cum = bq.load_ledger().get("cumulative_billed_bytes", 0) / bq.GIB
     headroom = PLANNED_CEILING_GIB - cum
-    _log(f"  planned total {total:.2f} GiB; ceiling {PLANNED_CEILING_GIB:.0f} - billed {cum:.2f} "
-         f"= {headroom:.2f} GiB")
+    _log(f"  planned total {total:.2f} GiB, new (not materialized) {new_total:.2f} GiB; ceiling "
+         f"{PLANNED_CEILING_GIB:.0f} - billed {cum:.2f} = {headroom:.2f} GiB")
     update_data_build(budget={"plan": plan, "planned_gib": round(total, 2),
+                              "planned_new_gib": round(new_total, 2),
                               "headroom_gib": round(headroom, 2)})
-    if total >= headroom:
-        raise StageFailed(f"planned {total:.1f} GiB >= headroom {headroom:.1f} GiB")
-    if plan[CORE_KEY]["gib"] > 400:
+    if new_total > NEW_GIB_CEILING:
+        raise StageFailed(f"planned new spend {new_total:.1f} GiB > {NEW_GIB_CEILING:.0f} GiB")
+    if new_total >= headroom:
+        raise StageFailed(f"planned {new_total:.1f} GiB >= headroom {headroom:.1f} GiB")
+    if not plan[CORE_KEY]["materialized"] and plan[CORE_KEY]["gib"] > 400:
         # Contingency from BQ_SPEC section 8: needs a decision, not an automatic change.
         raise StageFailed(f"{CORE_KEY} estimate {plan[CORE_KEY]['gib']:.0f} GiB > 400: follow the "
                           f"clustered-column check and FLOW_START contingency in BQ_SPEC section 8")
@@ -514,6 +545,52 @@ def stage_extract(which: str) -> dict:
     return out
 
 
+def stage_labels_epochs(epochs: list[str]) -> dict:
+    """Rebuild only the named label epochs from their cached extracts (no full sweep stage)."""
+    out = {}
+    for epoch in epochs:
+        fq, fp = bq_flows.ensure_labels(epoch, refresh=True)
+        out[epoch] = {"table": fq, "fingerprint": fp}
+        _log(f"  label epoch {epoch}: {fq} ({fp})")
+    update_data_build(labels_epochs=out)
+    return out
+
+
+def stage_verify_protocol() -> dict:
+    """Check the protocol-level inputs of the hourly Lido and Aave stress.
+
+    (a) the aToken and stETH symbols, from the public tokens table, only when that dry run
+    is at most 2 GiB; (b) the hourly stETH series over the Oct-2025 window. Fails when the
+    Withdrawal Queue or the mint series is empty, because the redemption signal would then
+    be degenerate."""
+    client = bq.get_client()
+    spec = config.BQ_EXTRACTS["oct25_lido"]
+    atokens = [a for a in config.ENTITIES["Aave"]["addresses"] if a not in AAVE_POOLS]
+    addrs = atokens + [config.TOKENS["stETH"]]
+    lookup_sql = (f"SELECT address, symbol, decimals FROM `bigquery-public-data.crypto_ethereum.tokens` "
+                  f"WHERE address IN ({bq_sql.hexlist(addrs)})")
+    est = bq.dry_run_bytes(lookup_sql, client) / bq.GIB
+    if est <= 2.0:
+        rows = bq.run_sql(lookup_sql, name="verify_tokens", client=client)
+        symbols = sorted({r["symbol"] for r in rows if r.get("symbol")})
+        tokens_lookup = {"rows": [{"address": r["address"], "symbol": r["symbol"]} for r in rows],
+                         "symbols_missing_expected": [s for s in PROTOCOL_SYMBOLS if s not in symbols]}
+    else:
+        tokens_lookup = "skipped"
+        _log(f"  token lookup skipped: dry run {est:.2f} GiB > 2 GiB")
+    series = bq_flows.lido_series_bq(spec["start"], spec["end"])
+    lido = {"hours": int(len(series)),
+            "share_hours_wq_in_gt0": float((series["steth_wq_in"] > 0).mean()),
+            "sum_wq_in": float(series["steth_wq_in"].sum()),
+            "sum_mint": float(series["steth_mint"].sum())}
+    _log(f"  lido: {lido}")
+    res = {"tokens_lookup": tokens_lookup, "lido": lido}
+    update_data_build(protocol_check=res)
+    if lido["sum_wq_in"] == 0 or lido["sum_mint"] == 0:
+        raise StageFailed(f"Lido series degenerate: {lido}")
+    return res
+
+
 def check_usde_against_dune() -> pd.DataFrame:
     df = bq_flows.usde_daily_bq(dt.date(2025, 10, 8), dt.date(2025, 10, 14))
     got = {d.strftime("%Y-%m-%d"): float(v) / 1e9 for d, v in zip(df["day"], df["usde"])}
@@ -629,7 +706,7 @@ def stage_sweeps() -> dict:
 # ---------------------------------------------------------------------------
 def stage_coverage() -> dict:
     res = {}
-    for key in EXTRACT_ORDER:
+    for key in EXTRACT_ORDER + COVERAGE_EXTRA:
         res[key] = bq_flows.coverage_bq(key)
     COVERAGE_JSON.write_text(json.dumps(res, indent=2, default=str))
     write_coverage_md(res)
@@ -648,26 +725,52 @@ def _extract_markers() -> dict:
 
 
 def write_coverage_md(res: dict) -> None:
+    def f(x):
+        return f"{x:.2%}"
     lines = ["# Label coverage of on-chain token flows", "",
-             "Shares are of total USD flow in each extract window. 'Both resolved' means both "
-             "endpoints carry a label (seed, open label or sweep). Mint and burn transfers are "
-             "reported separately.", "",
-             "Old-vs-new: the Dune pipeline resolved roughly 1% of the $438bn window flow between two "
-             "named entities (paper baseline). Compare the 'both resolved' row below.", "",
-             "| extract | window | total USD (bn) | both resolved | one side | neither | mint/burn |",
-             "|---|---|---|---|---|---|---|"]
+             "Shares are of total USD flow in each extract window. 'Both labelled, distinct "
+             "entities' means both endpoints carry a label and the labels name different "
+             "entities (named-to-named flow). 'Both labelled, same entity' is flow between two "
+             "addresses of one entity. Mint and burn transfers are reported separately.", "",
+             "| extract | window | total USD (bn) | both labelled, distinct entities | both labelled, same entity | one side | neither | mint/burn |",
+             "|---|---|---|---|---|---|---|---|"]
     for key, r in res.items():
         sh = r.get("shares") or {}
-        lines.append(f"| {key} | {r.get('window', [None, None])[0]}..{r.get('window', [None, None])[1]} | "
-                     f"{r.get('total_usd', 0) / 1e9:.2f} | {sh.get('both_resolved', 0):.2%} | "
-                     f"{sh.get('one_side', 0):.2%} | {sh.get('neither', 0):.2%} | {sh.get('mint_burn', 0):.2%} |")
+        win = r.get("window", [None, None])
+        lines.append(f"| {key} | {win[0]}..{win[1]} | {r.get('total_usd', 0) / 1e9:.2f} | "
+                     f"{f(sh.get('both_resolved_distinct', 0))} | {f(sh.get('both_resolved_same_entity', 0))} | "
+                     f"{f(sh.get('one_side', 0))} | {f(sh.get('neither', 0))} | {f(sh.get('mint_burn', 0))} |")
+    lines += ["", "## Panel tokens only", "",
+              "Restricted to the tokens the hourly stress is built from. 'Distinct named-to-named / "
+              "entity-touching' is the share of flow that touches a named entity and is named on both "
+              "sides, among flow touching a named entity on at least one side (mint/burn excluded).", "",
+              "| extract | panel tokens | total USD (bn) | distinct named-to-named | one side | distinct named-to-named / entity-touching |",
+              "|---|---|---|---|---|---|"]
+    for key, r in res.items():
+        p = r.get("panel_tokens")
+        if not p:
+            continue
+        lines.append(f"| {key} | {', '.join(p['tokens'])} | {p['total_usd'] / 1e9:.2f} | "
+                     f"{f(p['both_resolved_distinct'])} | {f(p['one_side'])} | "
+                     f"{f(p['named_distinct_share_of_touching'])} |")
+    lines.append("")
+    for key in ("oct25_hourly",):
+        r = res.get(key) or {}
+        bt = r.get("by_token_usd") or {}
+        tot = r.get("total_usd") or 0
+        if tot and "WETH" in bt:
+            lines.append(f"WETH is {bt['WETH'] / tot:.1%} of the {key} total USD flow "
+                         f"({bt['WETH'] / 1e9:.2f} bn of {tot / 1e9:.2f} bn), so the ETH-denominated "
+                         "flow is a large part of the October window; the panel-token table above "
+                         "shows the stablecoin and staked-ETH panel separately.")
     COVERAGE_MD.write_text("\n".join(lines) + "\n")
 
 
 # ---------------------------------------------------------------------------
 # driver
 # ---------------------------------------------------------------------------
-STAGES = ["check", "budget", "selftest", "labels", "extract", "sweeps", "coverage"]
+STAGES = ["check", "budget", "selftest", "labels", "extract", "sweeps", "coverage",
+          "labels_epochs", "verify_protocol"]
 
 
 def run(stage: str, extract_key: str | None = None) -> None:
@@ -686,6 +789,10 @@ def run(stage: str, extract_key: str | None = None) -> None:
         stage_sweeps()
     elif stage == "coverage":
         stage_coverage()
+    elif stage == "labels_epochs":
+        stage_labels_epochs(extract_key.split(","))
+    elif stage == "verify_protocol":
+        stage_verify_protocol()
     else:
         raise ValueError(stage)
 
@@ -699,6 +806,8 @@ def main(argv=None) -> int:
     ap.add_argument("--extract", metavar="KEY|all", nargs="?", const="all")
     ap.add_argument("--sweeps", action="store_true")
     ap.add_argument("--coverage", action="store_true")
+    ap.add_argument("--labels-epochs", metavar="E1,E2", dest="labels_epochs")
+    ap.add_argument("--verify-protocol", action="store_true", dest="verify_protocol")
     ap.add_argument("--all", action="store_true", help="run every stage in order, stopping at a failure")
     args = ap.parse_args(argv)
 
@@ -714,6 +823,8 @@ def main(argv=None) -> int:
         if args.extract is not None: plan.append(("extract", args.extract))
         if args.sweeps: plan.append(("sweeps", None))
         if args.coverage: plan.append(("coverage", None))
+        if args.labels_epochs: plan.append(("labels_epochs", args.labels_epochs))
+        if args.verify_protocol: plan.append(("verify_protocol", None))
     if not plan:
         ap.print_help()
         return 1

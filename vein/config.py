@@ -41,6 +41,7 @@ TOKENS = {
     "USDT":  "0xdac17f958d2ee523a2206206994597c13d831ec7",
     "wBETH": "0xa2e3356610840701bdf5611a53974510ae27e2e1",   # Binance staked ETH
     "WETH":  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "stETH": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",   # Lido staked ETH (token contract)
 }
 
 # entity -> dict(type, coingecko_id (peg/price ref or None), addresses[list])
@@ -69,9 +70,19 @@ ENTITIES = {
     "Aave": {
         "type": "LENDING",
         "coingecko_id": "aave",
+        # Pool contracts hold no reserves: the tokens sit in the aToken contracts, so the
+        # aTokens are seeds too (eth-labels "Aave" entries).
         "addresses": [
             "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",  # Aave v3 Pool
             "0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9",  # Aave v2 LendingPool
+            "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",  # aEthUSDC (Aave v3)
+            "0x23878914efe38d27c4d67ab83ed1b93a74d4086a",  # aEthUSDT (Aave v3)
+            "0x4f5923fc5fd4a93352581b38b7cd26943012decf",  # aEthUSDe (Aave v3)
+            "0x4579a27af00a62c0eb156349f31b345c08386419",  # aEthsUSDe (Aave v3)
+            "0x4d5f47fa6a74757f35c14fd3a6ef8e3c9bc514e8",  # aEthWETH (Aave v3)
+            "0xbcca60bb61934080951369a648fb03df4f96263c",  # aUSDC (Aave v2)
+            "0x3ed3b47dd13ec9a98b44e6204a523e766b225811",  # aUSDT (Aave v2)
+            "0x030ba81f1c18d280636f32af80b9aad02cf0854e",  # aWETH (Aave v2)
         ],
     },
     "Lido": {
@@ -86,6 +97,12 @@ ENTITIES = {
         "coingecko_id": "dai",
         "addresses": [
             "0x83f20f44975d03b1b09e64809b757c47f942beea",  # sDAI
+            # Sky PSM (USDC leg): the pocket and the GemJoin adapters hold the USDC
+            "0x37305b1cd40574e4c5ce33f8e8306be057fd7341",  # Sky: PSM (LitePSM USDC pocket)
+            "0xf6e72db5454dd049d0788e411b06cfaf16853042",  # LitePSM USDC A
+            "0x0a59649758aa4d66e25f08dd01271e891fe52199",  # PSM-USDC-A GemJoin
+            "0x89b78cfa322f6c5de0abceecab66aee45393cc5a",  # MCD PSM USDC A
+            "0xa188eec8f81263234da3622a406892f3d630f98c",  # Spark USDS PSM wrapper
         ],
     },
 }
@@ -101,6 +118,20 @@ MARKET_ASSETS = {
     "ENA": "ethena",
     "DAI": "dai",
     "USDC": "usd-coin",
+}
+
+# Protocol contracts read by the hourly Lido stress (not entity seeds: they never hold
+# panel tokens, so they are used only as the counterparty of stETH flows).
+PROTOCOL_ADDRESSES = {"lido_withdrawal_queue": "0x889edc2edab5f40e902b864ad4d7ade8e412f9b1"}   # Lido: Withdrawal Queue
+
+# Components of the hourly stress per entity (vein/hourly_stress.py). An entity's stress is
+# the equal-weight mean of its components that have a non-degenerate fit-window std.
+HOURLY_STRESS_COMPONENTS = {
+    "Ethena": ["flow", "peg:USDe"],
+    "Aave": ["flow", "drawdown:AAVE"],
+    "MakerSky": ["flow", "peg:DAI"],
+    "Lido": ["discount:stETH/ETH", "lido_redeem"],
+    "_default": ["flow"],
 }
 
 # DefiLlama protocol slugs for TVL-based stress proxies (Section 3.3)
@@ -142,14 +173,23 @@ BQ_MAX_GIB_PER_QUERY = float(os.environ.get("VEIN_BQ_MAX_GIB_PER_QUERY", 150))
 BQ_HARD_CAP_GIB = float(os.environ.get("VEIN_BQ_HARD_CAP_GIB", 800))
 BQ_MONTHLY_CAP_GIB = float(os.environ.get("VEIN_BQ_MONTHLY_CAP_GIB", 950))
 BQ_STORAGE_CAP_GIB = 9.0
-TOKEN_DECIMALS = {"USDe": 18, "sUSDe": 18, "USDC": 6, "USDT": 6, "wBETH": 18, "WETH": 18}
-ETH_DENOMINATED = {"wBETH", "WETH"}    # converted with daily ETH price; others $1/unit (sUSDe at $1: documented approximation)
+TOKEN_DECIMALS = {"USDe": 18, "sUSDe": 18, "USDC": 6, "USDT": 6, "wBETH": 18, "WETH": 18, "stETH": 18}
+ETH_DENOMINATED = {"wBETH", "WETH", "stETH"}    # converted with daily ETH price; others $1/unit (sUSDe at $1: documented approximation)
 BQ_EXTRACTS = {   # end exclusive
   "core_daily":   {"start": dt.date(2025,1,1),  "end": dt.date(2026,6,30), "tokens": ["USDe","sUSDe","wBETH"], "bucket": "day",  "chunk_days": 110, "epoch": "e2025"},
   "oct25_hourly": {"start": dt.date(2025,9,15), "end": dt.date(2025,10,25), "tokens": ["USDe","sUSDe","wBETH","USDC","USDT","WETH"], "bucket": "hour", "chunk_days": 40, "epoch": "e2025"},
   "ftx_hourly":   {"start": dt.date(2022,11,1), "end": dt.date(2022,11,16), "tokens": ["USDC","USDT","WETH"], "bucket": "hour", "chunk_days": 15, "epoch": "eftx"},
   "svb_hourly":   {"start": dt.date(2023,3,1),  "end": dt.date(2023,3,16),  "tokens": ["USDC","USDT","WETH"], "bucket": "hour", "chunk_days": 15, "epoch": "esvb"},
+  # Appended after the existing keys: select_extract returns the first covering key, so
+  # earlier requests resolve as before. "sweeps": False keeps the extract out of Tier-0
+  # sweep detection; "protocol": True marks extracts read by protocol-level series.
+  "oct25_lido":   {"start": dt.date(2025,9,15), "end": dt.date(2025,10,25), "tokens": ["stETH"], "bucket": "hour", "chunk_days": 40, "epoch": "e2025", "sweeps": False, "protocol": True},
+  "ftx_ext":      {"start": dt.date(2022,10,1), "end": dt.date(2022,11,16), "tokens": ["USDC","USDT","WETH"], "bucket": "hour", "chunk_days": 46, "epoch": "eftx_ext"},
+  "svb_ext":      {"start": dt.date(2023,2,1),  "end": dt.date(2023,3,16),  "tokens": ["USDC","USDT","WETH"], "bucket": "hour", "chunk_days": 43, "epoch": "esvb_ext"},
 }
+for _spec in BQ_EXTRACTS.values():
+    _spec.setdefault("sweeps", True)
+    _spec.setdefault("protocol", False)
 SWEEP_PARAMS = dict(tau=0.8, max_other_hot_share=0.05, max_out_cp=3, k_in=1, min_fwd=0.5,
                     max_fwd=1.25, max_in_from_hot_share=0.5, min_timed_share=0.8,
                     h_hours=24, min_sweep_usd=1000.0)

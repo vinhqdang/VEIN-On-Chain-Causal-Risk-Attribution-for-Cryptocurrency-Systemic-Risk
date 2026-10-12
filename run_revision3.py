@@ -28,8 +28,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
 
-from vein import config, market_data as md, onchain_graph as og
-from vein import entity_resolution as er, validation as val
+from vein import config, validation as val, pipeline as pl
 from vein.scm import StructuralCausalModel
 from vein import risk
 import run_best as rb
@@ -59,13 +58,8 @@ def det_exported(scm, ev_days, init_stress, hi, zero):
 def main():
     out = {"generated": dt.date.today().isoformat(), "data_backend": config.DATA_BACKEND}
     print("[1] Rebuild the consolidated hourly pipeline (graph, stress, SCM) ...")
-    flows = er.load_resolved_flows(rb.WIN_START, rb.WIN_END, rb.TOKENS, bucket="hour", min_addr_volume=1e3)
-    flows = er.top_k_entities(flows, k=12)
-    flows["day"] = pd.to_datetime(flows["day"])
-    entities = sorted(set(flows.from_entity) | set(flows.to_entity) | set(config.ENTITIES))
-    prices = md.build_hourly_price_panel(config.MARKET_ASSETS, rb.WIN_START, rb.WIN_END)
-    stress = rb.build_hourly_stress(flows, entities, prices).sort_index()
-    graph = og.build_graph(flows, min_usd=1e5)
+    ctx = pl.build_hourly_context(k=12)
+    flows, stress, graph = ctx.flows, ctx.stress.sort_index(), ctx.graph
     est_stress = stress[stress.index < rb.EVENT_START]
     est_flows = flows[flows.day < rb.EVENT_START]
     ev = list(stress.index[(stress.index >= rb.EVENT_START) & (stress.index <= rb.EVENT_END)])

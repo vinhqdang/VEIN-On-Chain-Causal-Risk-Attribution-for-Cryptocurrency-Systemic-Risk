@@ -21,6 +21,11 @@ CACHE_DIR = bq.CACHE_DIR
 OPEN_LABELS = CACHE_DIR / "labels_open.csv.gz"
 FLOW_COLS = ["day", "from_entity", "to_entity", "usd_volume", "n_tx", "from_src", "to_src"]
 ETH_TOKENS = config.ETH_DENOMINATED
+# Tokens whose panel coverage is reported (the flows the hourly stress is built from).
+PANEL_TOKENS = {"oct25_hourly": ["USDe", "sUSDe", "wBETH", "USDC", "USDT"],
+                "ftx_hourly": ["USDC", "USDT", "WETH"], "svb_hourly": ["USDC", "USDT", "WETH"],
+                "ftx_ext": ["USDC", "USDT", "WETH"], "svb_ext": ["USDC", "USDT", "WETH"],
+                "core_daily": ["USDe", "sUSDe", "wBETH"]}
 
 
 def _d(x) -> dt.date:
@@ -109,12 +114,20 @@ def ensure_labels(epoch: str, refresh: bool = False) -> tuple[str, str]:
     cache = CACHE_DIR / f"labels_{epoch}.csv.gz"
     seed = lb.seed_label_table()
     if cache.exists() and not refresh:
-        merged = pd.read_csv(cache, dtype=str, keep_default_na=False)
+        cached = pd.read_csv(cache, dtype=str, keep_default_na=False)
+        merged = lb.refresh_seeds(cached)
+        promoted = set(merged.loc[merged["src"] == "seed", "address"]) - \
+            set(cached.loc[cached["src"] == "seed", "address"])
+        changed = {a for a in promoted if a in set(cached["address"])}
+        for a in sorted(changed):
+            print(f"  label {a}: promoted to seed (was {cached.loc[cached.address == a, 'src'].iloc[0]})")
+        if len(merged) != len(cached) or changed:
+            merged.to_csv(cache, index=False, compression="gzip")
     else:
         _, _, base = _upload_base(client)   # labels_base is the input to the sweep queries
-        keys = [k for k, v in config.BQ_EXTRACTS.items() if v["epoch"] == epoch]
+        keys = bq_sql.sweep_keys(epoch)
         if not keys:
-            raise ValueError(f"no extract in epoch {epoch!r}")
+            raise ValueError(f"no sweep extract in epoch {epoch!r}")
         found = [detect_deposit_sweeps_bq(k) for k in keys]
         found = [f for f in found if len(f)]
         if found:
@@ -200,7 +213,12 @@ def fetch_labeled_edges_bq(token: str, start, end) -> pd.DataFrame:
 
 
 def coverage_bq(key: str, start=None, end=None) -> dict:
-    """USD share of extract flow by label coverage of each side (BQ_SPEC section 9.7)."""
+    """USD share of extract flow by label coverage of each side (BQ_SPEC section 9.7).
+
+    'both_resolved' splits into distinct labelled entities and one entity on both sides
+    (same_entity). panel_tokens restricts the same numbers to the tokens the hourly stress
+    is built from (PANEL_TOKENS) and adds the share of entity-touching flow that is named
+    on both sides."""
     spec = config.BQ_EXTRACTS[key]
     start = _d(start or spec["start"])
     end = _d(end or spec["end"])
@@ -212,23 +230,67 @@ def coverage_bq(key: str, start=None, end=None) -> dict:
         return {"key": key, "window": [str(start), str(end)], "total_usd": 0.0}
     unit = usd_per_unit(spec["tokens"], start, end)
     df["usd"] = pd.to_numeric(df["amount"]) * df["token"].map(unit).astype(float)
+    df["same"] = df["same_entity"].astype(str).str.lower().isin(["true", "1"])
     total = float(df["usd"].sum())
+    mb = df.is_mint_burn.astype(str).str.lower().isin(["true", "1"])
     both = df.from_src.ne("none") & df.to_src.ne("none")
     one = df.from_src.ne("none") ^ df.to_src.ne("none")
     neither = ~(both | one)
-    mb = df.is_mint_burn.astype(bool)
+    distinct = both & ~df.same
 
-    def share(mask):
-        return float(df.loc[mask, "usd"].sum() / total) if total else 0.0
+    def share(mask, base=total, frame=df):
+        return float(frame.loc[mask, "usd"].sum() / base) if base else 0.0
 
     by_pair = (df[~mb].groupby(["from_src", "to_src"])["usd"].sum() / total
                if total else pd.Series(dtype=float))
-    return {"key": key, "window": [str(start), str(end)], "total_usd": total,
-            "shares": {"both_resolved": share(both & ~mb), "one_side": share(one & ~mb),
-                       "neither": share(neither & ~mb), "mint_burn": share(mb)},
-            "by_src_pair": {f"{a}->{b}": float(v) for (a, b), v in by_pair.items()},
-            "by_token_usd": {t: float(v) for t, v in df.groupby("token")["usd"].sum().items()},
-            "n_pairs": int(df["n_pairs"].sum()), "n_rows": int(len(df))}
+    out = {"key": key, "window": [str(start), str(end)], "total_usd": total,
+           "shares": {"both_resolved": share(both & ~mb), "both_resolved_distinct": share(distinct & ~mb),
+                      "both_resolved_same_entity": share(both & df.same & ~mb),
+                      "one_side": share(one & ~mb), "neither": share(neither & ~mb),
+                      "mint_burn": share(mb)},
+           "by_src_pair": {f"{a}->{b}": float(v) for (a, b), v in by_pair.items()},
+           "by_token_usd": {t: float(v) for t, v in df.groupby("token")["usd"].sum().items()},
+           "n_pairs": int(df["n_pairs"].sum()), "n_rows": int(len(df))}
+    if key in PANEL_TOKENS:
+        pdf = df[df.token.isin(PANEL_TOKENS[key])]
+        ptot = float(pdf["usd"].sum())
+        pdist = distinct & ~mb & df.token.isin(PANEL_TOKENS[key])
+        pone = one & ~mb & df.token.isin(PANEL_TOKENS[key])
+        d_usd = float(pdf.loc[pdist[pdf.index], "usd"].sum()) if ptot else 0.0
+        o_usd = float(pdf.loc[pone[pdf.index], "usd"].sum()) if ptot else 0.0
+        out["panel_tokens"] = {
+            "tokens": PANEL_TOKENS[key], "total_usd": ptot,
+            "both_resolved_distinct": d_usd / ptot if ptot else 0.0,
+            "one_side": o_usd / ptot if ptot else 0.0,
+            "named_distinct_share_of_touching": d_usd / (d_usd + o_usd) if (d_usd + o_usd) else 0.0,
+            "token_share_of_total": {t: float(pdf.loc[pdf.token == t, "usd"].sum() / total)
+                                     for t in PANEL_TOKENS[key]} if total else {}}
+    return out
+
+
+def lido_series_bq(start, end, key: str = "oct25_lido") -> pd.DataFrame:
+    """Hourly stETH mints, Withdrawal Queue deposits and gross volume on [start, end).
+
+    Returns a tz-naive hourly frame with columns steth_mint, steth_wq_in, steth_gross;
+    hours with no transfer are zero."""
+    start, end = _d(start), _d(end)
+    spec = config.BQ_EXTRACTS[key]
+    if not (spec["start"] <= start and end <= spec["end"] and "stETH" in spec["tokens"]):
+        raise ValueError(f"extract {key} does not cover stETH {start}..{end}")
+    ids, hashes = ensure_extract(key)
+    sql = bq_sql.lido_series_sql(ids, hashes, start, end)
+    rows = bq.run_sql(sql, name="lido_series")
+    cols = ["steth_mint", "steth_wq_in", "steth_gross"]
+    idx = pd.date_range(pd.Timestamp(start), pd.Timestamp(end), freq="h", inclusive="left")
+    if not rows:
+        return pd.DataFrame(0.0, index=idx, columns=cols)
+    df = pd.DataFrame(rows)
+    hour = pd.to_datetime(df["hour"])
+    if getattr(hour.dt, "tz", None) is not None:
+        hour = hour.dt.tz_localize(None)
+    df.index = pd.DatetimeIndex(hour)
+    out = df[cols].apply(pd.to_numeric).astype(float)
+    return out.groupby(level=0).sum().reindex(idx, fill_value=0.0)
 
 
 def usde_daily_bq(start=dt.date(2025, 10, 8), end=dt.date(2025, 10, 14),

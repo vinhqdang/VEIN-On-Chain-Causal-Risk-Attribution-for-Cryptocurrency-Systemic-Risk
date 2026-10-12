@@ -485,6 +485,14 @@ def merge_labels(seed: pd.DataFrame, open_: pd.DataFrame,
     return df.drop(columns="_p").sort_values("address").reset_index(drop=True)
 
 
+def refresh_seeds(merged: pd.DataFrame) -> pd.DataFrame:
+    """Re-apply the current seed table to a cached label table.
+
+    Seeds take priority over every other source, so an address that became a seed after
+    the cache was written is promoted; all other rows are kept as they are."""
+    return merge_labels(seed_label_table(), merged[merged["src"] != "seed"])
+
+
 def label_fingerprint(df: pd.DataFrame) -> str:
     lines = sorted(f"{a}|{e}|{s}" for a, e, s in zip(df.address, df.entity, df.src))
     return hashlib.sha1("\n".join(lines).encode()).hexdigest()[:12]

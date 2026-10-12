@@ -3,7 +3,7 @@
 
 Pipeline:
   1. Real market data (CoinGecko prices) + DefiLlama TVL.
-  2. Real on-chain inter-entity flows (Dune SQL over decoded ERC-20 transfers).
+  2. Real on-chain inter-entity flows (decoded ERC-20 transfers, entity-resolved).
   3. Build observed flow graph G; operationalize stress states S_{i,t}.
   4. Fit the SCM {f_i} on the estimation window.
   5. OC-CoVaR systemic ranking (H3) + Delta-CoVaR benchmark + Spearman divergence.
@@ -12,7 +12,7 @@ Pipeline:
   8. VaR backtests (Kupiec / Christoffersen).
 Outputs: results/results.json and results/EVALUATION.md.
 
-Requires DUNE_API_KEY (source secrets.env). Market/TVL data are keyless.
+Flows come from the BigQuery cache in data_cache/ (run_build_data.py). Market/TVL data are keyless.
 """
 from __future__ import annotations
 
@@ -24,6 +24,12 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+# DATA_SOURCE_TEXT begin
+DATA_SOURCE_TEXT = {
+    "bigquery": "BigQuery crypto_ethereum.token_transfers + open labels (eth-labels, etherscan-labels, Spellbook) + Tier-0 sweeps",
+    "dune": "Dune SQL over decoded ERC-20 transfers and Dune's labels.cex_ethereum (legacy backend)",
+}
+# DATA_SOURCE_TEXT end
 from vein import config, market_data as md, onchain_graph as og, stress as st
 from vein import entity_resolution as er, resolver
 from vein.scm import StructuralCausalModel
@@ -32,8 +38,8 @@ from vein import risk, falsification as fz, benchmarks as bm, backtest as bt
 RESULTS = Path(__file__).resolve().parent / "results"
 RESULTS.mkdir(exist_ok=True)
 
-# Flow window kept to 2025 onward for the systemic-core tokens to stay within
-# Dune free-tier credits while covering pre-crisis baseline + event + regime.
+# Flow window kept to 2025 onward for the systemic-core tokens to limit the scan cost
+# while covering pre-crisis baseline + event + regime.
 FLOW_START = dt.date(2025, 1, 1)
 FLOW_END = config.REGIME_END
 EST_CUTOFF = pd.Timestamp(config.ESTIMATION_END)
@@ -70,10 +76,10 @@ def main():
             tvl[slug] = pd.Series(dtype=float)
     print("      TVL slugs:", {k: len(v) for k, v in tvl.items()})
 
-    # ---- 2. on-chain flows with ENTITY RESOLUTION (real, Dune) ---------------
-    print("[3/8] Fetching resolved on-chain inter-entity flows (Dune SQL) ...")
+    # ---- 2. on-chain flows with ENTITY RESOLUTION (real) ---------------------
+    print(f"[3/8] Fetching resolved on-chain inter-entity flows ({config.DATA_BACKEND}) ...")
     # Tier-3 resolution: both transfer endpoints resolved against our seed labels
-    # and Dune's labels.cex_ethereum, sub-wallets collapsed to exchange roots.
+    # and the open CEX label set, sub-wallets collapsed to exchange roots.
     flows_core = er.load_resolved_flows(FLOW_START, FLOW_END, og.CORE_TOKENS, eth_px)
     flows_extra = er.load_resolved_flows(dt.date(2025, 10, 1), dt.date(2025, 10, 22),
                                          ["USDC", "USDT", "WETH"], eth_px)
@@ -199,10 +205,10 @@ def write_report(out: dict):
     A = lines.append
     A("# VEIN — Empirical Evaluation on Real Data\n")
     A(f"_Generated {out['generated']}. On-chain flow window "
-      f"{out['data_window'][0]} → {out['data_window'][1]} (Dune); "
+      f"{out['data_window'][0]} → {out['data_window'][1]} ({DATA_SOURCE_TEXT[config.DATA_BACKEND]}); "
       f"prices/TVL Jan 2024 → Jun 2026 (CoinGecko/DefiLlama)._\n")
     A("All numbers below come from real Ethereum mainnet data (decoded ERC-20 "
-      "transfers via Dune), real market prices (CoinGecko), and real protocol "
+      "transfers), real market prices (CoinGecko), and real protocol "
       "TVL (DefiLlama). No synthetic data is used.\n")
 
     # ---- headline findings (computed from results, stated honestly) ----------
@@ -254,7 +260,7 @@ def write_report(out: dict):
         t2 = erv.get("tier2_embedding", {})
         A("## 0b. Entity resolution quality (Tier 1/2 + Tier-3 reconciliation)\n")
         A(f"On {erv['n_addresses']:,} addresses in the USDe event-window graph, "
-          f"{erv['n_cex_labeled']:,} carry a Dune CEX label spanning "
+          f"{erv['n_cex_labeled']:,} carry a CEX label spanning "
           f"{erv['n_distinct_cex']} distinct exchanges.")
         if t1.get("trained"):
             A(f"- **Tier-1 supervised classifier** (held-out, base rate "
@@ -346,7 +352,7 @@ def write_report(out: dict):
       engine is off-chain; we observe only its on-chain settlement flows. CEX-internal
       mechanics enter as exogenous shocks U, not structurally.
     - **Entity resolution (Tier 0–3) is implemented and run.** Both transfer
-      endpoints are resolved against seed labels + Dune `labels.cex_ethereum`, with
+      endpoints are resolved against seed labels + the open CEX labels, with
       sub-wallets collapsed to exchange roots (Section 0b reports the Tier-1
       classifier ROC-AUC and Tier-2 embedding homogeneity as robustness stats).
       Residual unlabeled addresses still collapse into 'retail', so recall is
@@ -355,7 +361,7 @@ def write_report(out: dict):
       is gated off by default because the ethereum.traces scan is credit-expensive.
     - **Flow tokens.** The historical graph uses the Ethena/Binance systemic-core
       tokens (USDe, sUSDe, wBETH) over 2025-01..2026-06, plus a tight Oct-2025
-      USDC/USDT/WETH enrichment, to stay within Dune free-tier credits. Even so,
+      USDC/USDT/WETH enrichment, to limit the scan cost. Even so,
       direct labeled↔labeled flows are dominated by Binance-internal transfers, so
       inter-entity edges rely on documented composability links — full densification
       needs the Tier-1/2 resolution layer (clustering user deposit addresses to

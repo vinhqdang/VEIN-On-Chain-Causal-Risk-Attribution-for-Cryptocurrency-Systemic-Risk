@@ -14,8 +14,9 @@ import datetime as dt, json, itertools
 from pathlib import Path
 import numpy as np, pandas as pd
 
-from vein import config, market_data as md, onchain_graph as og
-from vein import entity_resolution as er, estimated_graph as eg
+from vein import config, market_data as md
+from vein import estimated_graph as eg, validation as val, pipeline as pl
+from vein.validation import onestep_errors
 from vein.scm import StructuralCausalModel
 from vein import risk
 import run_best as rb
@@ -28,86 +29,11 @@ rng = np.random.default_rng(7)
 
 # ---------------------------------------------------------------- shared build
 def build():
-    flows = er.load_resolved_flows(rb.WIN_START, rb.WIN_END, rb.TOKENS, bucket="hour",
-                                   min_addr_volume=1e3)
-    flows = er.top_k_entities(flows, k=12)
-    flows["day"] = pd.to_datetime(flows["day"])
-    prices = md.build_hourly_price_panel(config.MARKET_ASSETS, rb.WIN_START, rb.WIN_END)
-    ents = sorted(set(flows.from_entity) | set(flows.to_entity) | set(config.ENTITIES))
-    stress = rb.build_hourly_stress(flows, ents, prices).sort_index()
-    graph = og.build_graph(flows, min_usd=1e5)
-    return flows, prices, stress, graph
+    ctx = pl.build_hourly_context(k=12)
+    return ctx.flows, ctx.prices_ffill, ctx.stress, ctx.graph
 
 
-# ------------------------------------------- self-contained one-step evaluator
-def onestep_errors(stress, flows, parents, fit_mask, eval_mask, flow_lag=0, alpha=1.0):
-    """Ridge one-step-ahead fit on fit rows, evaluate on eval rows.
-    Returns dict with weighted/unweighted RMSE, MAE, directional accuracy, and
-    the per-observation squared-error array (for paired bootstrap)."""
-    idx = stress.index
-    fmap = {(i, j): g.set_index("day").usd_volume.groupby(level=0).sum()
-            for (i, j), g in flows.groupby(["from_entity", "to_entity"])}
-
-    def flow_at(p, c, t_pos):
-        s = fmap.get((p, c))
-        if s is None:
-            return 0.0
-        day = idx[t_pos - flow_lag] if t_pos - flow_lag >= 0 else idx[0]
-        try:
-            return float(s.get(day, 0.0))
-        except Exception:
-            return 0.0
-
-    # fit per entity
-    coefs = {}
-    for ent in stress.columns:
-        par = [p for p in parents.get(ent, []) if p in stress.columns]
-        rows_y, rows_X = [], []
-        for tpos in range(1, len(idx)):
-            if not fit_mask[tpos]:
-                continue
-            feats = [stress.iloc[tpos - 1][p] for p in par] + \
-                    [np.log1p(flow_at(p, ent, tpos)) for p in par]
-            rows_X.append([1.0] + feats); rows_y.append(stress.iloc[tpos][ent])
-        if len(rows_y) < 5 or len(par) == 0:
-            coefs[ent] = (np.array([np.mean(rows_y) if rows_y else 0.0]), par)
-            continue
-        X = np.array(rows_X); y = np.array(rows_y)
-        A = X.T @ X + alpha * np.eye(X.shape[1]); A[0, 0] -= alpha
-        beta = np.linalg.solve(A, X.T @ y)
-        coefs[ent] = (beta, par)
-
-    preds, acts, wts, tpos_all, ent_all = [], [], [], [], []
-    for ent_pos, ent in enumerate(stress.columns):
-        beta, par = coefs[ent]
-        for tpos in range(1, len(idx)):
-            if not eval_mask[tpos]:
-                continue
-            if len(par) == 0 or len(beta) == 1:
-                yhat = beta[0]
-            else:
-                feats = [stress.iloc[tpos - 1][p] for p in par] + \
-                        [np.log1p(flow_at(p, ent, tpos)) for p in par]
-                yhat = beta @ np.array([1.0] + feats)
-            y = stress.iloc[tpos][ent]
-            preds.append(yhat); acts.append(y); wts.append(abs(y) + 0.1)
-            tpos_all.append(tpos); ent_all.append(ent_pos)
-    preds, acts, wts = np.array(preds), np.array(acts), np.array(wts)
-    err2 = (preds - acts) ** 2
-    wrmse = float(np.sqrt(np.average(err2, weights=wts)))
-    rmse = float(np.sqrt(np.mean(err2)))
-    mae = float(np.mean(np.abs(preds - acts)))
-    diracc = float(np.mean(np.sign(preds) == np.sign(acts)))
-    return {"wrmse": wrmse, "rmse": rmse, "mae": mae, "dir_acc": diracc,
-            "werr": (err2 * wts), "wts": wts, "n": len(preds),
-            "tpos": np.array(tpos_all), "ent": np.array(ent_all)}
-
-
-def masks(stress):
-    idx = stress.index
-    ev = np.array([(t >= EVENT_START) and (t <= EVENT_END) for t in idx])
-    fit = np.array([t < EVENT_START for t in idx])
-    return fit, ev
+masks = val.event_masks
 
 
 def main():

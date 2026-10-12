@@ -135,9 +135,30 @@ def coverage_sql(tables, labels_table, labels_fp, extract_hashes, start, end) ->
 WITH {_x_cte(tables)}, lab AS (SELECT address, entity, src FROM `{labels_table}`)
 SELECT x.token, COALESCE(lf.src,'none') AS from_src, COALESCE(lt.src,'none') AS to_src,
   (x.from_a = {NULL_ADDR_SQL} OR x.to_a = {NULL_ADDR_SQL}) AS is_mint_burn,
+  (lf.entity IS NOT NULL AND lf.entity = lt.entity) AS same_entity,
   SUM(x.amount) AS amount, SUM(x.n_tx) AS n_tx, COUNT(*) AS n_pairs
 FROM x LEFT JOIN lab lf ON x.from_a=lf.address LEFT JOIN lab lt ON x.to_a=lt.address
-WHERE {_window(start, end)} GROUP BY 1,2,3,4"""
+WHERE {_window(start, end)} GROUP BY 1,2,3,4,5"""
+
+
+def lido_series_sql(tables, extract_hashes, start, end) -> str:
+    """Hourly stETH mints (from the zero address), transfers into the Lido Withdrawal Queue
+    and gross stETH volume. Mints and queue deposits are the redemption-pressure signal."""
+    from . import config as _cfg
+    queue = _cfg.PROTOCOL_ADDRESSES["lido_withdrawal_queue"].lower()
+    return f"""{_header("lido_series", extract_hashes, "none")}
+WITH {_x_cte(tables)}
+SELECT x.bucket AS hour,
+  SUM(IF(x.from_a = {NULL_ADDR_SQL}, x.amount, 0)) AS steth_mint,
+  SUM(IF(x.to_a = FROM_HEX('{queue[2:]}'), x.amount, 0)) AS steth_wq_in,
+  SUM(x.amount) AS steth_gross, SUM(x.n_tx) AS n_tx
+FROM x WHERE x.token='stETH' AND {_window(start, end)} GROUP BY 1 ORDER BY 1"""
+
+
+def sweep_keys(epoch: str) -> list[str]:
+    """Extracts of a label epoch that feed Tier-0 sweep detection (sweeps flag not False)."""
+    return [k for k, v in config.BQ_EXTRACTS.items()
+            if v["epoch"] == epoch and v.get("sweeps", True)]
 
 
 def edges_sql(tables, labels_table, labels_fp, extract_hashes, token, start, end) -> str:

@@ -22,12 +22,10 @@ import datetime as dt
 import json
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
-from vein import config, onchain_graph as og
-from vein import entity_resolution as er, falsification as fz
-from vein.scm import StructuralCausalModel
+from vein import config, pipeline as pl
+from vein import falsification as fz
 
 RESULTS = Path(__file__).resolve().parent / "results"
 RESULTS.mkdir(exist_ok=True)
@@ -40,38 +38,13 @@ TOKENS = ["USDe", "sUSDe", "wBETH", "USDC", "USDT"]
 ROLL = 48                               # 48-hour rolling window for z-scores
 
 
-def zscore(s: pd.Series, win: int = ROLL) -> pd.Series:
-    mu = s.rolling(win, min_periods=6).mean()
-    sd = s.rolling(win, min_periods=6).std().replace(0, np.nan)
-    return ((s - mu) / sd).fillna(0.0)
-
-
-def build_intraday_stress(flows: pd.DataFrame, entities: list[str]) -> pd.DataFrame:
-    """Hourly flow-derived stress per entity: net-outflow ratio + volume spike."""
-    idx = pd.DatetimeIndex(sorted(flows["day"].unique()))
-    cols = {}
-    for ent in entities:
-        inflow = flows[flows.to_entity == ent].groupby("day").usd_volume.sum().reindex(idx, fill_value=0.0)
-        outflow = flows[flows.from_entity == ent].groupby("day").usd_volume.sum().reindex(idx, fill_value=0.0)
-        total = (inflow + outflow)
-        net_ratio = ((outflow - inflow) / total.rolling(ROLL, min_periods=6).mean().replace(0, np.nan)).fillna(0.0)
-        vol_spike = zscore(total)                      # throughput surge = stress
-        cols[ent] = 0.6 * zscore(net_ratio) + 0.4 * vol_spike
-    return pd.DataFrame(cols, index=idx).fillna(0.0)
-
-
 def main():
-    print("[1/4] Fetching HOURLY resolved on-chain flows (Dune) ...")
-    flows = er.load_resolved_flows(WIN_START, WIN_END, TOKENS, bucket="hour",
-                                   min_addr_volume=1e3)
-    flows = er.top_k_entities(flows, k=12)
-    flows["day"] = pd.to_datetime(flows["day"])
-    entities = sorted(set(flows.from_entity) | set(flows.to_entity) | set(config.ENTITIES))
+    print(f"[1/4] Hourly resolved flows, prices, Lido series ({config.DATA_BACKEND}) ...")
+    ctx = pl.build_hourly_context(k=12, win=(WIN_START, WIN_END), tokens=TOKENS)
+    flows, stress, graph, entities = ctx.flows, ctx.stress.sort_index(), ctx.graph, ctx.entities
     print(f"      {len(flows)} hourly rows; {flows.day.nunique()} hours; {len(entities)} entities")
 
-    print("[2/4] Building hourly stress + observed graph ...")
-    stress = build_intraday_stress(flows, entities).sort_index()
-    graph = og.build_graph(flows, min_usd=1e5)
+    print("[2/4] Hourly stress (shared builder) + observed graph ...")
 
     ev = stress.index[(stress.index >= EVENT_START) & (stress.index <= EVENT_END)]
     est_stress = stress[stress.index < EVENT_START]
@@ -137,7 +110,7 @@ def main():
         "# VEIN — Decisive Intraday A3 Falsification Test\n",
         f"_Hourly resolution, Oct 2025 cascade. Fit on {len(est_stress)} pre-event "
         f"hours, tested on {len(ev)} event hours (Oct 10–11). {len(entities)} "
-        "entity-resolved nodes. Real on-chain Dune data._\n",
+        "entity-resolved nodes. Real on-chain token-transfer data._\n",
         "## Result\n",
         "| model | weighted RMSE | timing corr | n |",
         "|---|--:|--:|--:|",
