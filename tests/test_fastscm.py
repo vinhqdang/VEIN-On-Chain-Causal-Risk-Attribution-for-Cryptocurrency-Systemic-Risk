@@ -94,6 +94,33 @@ def test_attribution_matrix_matches_counterfactual_attribution():
             assert abs(mat["L_obs"][i, j] - ref["L_observed"]) < 1e-9
 
 
+def test_attribution_matrix_legacy_zero_matches_counterfactual_attribution():
+    scm, days, init, rng, sys, C = _setup()
+    U_true = {e: rng.normal(size=len(days)) for e in scm.stress_cols}
+    observed = scm.simulate(days, init, U_true)
+    precrisis = {"X": 0.1, "Y": -0.4, "Z": 0.3}
+    S_obs = observed[sys.nodes].values
+    init_vec = [init[e] for e in sys.nodes]
+    mat = fs.attribution_matrix(sys, C, S_obs, init_vec, [precrisis[e] for e in sys.nodes],
+                                abduction="legacy_zero")
+    for i, a in enumerate(sys.nodes):
+        for j, b in enumerate(sys.nodes):
+            if a == b:
+                continue
+            ref = risk.counterfactual_attribution(scm, a, b, days, observed, init, precrisis[a],
+                                                  abduction="legacy_zero")
+            assert abs(mat["attr"][i, j] - ref["attribution"]) < 1e-9
+            assert abs(mat["share"][i, j] - ref["attribution_share"]) < 1e-9
+            assert abs(mat["L_obs"][i, j] - ref["L_observed"]) < 1e-9
+
+
+def test_attribution_matrix_rejects_unknown_abduction():
+    scm, days, init, rng, sys, C = _setup()
+    S_obs = np.zeros((len(days), sys.n))
+    with pytest.raises(ValueError):
+        fs.attribution_matrix(sys, C, S_obs, np.zeros(sys.n), np.zeros(sys.n), abduction="nope")
+
+
 def test_simulate_batch_rejects_bad_do_shape():
     scm, days, init, rng, sys, C = _setup()
     U = np.zeros((1, len(days), 3))

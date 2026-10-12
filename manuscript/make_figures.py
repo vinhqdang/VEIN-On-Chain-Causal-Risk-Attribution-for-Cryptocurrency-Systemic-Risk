@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate publication figures for the VEIN manuscript from the real results."""
 import json
+import sys
 from pathlib import Path
 
 import matplotlib
@@ -10,6 +11,7 @@ import numpy as np
 import networkx as nx
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))   # the vein package lives at the repo root
 RES = ROOT / "results"
 FIG = Path(__file__).resolve().parent / "figures"
 FIG.mkdir(exist_ok=True)
@@ -55,27 +57,35 @@ def fig_usde():
     fig.tight_layout(); fig.savefig(FIG / "fig_usde_spike.pdf"); plt.close(fig)
 
 
-# --- Fig 2: entity-resolved flow graph -----------------------------------------
+# --- Fig 2: hourly observed flow graph (fitted SCM parents) --------------------
 def fig_graph():
-    d = load("results.json")
-    edges = d["graph"]["edges"]   # [from,to,vol,conf,source]
+    """The hourly graph of the fitted SCM: one directed edge per parent->child pair in
+    results/hourly_scm_export.json (90 edges). Edge width is proportional to the USD volume
+    of the edge over the event window when event_flows is present, and unweighted otherwise."""
+    exp = load("hourly_scm_export.json")
+    vol = {}
+    for r in exp.get("event_flows", []):
+        key = (r["from"], r["to"])
+        vol[key] = vol.get(key, 0.0) + float(r["usd_volume"])
     G = nx.DiGraph()
-    for f, t, v, c, src in edges:
-        if v and v > 0:
-            G.add_edge(f, t, w=v)
-    if G.number_of_nodes() == 0:
-        return
+    for child, c in exp["scm_coefficients"].items():
+        for p in c["parents"]:
+            G.add_edge(p, child, w=vol.get((p, child), 0.0))
+    n_expected = load("final_results.json")["graph_edges"]
+    assert G.number_of_edges() == n_expected, (G.number_of_edges(), n_expected)
     fig, ax = plt.subplots(figsize=(6.2, 4.6))
     pos = nx.spring_layout(G, seed=3, k=1.1)
-    sizes = [600 if n != "retail" else 1100 for n in G.nodes()]
+    sizes = [1000 if n != "retail" else 1300 for n in G.nodes()]
     colors = [RED if n == "retail" else BLUE for n in G.nodes()]
     ws = np.array([G[u][v]["w"] for u, v in G.edges()])
-    widths = 0.4 + 3.0 * (ws / ws.max())
+    weighted = ws.max() > 0
+    widths = (0.4 + 3.0 * (ws / ws.max())) if weighted else np.full(len(ws), 0.8)
     nx.draw_networkx_nodes(G, pos, node_size=sizes, node_color=colors, alpha=0.85, ax=ax)
     nx.draw_networkx_edges(G, pos, width=widths, edge_color=GREY, alpha=0.6,
                            arrowsize=8, connectionstyle="arc3,rad=0.08", ax=ax)
-    nx.draw_networkx_labels(G, pos, font_size=7.5, font_color="white", ax=ax)
-    ax.set_title("Entity-resolved on-chain flow graph $G$ (edge width $\\propto$ USD volume)")
+    nx.draw_networkx_labels(G, pos, font_size=6, font_color="white", ax=ax)
+    width_txt = ("width $\\propto$ USD volume, 10--11 Oct" if weighted else "unweighted")
+    ax.set_title(f"Hourly observed flow graph $G$ ({G.number_of_edges()} edges; {width_txt})")
     ax.axis("off")
     fig.tight_layout(); fig.savefig(FIG / "fig_graph.pdf"); plt.close(fig)
 
@@ -125,6 +135,8 @@ def fig_h1():
 
 # --- Fig 5: falsification (A3) daily vs hourly ---------------------------------
 def fig_falsification():
+    """DEPRECATED, not generated. Labels the hourly bars "816 pts" (the hourly window has 720)
+    and mixes daily results with hourly ones. The manuscript does not use it."""
     daily = {r["model"]: r["rmse"] for r in load("results.json")["falsification"]}
     hourly = {r["model"]: r["rmse"] for r in load("intraday_a3.json")["falsification"]}
     keys = ["true_direction", "reversed_edges", "symmetric"]
@@ -252,6 +264,8 @@ def fig_placebo():
 
 # --- Fig 8: H3 rank divergence scatter -----------------------------------------
 def fig_h3():
+    """DEPRECATED, not generated. The title hard-codes rho=0.52, which is not a value read from
+    the results. The manuscript does not use it."""
     fr = load("final_results.json")
     e2a = {"Binance": "BNB", "Ethena": "ENA", "Aave": "AAVE", "Lido": "stETH",
            "retail": "ETH", "MakerSky": "DAI"}
@@ -276,47 +290,37 @@ def fig_h3():
     fig.tight_layout(); fig.savefig(FIG / "fig_h3_scatter.pdf"); plt.close(fig)
 
 
-# --- Fig 9: event stress trajectories (recomputed from cached hourly flows) ----
+# --- Fig 9: hourly entity stress with prices (flow + peg + discount + redemption) ---
 def fig_stress():
-    try:
-        import sys
-        sys.path.insert(0, str(ROOT))
-        import datetime as dt
-        from vein import entity_resolution as er
-        import run_best as rb
-        flows = er.load_resolved_flows(rb.WIN_START, rb.WIN_END, rb.TOKENS,
-                                       bucket="hour", min_addr_volume=1e3)
-        flows = er.top_k_entities(flows, k=12)
-        import pandas as pd
-        flows["day"] = pd.to_datetime(flows["day"])
-        ents = sorted(set(flows.from_entity) | set(flows.to_entity))
-        S = rb.build_hourly_stress(flows, ents).sort_index()
-        win = S[(S.index >= pd.Timestamp("2025-10-08")) & (S.index <= pd.Timestamp("2025-10-13"))]
-        show = [e for e in ["Binance", "Bybit", "Ethena", "retail"] if e in win.columns]
-        fig, ax = plt.subplots(figsize=(6.0, 3.2))
-        for e, c in zip(show, [BLUE, RED, GREEN, GREY]):
-            ax.plot(win.index, win[e], label=e, color=c, lw=1.3)
-        ax.axvspan(pd.Timestamp("2025-10-10"), pd.Timestamp("2025-10-11 23:00"),
-                   color="orange", alpha=0.12, label="event window")
-        ax.set_ylabel("stress $S_{i,t}$ (z-score)")
-        ax.set_title("Hourly entity stress around the October 2025 cascade")
-        ax.legend(frameon=False, ncol=3, fontsize=8)
-        fig.autofmt_xdate()
-        fig.tight_layout(); fig.savefig(FIG / "fig_stress.pdf"); plt.close(fig)
-    except Exception as e:  # pragma: no cover
-        print("fig_stress skipped:", e)
+    """Hourly stress panel rebuilt from the same context as run_best.py, with the prices and the
+    stETH series, so the Ethena curve includes its USDe peg component (flow-only recomputes
+    do not). The event window is checked against hourly_scm_export.json event_stress."""
+    import pandas as pd
+    from vein import pipeline as pl
+    ctx = pl.build_hourly_context(k=12)
+    S = ctx.stress.sort_index()
+    exp = load("hourly_scm_export.json")
+    ev = pd.DataFrame.from_dict(exp["event_stress"], orient="index")
+    ev.index = pd.to_datetime(ev.index)
+    diff = float(np.max(np.abs(S.loc[ev.index, ev.columns].values - ev.values)))
+    assert diff < 1e-9, f"stress differs from hourly_scm_export.json event_stress by {diff}"
+    win = S[(S.index >= pd.Timestamp("2025-10-08")) & (S.index <= pd.Timestamp("2025-10-13 23:00"))]
+    show = [e for e in ["Binance", "Bybit", "Ethena", "retail"] if e in win.columns]
+    fig, ax = plt.subplots(figsize=(6.0, 3.6))
+    for e, c in zip(show, [BLUE, RED, GREEN, GREY]):
+        ax.plot(win.index, win[e], label=e, color=c, lw=1.3)
+    ax.axvspan(pd.Timestamp("2025-10-10"), pd.Timestamp("2025-10-11 23:00"),
+               color="orange", alpha=0.12, label="event window")
+    ax.set_ylabel("stress $S_{i,t}$ (z-score)")
+    ax.set_title("Hourly entity stress around the October 2025 cascade")
+    ax.legend(frameon=False, ncol=5, fontsize=8, loc="upper center", bbox_to_anchor=(0.5, -0.22))
+    fig.autofmt_xdate()
+    fig.tight_layout(); fig.savefig(FIG / "fig_stress.pdf"); plt.close(fig)
 
 
-if __name__ == "__main__":
-    fig_usde(); fig_graph(); fig_ocranking(); fig_h1(); fig_falsification(); fig_robustness()
-    fig_attribution(); fig_h3(); fig_stress(); fig_rank_ci(); fig_pairwise_top6(); fig_placebo()
-    print("figures written to", FIG)
-    for p in sorted(FIG.glob("*.pdf")):
-        print(" ", p.name)
-
-
-# --- Revision figures -----------------------------------------------------------
+# --- Deprecated figures (not generated, not used in the manuscript) -----------
 def fig_h1_ci():
+    """DEPRECATED, not generated. Reads the archived revision.json."""
     import json
     d = json.loads((RES / "revision.json").read_text())["H1"]
     fig, ax = plt.subplots(figsize=(5.2, 2.6))
@@ -330,6 +334,8 @@ def fig_h1_ci():
 
 
 def fig_shapley():
+    """DEPRECATED, not generated. Reads the archived revision.json. Shapley values are reported
+    in a table instead."""
     import json
     d = json.loads((RES / "revision.json").read_text())["shapley"]
     sv = d["shapley_values"]; names = list(sv)[::-1]; vals = [sv[n] for n in names]
@@ -341,5 +347,9 @@ def fig_shapley():
     fig.tight_layout(); fig.savefig(FIG / "fig_shapley.pdf"); plt.close(fig)
 
 
-if __name__ == "__main__" and "--revision" in __import__("sys").argv:
-    fig_h1_ci(); fig_shapley(); print("revision figures done")
+if __name__ == "__main__":
+    fig_usde(); fig_graph(); fig_ocranking(); fig_h1(); fig_robustness()
+    fig_attribution(); fig_stress(); fig_rank_ci(); fig_pairwise_top6(); fig_placebo()
+    print("figures written to", FIG)
+    for p in sorted(FIG.glob("*.pdf")):
+        print(" ", p.name)

@@ -1,0 +1,2888 @@
+{
+  "generated": "2026-10-12",
+  "data_backend": "bigquery",
+  "resolution": "hourly",
+  "event_window": [
+    "2025-10-10 00:00:00",
+    "2025-10-11 23:00:00"
+  ],
+  "fit_window": [
+    "2025-09-15 00:00:00",
+    "2025-10-09 23:00:00"
+  ],
+  "n_entities": 15,
+  "source": "Binance",
+  "target": "Bybit",
+  "pair_criterion": "ordered pairs with L_observed > 1e-9",
+  "checks": {
+    "full_vs_reported_points_max_abs_diff": 0.0,
+    "tolerance": 1e-09,
+    "reported_points": [
+      "results/final_results.json counterfactual_attribution (top 10)",
+      "results/uncertainty.json attribution.channels and max_share.point"
+    ]
+  },
+  "modes": [
+    {
+      "abduction": "legacy_zero",
+      "engine": {
+        "ranking": "vein.fastscm.attribution_matrix",
+        "reference": "vein.risk.counterfactual_attribution"
+      },
+      "bybit_L_observed": 3.841218275024533,
+      "bybit_L_observed_by_source": {
+        "min": 1.4864420657157287,
+        "max": 3.841218275024533
+      },
+      "binance_to_bybit": {
+        "L_observed": 3.841218275024533,
+        "attribution": 2.509081678613775,
+        "share": 0.653199453654518
+      },
+      "max_share": {
+        "share": 1.0,
+        "i": "Binance",
+        "j": "Ethena",
+        "attribution": 0.032622151228495155,
+        "L_observed": 0.032622151228495155
+      },
+      "max_share_L_observed_ge_1": {
+        "share": 0.8115481538468906,
+        "i": "retail",
+        "j": "Crypto.com",
+        "L_observed": 1.2249119622104727
+      },
+      "n_pairs": 183,
+      "L_observed_by_entity": {
+        "Aave": 1.919697044528429,
+        "Binance": 18.859787433477944,
+        "Bitfinex": 5.150114036496426,
+        "Bybit": 3.841218275024533,
+        "Ceffu": 0.0,
+        "Coinbase": 7.82917330087053,
+        "Copper": 1.574655574962368,
+        "Crypto.com": 1.6726346713201592,
+        "Ethena": 0.032622151228495155,
+        "HTX": 1.7400198814392,
+        "Kraken": 7.439172672463123,
+        "Lido": 0.044654534502215,
+        "MakerSky": 2.0090425977517232,
+        "OKX": 2.1038244133327053,
+        "retail": 9.807751011982571
+      },
+      "pairs": [
+        {
+          "i": "Binance",
+          "j": "Ethena",
+          "L_observed": 0.032622151228495155,
+          "attribution": 0.032622151228495155,
+          "share": 1.0
+        },
+        {
+          "i": "retail",
+          "j": "Crypto.com",
+          "L_observed": 1.2249119622104727,
+          "attribution": 0.9940750415568813,
+          "share": 0.8115481538468906
+        },
+        {
+          "i": "retail",
+          "j": "Bitfinex",
+          "L_observed": 4.463832984496805,
+          "attribution": 3.2726616765184775,
+          "share": 0.7331505654187004
+        },
+        {
+          "i": "Bybit",
+          "j": "Binance",
+          "L_observed": 1.981968858058599,
+          "attribution": 1.4351879272774153,
+          "share": 0.724122339986324
+        },
+        {
+          "i": "OKX",
+          "j": "Crypto.com",
+          "L_observed": 1.3850439118674054,
+          "attribution": 0.9936658129581419,
+          "share": 0.7174254941985324
+        },
+        {
+          "i": "retail",
+          "j": "Copper",
+          "L_observed": 1.9223649381647723,
+          "attribution": 1.3768076519133843,
+          "share": 0.7162051411673082
+        },
+        {
+          "i": "retail",
+          "j": "HTX",
+          "L_observed": 1.301923716467075,
+          "attribution": 0.9172228696444564,
+          "share": 0.7045135272083759
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Binance",
+          "L_observed": 1.7141899409864643,
+          "attribution": 1.156095855876508,
+          "share": 0.6744269279816273
+        },
+        {
+          "i": "Binance",
+          "j": "Crypto.com",
+          "L_observed": 1.6726346713201592,
+          "attribution": 1.1126321526325964,
+          "share": 0.6651973510476319
+        },
+        {
+          "i": "Bybit",
+          "j": "Crypto.com",
+          "L_observed": 1.2784818301824694,
+          "attribution": 0.8396385036081204,
+          "share": 0.6567465284104071
+        },
+        {
+          "i": "Binance",
+          "j": "Bybit",
+          "L_observed": 3.841218275024533,
+          "attribution": 2.509081678613775,
+          "share": 0.653199453654518
+        },
+        {
+          "i": "Kraken",
+          "j": "Crypto.com",
+          "L_observed": 1.1427790958599124,
+          "attribution": 0.7308902159404305,
+          "share": 0.639572616079798
+        },
+        {
+          "i": "retail",
+          "j": "Binance",
+          "L_observed": 1.1075670353099427,
+          "attribution": 0.6635038604051461,
+          "share": 0.5990642906950282
+        },
+        {
+          "i": "Coinbase",
+          "j": "Bitfinex",
+          "L_observed": 3.5457855106350324,
+          "attribution": 1.9675394751940491,
+          "share": 0.5548952324647727
+        },
+        {
+          "i": "Aave",
+          "j": "HTX",
+          "L_observed": 2.2379253618660777,
+          "attribution": 1.2352101216890938,
+          "share": 0.5519442885526454
+        },
+        {
+          "i": "retail",
+          "j": "OKX",
+          "L_observed": 1.9773535035684024,
+          "attribution": 1.0818066479103483,
+          "share": 0.5470982532754419
+        },
+        {
+          "i": "MakerSky",
+          "j": "Binance",
+          "L_observed": 1.3291500916217949,
+          "attribution": 0.6679682785365944,
+          "share": 0.5025529341998966
+        },
+        {
+          "i": "Kraken",
+          "j": "OKX",
+          "L_observed": 2.183290198893506,
+          "attribution": 1.087331248904521,
+          "share": 0.4980241515560239
+        },
+        {
+          "i": "Kraken",
+          "j": "Binance",
+          "L_observed": 1.0873222755688035,
+          "attribution": 0.5403158139741966,
+          "share": 0.4969233373716591
+        },
+        {
+          "i": "Binance",
+          "j": "HTX",
+          "L_observed": 1.7400198814392,
+          "attribution": 0.8133870280691756,
+          "share": 0.46745846800118707
+        },
+        {
+          "i": "retail",
+          "j": "Coinbase",
+          "L_observed": 7.93095208587408,
+          "attribution": 3.6194671590251657,
+          "share": 0.45637233964278323
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Bybit",
+          "L_observed": 2.248048198661595,
+          "attribution": 1.0088155797508558,
+          "share": 0.4487517573473146
+        },
+        {
+          "i": "OKX",
+          "j": "Binance",
+          "L_observed": 1.1248301813586532,
+          "attribution": 0.4994971821458396,
+          "share": 0.44406452673816943
+        },
+        {
+          "i": "MakerSky",
+          "j": "Crypto.com",
+          "L_observed": 0.9049309535127581,
+          "attribution": 0.38086797555660046,
+          "share": 0.42088070264161964
+        },
+        {
+          "i": "Binance",
+          "j": "Kraken",
+          "L_observed": 7.439172672463123,
+          "attribution": 3.102743071713607,
+          "share": 0.41708173856465725
+        },
+        {
+          "i": "Bybit",
+          "j": "OKX",
+          "L_observed": 2.140680072149028,
+          "attribution": 0.8741501738548183,
+          "share": 0.4083516192951053
+        },
+        {
+          "i": "Kraken",
+          "j": "Bitfinex",
+          "L_observed": 4.566472326137437,
+          "attribution": 1.6850551012254282,
+          "share": 0.3690058716836102
+        },
+        {
+          "i": "MakerSky",
+          "j": "retail",
+          "L_observed": 11.80728821712403,
+          "attribution": 4.137034154226611,
+          "share": 0.350379704310656
+        },
+        {
+          "i": "Bybit",
+          "j": "HTX",
+          "L_observed": 1.2997396476720293,
+          "attribution": 0.43670120462111317,
+          "share": 0.3359912928741468
+        },
+        {
+          "i": "retail",
+          "j": "Kraken",
+          "L_observed": 5.049704401915376,
+          "attribution": 1.683219379560032,
+          "share": 0.33333027947568167
+        },
+        {
+          "i": "Kraken",
+          "j": "Bybit",
+          "L_observed": 1.9531628122738711,
+          "attribution": 0.6442486346475764,
+          "share": 0.329848915102752
+        },
+        {
+          "i": "Binance",
+          "j": "Bitfinex",
+          "L_observed": 5.150114036496426,
+          "attribution": 1.6805689502440488,
+          "share": 0.3263168423717709
+        },
+        {
+          "i": "MakerSky",
+          "j": "Coinbase",
+          "L_observed": 8.745137824776346,
+          "attribution": 2.5989199022238045,
+          "share": 0.2971845560696204
+        },
+        {
+          "i": "Binance",
+          "j": "OKX",
+          "L_observed": 2.1038244133327053,
+          "attribution": 0.6094593898631662,
+          "share": 0.28969118620394313
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Kraken",
+          "L_observed": 5.4363134299012215,
+          "attribution": 1.5261690507986647,
+          "share": 0.2807360301200285
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Bitfinex",
+          "L_observed": 4.228374875793091,
+          "attribution": 1.1824429820997864,
+          "share": 0.27964478477750926
+        },
+        {
+          "i": "Coinbase",
+          "j": "Crypto.com",
+          "L_observed": 0.6169985993852287,
+          "attribution": 0.1683534780977506,
+          "share": 0.27285876866737835
+        },
+        {
+          "i": "Copper",
+          "j": "Binance",
+          "L_observed": 0.9805229497189859,
+          "attribution": 0.2606707596269512,
+          "share": 0.26584870828536794
+        },
+        {
+          "i": "OKX",
+          "j": "Bitfinex",
+          "L_observed": 4.288083722467833,
+          "attribution": 1.1129126492661565,
+          "share": 0.259536128792202
+        },
+        {
+          "i": "MakerSky",
+          "j": "Bitfinex",
+          "L_observed": 4.333498591988606,
+          "attribution": 1.1068481672886965,
+          "share": 0.2554167594135004
+        },
+        {
+          "i": "Crypto.com",
+          "j": "OKX",
+          "L_observed": 1.7571193744027385,
+          "attribution": 0.4304633643581268,
+          "share": 0.2449824244322873
+        },
+        {
+          "i": "HTX",
+          "j": "Binance",
+          "L_observed": 1.0217906555184304,
+          "attribution": 0.24713728875811736,
+          "share": 0.24186685151541754
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Kraken",
+          "L_observed": 4.40040750231196,
+          "attribution": 0.935126119216124,
+          "share": 0.21250898211695432
+        },
+        {
+          "i": "Coinbase",
+          "j": "Binance",
+          "L_observed": 0.7810068531164542,
+          "attribution": 0.1642040518137453,
+          "share": 0.2102466209592417
+        },
+        {
+          "i": "Coinbase",
+          "j": "Bybit",
+          "L_observed": 1.5106351284567414,
+          "attribution": 0.31722361703946356,
+          "share": 0.20999353918344127
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Crypto.com",
+          "L_observed": 0.6313423730260619,
+          "attribution": 0.13107117482589326,
+          "share": 0.20760712479610904
+        },
+        {
+          "i": "Kraken",
+          "j": "retail",
+          "L_observed": 10.493963890635941,
+          "attribution": 2.132845784956432,
+          "share": 0.2032450089579239
+        },
+        {
+          "i": "Bitfinex",
+          "j": "retail",
+          "L_observed": 9.150352186101719,
+          "attribution": 1.7786134636520332,
+          "share": 0.1943765034916943
+        },
+        {
+          "i": "MakerSky",
+          "j": "HTX",
+          "L_observed": 1.106365218481087,
+          "attribution": 0.21364068837341377,
+          "share": 0.1931014142569648
+        },
+        {
+          "i": "Coinbase",
+          "j": "retail",
+          "L_observed": 8.652714261903363,
+          "attribution": 1.6522494657070403,
+          "share": 0.19095158070591253
+        },
+        {
+          "i": "HTX",
+          "j": "Crypto.com",
+          "L_observed": 0.7125098238669967,
+          "attribution": 0.13344191960538543,
+          "share": 0.18728432245489274
+        },
+        {
+          "i": "Kraken",
+          "j": "HTX",
+          "L_observed": 1.1206751424316852,
+          "attribution": 0.2064160973036817,
+          "share": 0.1841890566572146
+        },
+        {
+          "i": "Copper",
+          "j": "Kraken",
+          "L_observed": 4.986308434946314,
+          "attribution": 0.9165126505671841,
+          "share": 0.18380584805862535
+        },
+        {
+          "i": "MakerSky",
+          "j": "Copper",
+          "L_observed": 1.6824220247973722,
+          "attribution": 0.30159326716705936,
+          "share": 0.17926136410594284
+        },
+        {
+          "i": "OKX",
+          "j": "Kraken",
+          "L_observed": 5.158667345011196,
+          "attribution": 0.9010898780620495,
+          "share": 0.17467493400858045
+        },
+        {
+          "i": "Bybit",
+          "j": "Bitfinex",
+          "L_observed": 4.13099390584285,
+          "attribution": 0.7025845283348411,
+          "share": 0.1700763894473701
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Coinbase",
+          "L_observed": 7.048314624093808,
+          "attribution": 1.068225412445095,
+          "share": 0.15155756651292154
+        },
+        {
+          "i": "MakerSky",
+          "j": "Kraken",
+          "L_observed": 5.043432655777018,
+          "attribution": 0.7408460068687113,
+          "share": 0.14689320893778696
+        },
+        {
+          "i": "retail",
+          "j": "Aave",
+          "L_observed": 1.9243837596313884,
+          "attribution": 0.2804546929518812,
+          "share": 0.14573740375235847
+        },
+        {
+          "i": "MakerSky",
+          "j": "OKX",
+          "L_observed": 1.6563709347573676,
+          "attribution": 0.23297486417638225,
+          "share": 0.1406537987884395
+        },
+        {
+          "i": "Coinbase",
+          "j": "OKX",
+          "L_observed": 1.5785095859458238,
+          "attribution": 0.2158057435441878,
+          "share": 0.13671487678351957
+        },
+        {
+          "i": "Kraken",
+          "j": "Copper",
+          "L_observed": 1.6323567130403787,
+          "attribution": 0.2169519180970232,
+          "share": 0.13290717424926998
+        },
+        {
+          "i": "Bybit",
+          "j": "Coinbase",
+          "L_observed": 7.6817931743352155,
+          "attribution": 0.9734384539101724,
+          "share": 0.12672021126036292
+        },
+        {
+          "i": "Bybit",
+          "j": "Kraken",
+          "L_observed": 4.986718268777738,
+          "attribution": 0.6189570283329688,
+          "share": 0.12412111432248155
+        },
+        {
+          "i": "Crypto.com",
+          "j": "retail",
+          "L_observed": 9.731091287395731,
+          "attribution": 1.1808629969211566,
+          "share": 0.1213494932937972
+        },
+        {
+          "i": "Bitfinex",
+          "j": "HTX",
+          "L_observed": 1.0134536226758588,
+          "attribution": 0.12262641324057277,
+          "share": 0.12099854447882652
+        },
+        {
+          "i": "Coinbase",
+          "j": "Copper",
+          "L_observed": 1.4883216175883156,
+          "attribution": 0.17208773829598845,
+          "share": 0.1156253703919455
+        },
+        {
+          "i": "Binance",
+          "j": "Coinbase",
+          "L_observed": 7.82917330087053,
+          "attribution": 0.8793788756268528,
+          "share": 0.11232078302942587
+        },
+        {
+          "i": "HTX",
+          "j": "Bybit",
+          "L_observed": 1.6142475839958395,
+          "attribution": 0.1800894228022376,
+          "share": 0.11156245459971632
+        },
+        {
+          "i": "Bitfinex",
+          "j": "OKX",
+          "L_observed": 1.5541610166174336,
+          "attribution": 0.17018700495665606,
+          "share": 0.1095041010146175
+        },
+        {
+          "i": "Crypto.com",
+          "j": "HTX",
+          "L_observed": 1.0358734229493183,
+          "attribution": 0.11326745999854959,
+          "share": 0.10934488470228025
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Binance",
+          "L_observed": 0.7877379694121125,
+          "attribution": 0.08599602879871815,
+          "share": 0.10916831755983127
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Copper",
+          "L_observed": 1.5079490525619248,
+          "attribution": 0.16419466837158914,
+          "share": 0.10888608477364084
+        },
+        {
+          "i": "OKX",
+          "j": "Coinbase",
+          "L_observed": 7.526805905991916,
+          "attribution": 0.8121823534662056,
+          "share": 0.10790531383566647
+        },
+        {
+          "i": "OKX",
+          "j": "retail",
+          "L_observed": 9.778602385631917,
+          "attribution": 1.0296345108126879,
+          "share": 0.10529464950181124
+        },
+        {
+          "i": "Ethena",
+          "j": "Binance",
+          "L_observed": 0.8666014196161758,
+          "attribution": 0.09075654603182404,
+          "share": 0.10472697595166737
+        },
+        {
+          "i": "Coinbase",
+          "j": "HTX",
+          "L_observed": 0.9914763582502578,
+          "attribution": 0.09877331027591629,
+          "share": 0.09962245640453789
+        },
+        {
+          "i": "OKX",
+          "j": "HTX",
+          "L_observed": 1.0593018370699865,
+          "attribution": 0.10388360873103708,
+          "share": 0.09806799638748634
+        },
+        {
+          "i": "Bybit",
+          "j": "retail",
+          "L_observed": 9.781016190858725,
+          "attribution": 0.9488555648607289,
+          "share": 0.09700991659205341
+        },
+        {
+          "i": "Coinbase",
+          "j": "Kraken",
+          "L_observed": 4.248741113920051,
+          "attribution": 0.3974914544287711,
+          "share": 0.09355511286071988
+        },
+        {
+          "i": "Kraken",
+          "j": "Coinbase",
+          "L_observed": 7.388509755771877,
+          "attribution": 0.6711351193260651,
+          "share": 0.09083497775742622
+        },
+        {
+          "i": "HTX",
+          "j": "Bitfinex",
+          "L_observed": 3.816183881840237,
+          "attribution": 0.3086984688367669,
+          "share": 0.08089192722230842
+        },
+        {
+          "i": "Binance",
+          "j": "retail",
+          "L_observed": 9.807751011982571,
+          "attribution": 0.7497536894089993,
+          "share": 0.07644501664989165
+        },
+        {
+          "i": "Aave",
+          "j": "Crypto.com",
+          "L_observed": 0.6750288288936964,
+          "attribution": 0.04856625728397801,
+          "share": 0.07194693797533531
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Copper",
+          "L_observed": 1.5531273264603773,
+          "attribution": 0.10529632461216432,
+          "share": 0.06779632475602482
+        },
+        {
+          "i": "HTX",
+          "j": "Coinbase",
+          "L_observed": 7.3236792446581855,
+          "attribution": 0.494205170103319,
+          "share": 0.0674804498659314
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Coinbase",
+          "L_observed": 7.296553534957045,
+          "attribution": 0.4464652057855405,
+          "share": 0.06118850545625015
+        },
+        {
+          "i": "OKX",
+          "j": "Copper",
+          "L_observed": 1.5613472389008498,
+          "attribution": 0.09231083046928568,
+          "share": 0.05912255017293286
+        },
+        {
+          "i": "Bybit",
+          "j": "Copper",
+          "L_observed": 1.5569371355096895,
+          "attribution": 0.08402755845765486,
+          "share": 0.05396978242807924
+        },
+        {
+          "i": "Aave",
+          "j": "retail",
+          "L_observed": 9.683607915890878,
+          "attribution": 0.5078339280806876,
+          "share": 0.05244263630782986
+        },
+        {
+          "i": "Binance",
+          "j": "Copper",
+          "L_observed": 1.574655574962368,
+          "attribution": 0.08255250072728959,
+          "share": 0.05242575077363345
+        },
+        {
+          "i": "OKX",
+          "j": "Bybit",
+          "L_observed": 1.5796029565005478,
+          "attribution": 0.07840889150968144,
+          "share": 0.049638354490921244
+        },
+        {
+          "i": "Aave",
+          "j": "Bitfinex",
+          "L_observed": 3.8723191463533215,
+          "attribution": 0.18941755677341066,
+          "share": 0.048915791703736715
+        },
+        {
+          "i": "HTX",
+          "j": "retail",
+          "L_observed": 9.372305720842292,
+          "attribution": 0.42294193428904236,
+          "share": 0.04512677529804613
+        },
+        {
+          "i": "MakerSky",
+          "j": "Aave",
+          "L_observed": 1.9587474843657748,
+          "attribution": 0.08617618588293219,
+          "share": 0.04399555663543597
+        },
+        {
+          "i": "Aave",
+          "j": "Binance",
+          "L_observed": 0.8440972046368859,
+          "attribution": 0.03280634071838817,
+          "share": 0.03886559573728338
+        },
+        {
+          "i": "Ceffu",
+          "j": "Crypto.com",
+          "L_observed": 0.6425515311501382,
+          "attribution": 0.022921837325561745,
+          "share": 0.03567315026785897
+        },
+        {
+          "i": "HTX",
+          "j": "Kraken",
+          "L_observed": 4.626026354152321,
+          "attribution": 0.15655363914751774,
+          "share": 0.03384192548038452
+        },
+        {
+          "i": "Aave",
+          "j": "Coinbase",
+          "L_observed": 7.30902032602992,
+          "attribution": 0.23126760899420162,
+          "share": 0.03164139634016047
+        },
+        {
+          "i": "Aave",
+          "j": "Copper",
+          "L_observed": 1.5479043786929103,
+          "attribution": 0.04578663260038596,
+          "share": 0.029579755203644652
+        },
+        {
+          "i": "Lido",
+          "j": "Aave",
+          "L_observed": 1.6086472668736929,
+          "attribution": 0.04369264114842086,
+          "share": 0.02716110737771297
+        },
+        {
+          "i": "Aave",
+          "j": "Kraken",
+          "L_observed": 4.680270340038013,
+          "attribution": 0.12489437261488945,
+          "share": 0.026685290280448856
+        },
+        {
+          "i": "Ceffu",
+          "j": "retail",
+          "L_observed": 9.322746681447757,
+          "attribution": 0.241245055174371,
+          "share": 0.025877036394697718
+        },
+        {
+          "i": "Copper",
+          "j": "Bitfinex",
+          "L_observed": 3.709501690678068,
+          "attribution": 0.09055691580156644,
+          "share": 0.024412151106207838
+        },
+        {
+          "i": "Aave",
+          "j": "Bybit",
+          "L_observed": 1.5421101585480106,
+          "attribution": 0.03761826517196365,
+          "share": 0.024394019430741255
+        },
+        {
+          "i": "HTX",
+          "j": "Copper",
+          "L_observed": 1.519216487013054,
+          "attribution": 0.03596092576680432,
+          "share": 0.023670705310411315
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Aave",
+          "L_observed": 1.909277118305503,
+          "attribution": 0.0447222761552577,
+          "share": 0.023423669474941927
+        },
+        {
+          "i": "retail",
+          "j": "Bybit",
+          "L_observed": 1.540775308209272,
+          "attribution": 0.033569336491887425,
+          "share": 0.021787301700013972
+        },
+        {
+          "i": "Kraken",
+          "j": "Aave",
+          "L_observed": 1.9250968291304662,
+          "attribution": 0.0382838940394834,
+          "share": 0.01988673684366079
+        },
+        {
+          "i": "Ethena",
+          "j": "Bybit",
+          "L_observed": 1.5197048214782196,
+          "attribution": 0.029172959103494822,
+          "share": 0.019196464136448703
+        },
+        {
+          "i": "Coinbase",
+          "j": "Aave",
+          "L_observed": 1.8969508443300889,
+          "attribution": 0.03262378523585774,
+          "share": 0.017198012976123733
+        },
+        {
+          "i": "Ceffu",
+          "j": "OKX",
+          "L_observed": 1.6070310392497573,
+          "attribution": 0.027217063166016908,
+          "share": 0.01693623987419882
+        },
+        {
+          "i": "Ceffu",
+          "j": "Copper",
+          "L_observed": 1.517493516233022,
+          "attribution": 0.023413801639105225,
+          "share": 0.015429259755406998
+        },
+        {
+          "i": "Ceffu",
+          "j": "Bitfinex",
+          "L_observed": 3.7173814619251013,
+          "attribution": 0.055475667669891315,
+          "share": 0.014923318534321849
+        },
+        {
+          "i": "Ethena",
+          "j": "MakerSky",
+          "L_observed": 2.0470219066673256,
+          "attribution": 0.030094787507099596,
+          "share": 0.014701741788438265
+        },
+        {
+          "i": "Ceffu",
+          "j": "HTX",
+          "L_observed": 1.018536552348929,
+          "attribution": 0.014758172590508156,
+          "share": 0.014489585628000437
+        },
+        {
+          "i": "OKX",
+          "j": "Aave",
+          "L_observed": 1.9294263131016547,
+          "attribution": 0.02693820350845888,
+          "share": 0.013961768493327063
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Aave",
+          "L_observed": 1.9242954061984323,
+          "attribution": 0.02607510862208562,
+          "share": 0.013550470753135898
+        },
+        {
+          "i": "Copper",
+          "j": "Crypto.com",
+          "L_observed": 0.6241520197413883,
+          "attribution": 0.00816259191044788,
+          "share": 0.013077890725772185
+        },
+        {
+          "i": "Bybit",
+          "j": "Aave",
+          "L_observed": 1.9247505673141374,
+          "attribution": 0.017191838671978932,
+          "share": 0.008931982649559111
+        },
+        {
+          "i": "Ceffu",
+          "j": "Kraken",
+          "L_observed": 4.580083328978496,
+          "attribution": 0.03883021794745378,
+          "share": 0.008478059274985758
+        },
+        {
+          "i": "Ceffu",
+          "j": "Binance",
+          "L_observed": 0.8147598987480326,
+          "attribution": 0.006877187529683915,
+          "share": 0.008440753576914454
+        },
+        {
+          "i": "Ceffu",
+          "j": "Coinbase",
+          "L_observed": 7.114310406291885,
+          "attribution": 0.05850057540357767,
+          "share": 0.008222943906388995
+        },
+        {
+          "i": "Copper",
+          "j": "Coinbase",
+          "L_observed": 7.089329856276996,
+          "attribution": 0.038001956583349816,
+          "share": 0.0053604441257169505
+        },
+        {
+          "i": "Aave",
+          "j": "OKX",
+          "L_observed": 1.596727511254418,
+          "attribution": 0.008104285808394174,
+          "share": 0.005075559700244221
+        },
+        {
+          "i": "Copper",
+          "j": "HTX",
+          "L_observed": 1.0084660693015532,
+          "attribution": 0.003381122836136008,
+          "share": 0.0033527383211591016
+        },
+        {
+          "i": "Binance",
+          "j": "Aave",
+          "L_observed": 1.919697044528429,
+          "attribution": 0.005805181143216043,
+          "share": 0.0030240090017131208
+        },
+        {
+          "i": "HTX",
+          "j": "OKX",
+          "L_observed": 1.6310933415225801,
+          "attribution": 0.0024917881177857204,
+          "share": 0.0015276796577807776
+        },
+        {
+          "i": "Copper",
+          "j": "MakerSky",
+          "L_observed": 2.0340916782280836,
+          "attribution": 0.001093258088174398,
+          "share": 0.0005374674602310676
+        },
+        {
+          "i": "Ceffu",
+          "j": "Aave",
+          "L_observed": 1.9117782989890366,
+          "attribution": 0.00023391327684674224,
+          "share": 0.00012235376715513373
+        },
+        {
+          "i": "Lido",
+          "j": "MakerSky",
+          "L_observed": 2.035642371476441,
+          "attribution": 0.00011226240400796783,
+          "share": 5.5148392262313e-05
+        },
+        {
+          "i": "Aave",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Binance",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Bybit",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Ceffu",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Coinbase",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Copper",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Ethena",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "HTX",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Kraken",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "MakerSky",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "OKX",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "retail",
+          "j": "Lido",
+          "L_observed": 0.044654534502215,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Lido",
+          "j": "OKX",
+          "L_observed": 1.5885046582137485,
+          "attribution": -3.982615809650092e-05,
+          "share": -2.507147705898759e-05
+        },
+        {
+          "i": "Lido",
+          "j": "Binance",
+          "L_observed": 0.8117732871410624,
+          "attribution": -3.516653164914452e-05,
+          "share": -4.3320631765299274e-05
+        },
+        {
+          "i": "Lido",
+          "j": "Bybit",
+          "L_observed": 1.5048155703861896,
+          "attribution": -8.540808623203056e-05,
+          "share": -5.675651416213867e-05
+        },
+        {
+          "i": "Lido",
+          "j": "Kraken",
+          "L_observed": 4.553128309290326,
+          "attribution": -0.0005078209792470645,
+          "share": -0.00011153232343812778
+        },
+        {
+          "i": "Lido",
+          "j": "Coinbase",
+          "L_observed": 7.075276591204414,
+          "attribution": -0.0009227262544397874,
+          "share": -0.0001304155735179129
+        },
+        {
+          "i": "Lido",
+          "j": "Copper",
+          "L_observed": 1.5014475184502818,
+          "attribution": -0.00021191148543198146,
+          "share": -0.00014113812359602538
+        },
+        {
+          "i": "Lido",
+          "j": "Bitfinex",
+          "L_observed": 3.680952101696097,
+          "attribution": -0.0007117166552021992,
+          "share": -0.00019335124053210492
+        },
+        {
+          "i": "Lido",
+          "j": "Crypto.com",
+          "L_observed": 0.6251702134914595,
+          "attribution": -0.00014894051047953383,
+          "share": -0.00023823993412566593
+        },
+        {
+          "i": "Lido",
+          "j": "retail",
+          "L_observed": 9.169093294911997,
+          "attribution": -0.002513772894710442,
+          "share": -0.0002741571945947321
+        },
+        {
+          "i": "Ceffu",
+          "j": "Bybit",
+          "L_observed": 1.5048671601565986,
+          "attribution": -0.00064942347205732,
+          "share": -0.0004315487036010142
+        },
+        {
+          "i": "Copper",
+          "j": "Aave",
+          "L_observed": 1.9140137135188644,
+          "attribution": -0.0018306281300910499,
+          "share": -0.000956434176600275
+        },
+        {
+          "i": "Lido",
+          "j": "HTX",
+          "L_observed": 0.9971707558590781,
+          "attribution": -0.002604467397905097,
+          "share": -0.002611856978959745
+        },
+        {
+          "i": "Aave",
+          "j": "MakerSky",
+          "L_observed": 2.027037063387168,
+          "attribution": -0.007889129419394347,
+          "share": -0.0038919512434625416
+        },
+        {
+          "i": "Ceffu",
+          "j": "MakerSky",
+          "L_observed": 2.026748995627161,
+          "attribution": -0.013441190194536823,
+          "share": -0.006631896807911112
+        },
+        {
+          "i": "Copper",
+          "j": "retail",
+          "L_observed": 9.150379061354561,
+          "attribution": -0.07443474090208468,
+          "share": -0.0081346073646774
+        },
+        {
+          "i": "Ethena",
+          "j": "Kraken",
+          "L_observed": 4.5406386944180275,
+          "attribution": -0.04382116723854601,
+          "share": -0.00965088177846367
+        },
+        {
+          "i": "HTX",
+          "j": "Aave",
+          "L_observed": 1.9103364774309581,
+          "attribution": -0.019914305627114937,
+          "share": -0.010424501579897546
+        },
+        {
+          "i": "HTX",
+          "j": "MakerSky",
+          "L_observed": 2.0212727817607807,
+          "attribution": -0.024347836857569582,
+          "share": -0.012045794648439079
+        },
+        {
+          "i": "Copper",
+          "j": "OKX",
+          "L_observed": 1.6040827776664044,
+          "attribution": -0.019424364404663885,
+          "share": -0.012109327944360926
+        },
+        {
+          "i": "Crypto.com",
+          "j": "MakerSky",
+          "L_observed": 2.043121214503903,
+          "attribution": -0.024745985199997378,
+          "share": -0.012111853679717203
+        },
+        {
+          "i": "Kraken",
+          "j": "MakerSky",
+          "L_observed": 2.0618513280111834,
+          "attribution": -0.02913622181155162,
+          "share": -0.014131097337486395
+        },
+        {
+          "i": "Binance",
+          "j": "MakerSky",
+          "L_observed": 2.0090425977517232,
+          "attribution": -0.031556108211529654,
+          "share": -0.015707037892996108
+        },
+        {
+          "i": "Coinbase",
+          "j": "MakerSky",
+          "L_observed": 2.0924200930849293,
+          "attribution": -0.03403663940542989,
+          "share": -0.016266637621152102
+        },
+        {
+          "i": "Ethena",
+          "j": "OKX",
+          "L_observed": 1.582693139386323,
+          "attribution": -0.030243932092124615,
+          "share": -0.019109157258273998
+        },
+        {
+          "i": "Bybit",
+          "j": "MakerSky",
+          "L_observed": 2.0095109613898305,
+          "attribution": -0.04300508801326952,
+          "share": -0.021400773043569802
+        },
+        {
+          "i": "Ethena",
+          "j": "Coinbase",
+          "L_observed": 6.995928670019148,
+          "attribution": -0.15845731739219815,
+          "share": -0.02264993324921428
+        },
+        {
+          "i": "OKX",
+          "j": "MakerSky",
+          "L_observed": 2.0126809377598454,
+          "attribution": -0.04681828340642502,
+          "share": -0.023261651923098512
+        },
+        {
+          "i": "Ethena",
+          "j": "HTX",
+          "L_observed": 1.0062710337895537,
+          "attribution": -0.030492131526008492,
+          "share": -0.030302105995416596
+        },
+        {
+          "i": "Bitfinex",
+          "j": "MakerSky",
+          "L_observed": 2.053017474598125,
+          "attribution": -0.07589179852563754,
+          "share": -0.036965977866551404
+        },
+        {
+          "i": "Ethena",
+          "j": "Bitfinex",
+          "L_observed": 3.6118125334427487,
+          "attribution": -0.13553078178932854,
+          "share": -0.03752431238731589
+        },
+        {
+          "i": "Ethena",
+          "j": "Copper",
+          "L_observed": 1.4754521137603298,
+          "attribution": -0.056602978253842195,
+          "share": -0.038363141525199436
+        },
+        {
+          "i": "Ethena",
+          "j": "Crypto.com",
+          "L_observed": 0.6060733842880894,
+          "attribution": -0.03808576808901676,
+          "share": -0.06284019241952582
+        },
+        {
+          "i": "Ethena",
+          "j": "retail",
+          "L_observed": 8.943469077319206,
+          "attribution": -0.5951887884225311,
+          "share": -0.06655010301672987
+        },
+        {
+          "i": "MakerSky",
+          "j": "Bybit",
+          "L_observed": 1.4864420657157287,
+          "attribution": -0.10965108662858336,
+          "share": -0.07376748085757776
+        },
+        {
+          "i": "Copper",
+          "j": "Bybit",
+          "L_observed": 1.6051190131576956,
+          "attribution": -0.12336637226392155,
+          "share": -0.0768580841997673
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Bybit",
+          "L_observed": 1.5867659700744134,
+          "attribution": -0.12651239020307847,
+          "share": -0.0797297097297502
+        },
+        {
+          "i": "retail",
+          "j": "MakerSky",
+          "L_observed": 2.3127909770209802,
+          "attribution": -0.2557210013519162,
+          "share": -0.11056814208143483
+        },
+        {
+          "i": "Ethena",
+          "j": "Aave",
+          "L_observed": 1.7375287679832325,
+          "attribution": -0.5090699251506445,
+          "share": -0.2929850339925751
+        }
+      ],
+      "reference_max_abs_diff": {
+        "attribution": 1.2434497875801753e-14,
+        "share": 1.3530843112619095e-15,
+        "L_observed": 1.2434497875801753e-14
+      }
+    },
+    {
+      "abduction": "full",
+      "engine": {
+        "ranking": "vein.fastscm.attribution_matrix",
+        "reference": "vein.risk.counterfactual_attribution"
+      },
+      "bybit_L_observed": 21.6606555252785,
+      "bybit_L_observed_by_source": {
+        "min": 21.6606555252785,
+        "max": 21.6606555252785
+      },
+      "binance_to_bybit": {
+        "L_observed": 21.6606555252785,
+        "attribution": 1.3703503862604016,
+        "share": 0.06326449283407744
+      },
+      "max_share": {
+        "share": 0.1516764293793941,
+        "i": "MakerSky",
+        "j": "retail",
+        "attribution": 2.1855087676152802,
+        "L_observed": 14.409020416406182
+      },
+      "max_share_L_observed_ge_1": {
+        "share": 0.1516764293793941,
+        "i": "MakerSky",
+        "j": "retail",
+        "L_observed": 14.409020416406182
+      },
+      "n_pairs": 210,
+      "L_observed_by_entity": {
+        "Aave": 35.45935332184566,
+        "Binance": 18.859787433477944,
+        "Bitfinex": 8.973083692124987,
+        "Bybit": 21.6606555252785,
+        "Ceffu": 9.627126044095316,
+        "Coinbase": 12.306787089248218,
+        "Copper": 9.821138248366552,
+        "Crypto.com": 14.854138877337382,
+        "Ethena": 13.556958557987256,
+        "HTX": 5.83239514158501,
+        "Kraken": 18.002366831555317,
+        "Lido": 3.086508143534434,
+        "MakerSky": 19.55489817934183,
+        "OKX": 10.640953832002971,
+        "retail": 14.409020416406182
+      },
+      "pairs": [
+        {
+          "i": "MakerSky",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": 2.1855087676152802,
+          "share": 0.1516764293793941
+        },
+        {
+          "i": "Kraken",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": 1.922082448571775,
+          "share": 0.13339438719812502
+        },
+        {
+          "i": "MakerSky",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": 1.3443506849786022,
+          "share": 0.1092365273917097
+        },
+        {
+          "i": "Coinbase",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": 1.4826282840524954,
+          "share": 0.10289584171623266
+        },
+        {
+          "i": "retail",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": 1.200577873664738,
+          "share": 0.09755412724362629
+        },
+        {
+          "i": "Bitfinex",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": 1.3084599589640646,
+          "share": 0.0908083909350455
+        },
+        {
+          "i": "retail",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": 0.8620222780470677,
+          "share": 0.0810098691956083
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 1.3572056425070507,
+          "share": 0.07196293422151087
+        },
+        {
+          "i": "Kraken",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": 0.6111149937473197,
+          "share": 0.0681053486978674
+        },
+        {
+          "i": "Binance",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": 0.7177420844836515,
+          "share": 0.06745091613169317
+        },
+        {
+          "i": "Binance",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": 1.3703503862604016,
+          "share": 0.06326449283407744
+        },
+        {
+          "i": "retail",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": 0.9465898376792765,
+          "share": 0.05258141035211289
+        },
+        {
+          "i": "OKX",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": 0.7332797313359993,
+          "share": 0.0508903249592931
+        },
+        {
+          "i": "Crypto.com",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": 0.7215518078495275,
+          "share": 0.05007639568807641
+        },
+        {
+          "i": "retail",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": 0.4844396823317325,
+          "share": 0.04932622574703134
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": 0.8731547189347353,
+          "share": 0.048502217908604796
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": 0.5891600001649469,
+          "share": 0.04787277100776891
+        },
+        {
+          "i": "Crypto.com",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": 0.46043581805056455,
+          "share": 0.043270164058581924
+        },
+        {
+          "i": "Bybit",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": 0.5289967667638997,
+          "share": 0.04298414874066164
+        },
+        {
+          "i": "retail",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 0.7654177561997564,
+          "share": 0.040584643856646334
+        },
+        {
+          "i": "MakerSky",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 0.7609396394218422,
+          "share": 0.0403472012664947
+        },
+        {
+          "i": "Bybit",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": 0.5810341858380621,
+          "share": 0.04032433635644611
+        },
+        {
+          "i": "Bybit",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": 0.4262609109111377,
+          "share": 0.04005852460605044
+        },
+        {
+          "i": "OKX",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": 0.5817881257036,
+          "share": 0.03916673531248726
+        },
+        {
+          "i": "Bybit",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 0.7095555293858418,
+          "share": 0.03762266843614113
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": 0.647465145006386,
+          "share": 0.035965556699549164
+        },
+        {
+          "i": "Binance",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": 0.42090018275857766,
+          "share": 0.03420065527308063
+        },
+        {
+          "i": "OKX",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": 0.29814718941904417,
+          "share": 0.03322683702155881
+        },
+        {
+          "i": "MakerSky",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": 0.3520371569067695,
+          "share": 0.03308323318234948
+        },
+        {
+          "i": "Copper",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": 0.5926455805310376,
+          "share": 0.03292042574603152
+        },
+        {
+          "i": "Aave",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": 0.4677881832218205,
+          "share": 0.032464953876336695
+        },
+        {
+          "i": "Binance",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": 0.46513744186406747,
+          "share": 0.031313659156217866
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": 0.2621860496792898,
+          "share": 0.029219169092269934
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": 0.6214152866484959,
+          "share": 0.028688664843189507
+        },
+        {
+          "i": "retail",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": 0.257351082741776,
+          "share": 0.028680339064220923
+        },
+        {
+          "i": "HTX",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": 0.2563214959486615,
+          "share": 0.02856559737357804
+        },
+        {
+          "i": "Kraken",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": 0.3245765948713064,
+          "share": 0.02637378809899715
+        },
+        {
+          "i": "Binance",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": 0.47071549642830135,
+          "share": 0.02614742277127756
+        },
+        {
+          "i": "OKX",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": 0.3195899687667545,
+          "share": 0.025968594926450234
+        },
+        {
+          "i": "OKX",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 0.4433381106696075,
+          "share": 0.02350705766082175
+        },
+        {
+          "i": "Binance",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": 0.3338366356189191,
+          "share": 0.02316858648064729
+        },
+        {
+          "i": "OKX",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": 0.4114460424179498,
+          "share": 0.02285510823480997
+        },
+        {
+          "i": "Bybit",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": 0.20257916022506173,
+          "share": 0.02257631458434412
+        },
+        {
+          "i": "MakerSky",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": 0.3091226430707117,
+          "share": 0.020810539447852678
+        },
+        {
+          "i": "Coinbase",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": 0.3629233922857402,
+          "share": 0.020159759862774965
+        },
+        {
+          "i": "Bybit",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": 0.3532896614198542,
+          "share": 0.01962462295794312
+        },
+        {
+          "i": "retail",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": 0.2883726680412888,
+          "share": 0.019413624069534743
+        },
+        {
+          "i": "Kraken",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": 0.20594771173384352,
+          "share": 0.01935425291616715
+        },
+        {
+          "i": "MakerSky",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": 0.18060901699031717,
+          "share": 0.018389825336218642
+        },
+        {
+          "i": "Bybit",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": 0.2699949436735416,
+          "share": 0.018176411699332276
+        },
+        {
+          "i": "Kraken",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": 0.3635562863173085,
+          "share": 0.016784177463744332
+        },
+        {
+          "i": "Coinbase",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 0.2906352092670126,
+          "share": 0.015410312035177396
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": 0.18678203436910046,
+          "share": 0.015177156557155519
+        },
+        {
+          "i": "Bybit",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": 0.08526447441816565,
+          "share": 0.014619118277880294
+        },
+        {
+          "i": "Bitfinex",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": 0.15126363142661958,
+          "share": 0.014215232376226454
+        },
+        {
+          "i": "Binance",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": 0.1832188452978354,
+          "share": 0.013514745546661691
+        },
+        {
+          "i": "Coinbase",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": 0.13569082488968043,
+          "share": 0.01275175393408685
+        },
+        {
+          "i": "Ceffu",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": 0.1786505673602452,
+          "share": 0.012398522744601901
+        },
+        {
+          "i": "Kraken",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": 0.17849904921936854,
+          "share": 0.012016788767991152
+        },
+        {
+          "i": "Kraken",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 0.22541268569193562,
+          "share": 0.011952026844788629
+        },
+        {
+          "i": "Kraken",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": 0.11200863740218026,
+          "share": 0.01140485293757162
+        },
+        {
+          "i": "retail",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": 0.14875576966966442,
+          "share": 0.010972650615799297
+        },
+        {
+          "i": "retail",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": 0.060666371932551755,
+          "share": 0.010401622396946355
+        },
+        {
+          "i": "Copper",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 0.18351394320190906,
+          "share": 0.0097304353959024
+        },
+        {
+          "i": "HTX",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": 0.13744329696942614,
+          "share": 0.009538698190262297
+        },
+        {
+          "i": "Coinbase",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": 0.08758344507409177,
+          "share": 0.008917850747967896
+        },
+        {
+          "i": "retail",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": 0.3075378802319406,
+          "share": 0.008672969228755614
+        },
+        {
+          "i": "Aave",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": 0.10277100873727107,
+          "share": 0.008350758649839373
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 0.15056872939787525,
+          "share": 0.007983585707365992
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": 0.07539573647881781,
+          "share": 0.0076768837350759825
+        },
+        {
+          "i": "Coinbase",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": 0.15722169196856584,
+          "share": 0.007258399533896118
+        },
+        {
+          "i": "Kraken",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": 0.03812243257012593,
+          "share": 0.006536325410861272
+        },
+        {
+          "i": "MakerSky",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": 0.11212917892799368,
+          "share": 0.006228579829372706
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": 0.06079088279001432,
+          "share": 0.006189800128322706
+        },
+        {
+          "i": "HTX",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": 0.11138435809571234,
+          "share": 0.00618720633447337
+        },
+        {
+          "i": "HTX",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": 0.13198548621068795,
+          "share": 0.006093328341640342
+        },
+        {
+          "i": "Ceffu",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": 0.051293349419049505,
+          "share": 0.005716356960324118
+        },
+        {
+          "i": "Coinbase",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": 0.07101739089742232,
+          "share": 0.0047809833665802
+        },
+        {
+          "i": "OKX",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": 0.044506520203725586,
+          "share": 0.004531706924207884
+        },
+        {
+          "i": "MakerSky",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": 0.060723822602293254,
+          "share": 0.004479162663407054
+        },
+        {
+          "i": "Bybit",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": 0.04263941938021176,
+          "share": 0.0043415964933905225
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": 0.06264442258853364,
+          "share": 0.004217304221122424
+        },
+        {
+          "i": "Ethena",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 0.07818684206793236,
+          "share": 0.0041456905250768184
+        },
+        {
+          "i": "Aave",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": 0.06084190778926768,
+          "share": 0.004095956574237553
+        },
+        {
+          "i": "HTX",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 0.07429690044518722,
+          "share": 0.003939434667927543
+        },
+        {
+          "i": "Aave",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": 0.03836867011981937,
+          "share": 0.003906743714375554
+        },
+        {
+          "i": "Aave",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 0.07250946650884771,
+          "share": 0.0038446597961192502
+        },
+        {
+          "i": "MakerSky",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": 0.10965695882298832,
+          "share": 0.0030924692232170876
+        },
+        {
+          "i": "Binance",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": 0.026675908264628845,
+          "share": 0.0029728808044039885
+        },
+        {
+          "i": "Ceffu",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": 0.03641075678929262,
+          "share": 0.0029585915905787265
+        },
+        {
+          "i": "Binance",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": 0.02884301495391206,
+          "share": 0.002936830153949744
+        },
+        {
+          "i": "Ceffu",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": 0.017080340891883594,
+          "share": 0.00292852944240706
+        },
+        {
+          "i": "Aave",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": 0.05022246043041534,
+          "share": 0.002789769861948556
+        },
+        {
+          "i": "Coinbase",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": 0.03429414673171394,
+          "share": 0.0025296342527733923
+        },
+        {
+          "i": "Bitfinex",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": 0.014434436788161698,
+          "share": 0.0024748729188878308
+        },
+        {
+          "i": "Bybit",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": 0.031829804372717874,
+          "share": 0.0023478573189238626
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": 0.029493489234498682,
+          "share": 0.002175524038695406
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": 0.028311805539884105,
+          "share": 0.0020883596729152675
+        },
+        {
+          "i": "Aave",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": 0.021679712881073954,
+          "share": 0.0020373843570180338
+        },
+        {
+          "i": "OKX",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": 0.026812617557249396,
+          "share": 0.001977775283634868
+        },
+        {
+          "i": "Ceffu",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": 0.019208028614537298,
+          "share": 0.001955784363154848
+        },
+        {
+          "i": "Kraken",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": 0.026335790612046495,
+          "share": 0.0019426031657027102
+        },
+        {
+          "i": "HTX",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": 0.018761369958786744,
+          "share": 0.001910305046556811
+        },
+        {
+          "i": "Ethena",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": 0.04081037520945685,
+          "share": 0.0018840784925382417
+        },
+        {
+          "i": "Ceffu",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": 0.03060719670693146,
+          "share": 0.0017001762597839002
+        },
+        {
+          "i": "Aave",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": 0.036180123243891416,
+          "share": 0.0016703152497701812
+        },
+        {
+          "i": "retail",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": 0.015457474202847266,
+          "share": 0.00160561668477665
+        },
+        {
+          "i": "Aave",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": 0.013912813254387757,
+          "share": 0.0015505052367446438
+        },
+        {
+          "i": "OKX",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": 0.008629649057498412,
+          "share": 0.0014796063791989958
+        },
+        {
+          "i": "Kraken",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": 0.045949618708036155,
+          "share": 0.0012958391624059227
+        },
+        {
+          "i": "Ethena",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": 0.024690879401994437,
+          "share": 0.0012626442324347336
+        },
+        {
+          "i": "Coinbase",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": 0.040702767514993354,
+          "share": 0.001147871117263646
+        },
+        {
+          "i": "HTX",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": 0.014532484463380513,
+          "share": 0.0010719575781854489
+        },
+        {
+          "i": "HTX",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": 0.01160940436532698,
+          "share": 0.0009433334859160355
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": 0.0332811113642677,
+          "share": 0.0009385707365329757
+        },
+        {
+          "i": "Copper",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": 0.012191601929712803,
+          "share": 0.0008461090051500922
+        },
+        {
+          "i": "Copper",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": 0.006915420651237625,
+          "share": 0.0007706849605455902
+        },
+        {
+          "i": "OKX",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": 0.023970249746220418,
+          "share": 0.0006759922982423067
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": 0.018986791721999907,
+          "share": 0.0005354522839056571
+        },
+        {
+          "i": "Ceffu",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": 0.005058382922340954,
+          "share": 0.00047536931389813227
+        },
+        {
+          "i": "Aave",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": 0.005838190159714429,
+          "share": 0.00043064158784160216
+        },
+        {
+          "i": "Bybit",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": 0.014670325092318137,
+          "share": 0.00041372229660150344
+        },
+        {
+          "i": "MakerSky",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": 0.0038258978621197315,
+          "share": 0.00039740809921838516
+        },
+        {
+          "i": "Ceffu",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": 0.007971444474861755,
+          "share": 0.00036801492298138853
+        },
+        {
+          "i": "Coinbase",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": 0.0031658507498111277,
+          "share": 0.0003288469201826712
+        },
+        {
+          "i": "Copper",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": 0.001614168130823046,
+          "share": 0.0002767590486649332
+        },
+        {
+          "i": "Copper",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": 0.003522656465591467,
+          "share": 0.00023714982704018628
+        },
+        {
+          "i": "Ceffu",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": 0.0034935077748663446,
+          "share": 0.00018523579797432026
+        },
+        {
+          "i": "Copper",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": 0.003616823510714795,
+          "share": 0.00018495741974947622
+        },
+        {
+          "i": "Ceffu",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": 0.0037613030818235416,
+          "share": 0.0001060736513631311
+        },
+        {
+          "i": "Ceffu",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": 0.0020303499890488297,
+          "share": 0.00010382820562030492
+        },
+        {
+          "i": "Copper",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": 0.0013154019869965339,
+          "share": 9.702780910409643e-05
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": 0.0008379209706905755,
+          "share": 8.703749871484277e-05
+        },
+        {
+          "i": "Binance",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": 0.0029075495769390614,
+          "share": 8.19966892951708e-05
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": 0.00033939251477121957,
+          "share": 3.5253772851492055e-05
+        },
+        {
+          "i": "Aave",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": 0.00017265197166693724,
+          "share": 1.793390580700159e-05
+        },
+        {
+          "i": "Copper",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": 0.00013426093272883577,
+          "share": 1.3946107292444054e-05
+        },
+        {
+          "i": "Kraken",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": 4.59040863791671e-05,
+          "share": 4.76820249043294e-06
+        },
+        {
+          "i": "Aave",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Binance",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Bybit",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Ceffu",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Coinbase",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Copper",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Crypto.com",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Ethena",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "HTX",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Kraken",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "MakerSky",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "OKX",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "retail",
+          "j": "Lido",
+          "L_observed": 3.086508143534434,
+          "attribution": 0.0,
+          "share": 0.0
+        },
+        {
+          "i": "Lido",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": -3.4187098396643023e-06,
+          "share": -3.5511219277752444e-07
+        },
+        {
+          "i": "Lido",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": -7.7483147009616e-06,
+          "share": -3.962339578503696e-07
+        },
+        {
+          "i": "Lido",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": -1.2009581787708612e-05,
+          "share": -9.758502930631457e-07
+        },
+        {
+          "i": "Lido",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": -1.384608615140337e-05,
+          "share": -1.0213268774245658e-06
+        },
+        {
+          "i": "Lido",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": -3.475343856607083e-05,
+          "share": -3.2660078330148253e-06
+        },
+        {
+          "i": "Lido",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": -5.7578101268163095e-05,
+          "share": -3.876232863017639e-06
+        },
+        {
+          "i": "Lido",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": -8.462158375621698e-05,
+          "share": -9.430602305702674e-06
+        },
+        {
+          "i": "Bybit",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": -0.00013585840948771022,
+          "share": -1.4112042250764688e-05
+        },
+        {
+          "i": "Lido",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": -0.0003135249000223439,
+          "share": -1.4474395738229293e-05
+        },
+        {
+          "i": "HTX",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": -0.00019752792103844286,
+          "share": -2.0517849266094763e-05
+        },
+        {
+          "i": "Lido",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": -0.00023307050724241662,
+          "share": -2.3731516790447465e-05
+        },
+        {
+          "i": "Ceffu",
+          "j": "Ethena",
+          "L_observed": 13.556958557987256,
+          "attribution": -0.0003482263757579318,
+          "share": -2.5686172475076997e-05
+        },
+        {
+          "i": "Lido",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": -0.0004938412034043438,
+          "share": -2.743201535804269e-05
+        },
+        {
+          "i": "Lido",
+          "j": "Binance",
+          "L_observed": 18.859787433477944,
+          "attribution": -0.0006476116100344598,
+          "share": -3.4338224241323456e-05
+        },
+        {
+          "i": "Ethena",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": -0.00039210081117246887,
+          "share": -4.072875013545286e-05
+        },
+        {
+          "i": "Binance",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": -0.00047337810799419344,
+          "share": -4.917127975950147e-05
+        },
+        {
+          "i": "Copper",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": -0.002034127419179299,
+          "share": -5.7365045569686734e-05
+        },
+        {
+          "i": "Lido",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": -0.0019315277606661851,
+          "share": -0.0001340499010235934
+        },
+        {
+          "i": "Ceffu",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": -0.002250444121809636,
+          "share": -0.00015150283300791585
+        },
+        {
+          "i": "HTX",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": -0.005944547314747695,
+          "share": -0.00016764398551750805
+        },
+        {
+          "i": "Lido",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": -0.0013288977409313674,
+          "share": -0.00022784768670015495
+        },
+        {
+          "i": "Lido",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": -0.012176663949624356,
+          "share": -0.00034339780083137057
+        },
+        {
+          "i": "Crypto.com",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": -0.00360779789209964,
+          "share": -0.0006185791265025959
+        },
+        {
+          "i": "Ethena",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": -0.005756006730583962,
+          "share": -0.000986902737358037
+        },
+        {
+          "i": "HTX",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": -0.019594067036543095,
+          "share": -0.0010020030202582515
+        },
+        {
+          "i": "Copper",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": -0.012773687988651972,
+          "share": -0.0010379384884143857
+        },
+        {
+          "i": "Binance",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": -0.021743442760893572,
+          "share": -0.001111917973772104
+        },
+        {
+          "i": "Aave",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": -0.026754456680205152,
+          "share": -0.0013681716179156113
+        },
+        {
+          "i": "Ethena",
+          "j": "Copper",
+          "L_observed": 9.821138248366552,
+          "attribution": -0.014039155493433597,
+          "share": -0.0014294835423754048
+        },
+        {
+          "i": "Bybit",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": -0.029420718160423576,
+          "share": -0.0015045191179519507
+        },
+        {
+          "i": "retail",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": -0.03804092623601463,
+          "share": -0.0017562222986104905
+        },
+        {
+          "i": "HTX",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": -0.026197365321982247,
+          "share": -0.0017636407965695652
+        },
+        {
+          "i": "Aave",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": -0.010671679081402985,
+          "share": -0.0018297249795909494
+        },
+        {
+          "i": "Ethena",
+          "j": "Kraken",
+          "L_observed": 18.002366831555317,
+          "attribution": -0.035399190235015254,
+          "share": -0.0019663631213739097
+        },
+        {
+          "i": "OKX",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": -0.03983729590463625,
+          "share": -0.0020372029319345236
+        },
+        {
+          "i": "Kraken",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": -0.04185671599713814,
+          "share": -0.0021404722036014678
+        },
+        {
+          "i": "Ethena",
+          "j": "Crypto.com",
+          "L_observed": 14.854138877337382,
+          "attribution": -0.03283754691574181,
+          "share": -0.002210666480696589
+        },
+        {
+          "i": "OKX",
+          "j": "Ceffu",
+          "L_observed": 9.627126044095316,
+          "attribution": -0.025521752741283876,
+          "share": -0.00265102509558783
+        },
+        {
+          "i": "Crypto.com",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": -0.06495165861795371,
+          "share": -0.0033215032889595862
+        },
+        {
+          "i": "OKX",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": -0.07280354207224349,
+          "share": -0.0033610959736320085
+        },
+        {
+          "i": "Bitfinex",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": -0.07180880261913813,
+          "share": -0.0036721644858779337
+        },
+        {
+          "i": "Copper",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": -0.041647299206301724,
+          "share": -0.003913868988045629
+        },
+        {
+          "i": "Coinbase",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": -0.024658967743780735,
+          "share": -0.004227931603598349
+        },
+        {
+          "i": "Ethena",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": -0.048986613397659085,
+          "share": -0.0046035923255611216
+        },
+        {
+          "i": "HTX",
+          "j": "OKX",
+          "L_observed": 10.640953832002971,
+          "attribution": -0.05290749326952593,
+          "share": -0.004972063041041033
+        },
+        {
+          "i": "Coinbase",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": -0.09788509645056465,
+          "share": -0.005005656155958528
+        },
+        {
+          "i": "Ethena",
+          "j": "Coinbase",
+          "L_observed": 12.306787089248218,
+          "attribution": -0.07573033259342132,
+          "share": -0.006153542110075413
+        },
+        {
+          "i": "Ethena",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": -0.05636703828542622,
+          "share": -0.006281791212411783
+        },
+        {
+          "i": "MakerSky",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": -0.061303114996441366,
+          "share": -0.01051079590944547
+        },
+        {
+          "i": "Ethena",
+          "j": "Aave",
+          "L_observed": 35.45935332184566,
+          "attribution": -0.40592640066556385,
+          "share": -0.011447653796198316
+        },
+        {
+          "i": "Bitfinex",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": -0.2540917205556319,
+          "share": -0.011730564675621235
+        },
+        {
+          "i": "MakerSky",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": -0.12620553653633593,
+          "share": -0.014064901305567583
+        },
+        {
+          "i": "MakerSky",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": -0.3109759132591847,
+          "share": -0.014356717546995216
+        },
+        {
+          "i": "Coinbase",
+          "j": "Bitfinex",
+          "L_observed": 8.973083692124987,
+          "attribution": -0.16800047548545116,
+          "share": -0.018722713534132393
+        },
+        {
+          "i": "retail",
+          "j": "MakerSky",
+          "L_observed": 19.55489817934183,
+          "attribution": -0.38356714530473823,
+          "share": -0.01961488839200124
+        },
+        {
+          "i": "Copper",
+          "j": "Bybit",
+          "L_observed": 21.6606555252785,
+          "attribution": -0.45561186425251776,
+          "share": -0.02103407552559099
+        },
+        {
+          "i": "Binance",
+          "j": "HTX",
+          "L_observed": 5.83239514158501,
+          "attribution": -0.15075817536367886,
+          "share": -0.025848415908718565
+        },
+        {
+          "i": "Ethena",
+          "j": "retail",
+          "L_observed": 14.409020416406182,
+          "attribution": -0.500434339004391,
+          "share": -0.03473062876880888
+        }
+      ],
+      "reference_max_abs_diff": {
+        "attribution": 2.1316282072803006e-14,
+        "share": 6.010816844259637e-16,
+        "L_observed": 7.105427357601002e-15
+      }
+    }
+  ]
+}

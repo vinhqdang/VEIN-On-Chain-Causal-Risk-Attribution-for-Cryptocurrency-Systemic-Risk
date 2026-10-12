@@ -165,17 +165,28 @@ def abduct(sys: LinearSystem, C, S_obs, S_prev0) -> np.ndarray:
     return S_obs - (S_prev @ sys.A.T + np.asarray(C, dtype=float))
 
 
-def attribution_matrix(sys: LinearSystem, C, S_obs, S_prev0, precrisis):
-    """Counterfactual attribution for every ordered pair (i, j), full abduction.
+def attribution_matrix(sys: LinearSystem, C, S_obs, S_prev0, precrisis,
+                       abduction: str = "full"):
+    """Counterfactual attribution for every ordered pair (i, j).
+
+    abduction="full" (default) recovers the event-window shocks from the observed path
+    (abduct); abduction="legacy_zero" uses zero shocks on the event window, as
+    risk.counterfactual_attribution(abduction="legacy_zero") does because the fit-window
+    residuals are undefined there. S_prev0 is the start state in both modes.
 
     Returns dict with L_obs, attr, share (each (N, N)). Row i is the intervention on i:
-    L_obs[i, j] = loss of j along the observed path, attr = L_obs - L_cf with i held at its
-    pre-crisis level, share = attr / L_obs (0 where L_obs <= 1e-9). Diagonals of attr and
-    share are 0."""
+    L_obs[i, j] = loss of j along the replay with i held at its observed path, attr =
+    L_obs - L_cf with i held at its pre-crisis level, share = attr / L_obs (0 where
+    L_obs <= 1e-9). Diagonals of attr and share are 0."""
     S_obs = np.asarray(S_obs, dtype=float)
     T, N = S_obs.shape
     pre = _vec(sys.nodes, precrisis)
-    U_hat = abduct(sys, C, S_obs, S_prev0)[None]
+    if abduction == "full":
+        U_hat = abduct(sys, C, S_obs, S_prev0)[None]
+    elif abduction == "legacy_zero":
+        U_hat = np.zeros((1, T, N))
+    else:
+        raise ValueError(f"unknown abduction mode: {abduction!r}")
     L_obs, L_cf = np.zeros((N, N)), np.zeros((N, N))
     for i in range(N):
         obs = simulate_batch(sys, C, S_prev0, U_hat, [i], S_obs[:, i])
