@@ -1,0 +1,417 @@
+{
+ "version": 1,
+ "cumulative_billed_bytes": 277820211200,
+ "by_month": {
+  "2026-10": 277820211200
+ },
+ "entries": [
+  {
+   "ts": "2026-10-12T07:35:56+00:00",
+   "name": "dry_run",
+   "sql_hash": "1cadcbdc448b967a",
+   "kind": "dry_run",
+   "est_bytes": 10485760,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:35:57+00:00",
+   "name": "check_columns",
+   "sql_hash": "1cadcbdc448b967a",
+   "kind": "query",
+   "est_bytes": 10485760,
+   "billed_bytes": 10485760,
+   "cache_hit": false,
+   "job_id": "7fcf58b5-39fa-403d-97f9-12180df56bd7"
+  },
+  {
+   "ts": "2026-10-12T07:36:43+00:00",
+   "name": "dry_run",
+   "sql_hash": "1cadcbdc448b967a",
+   "kind": "dry_run",
+   "est_bytes": 10485760,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:36:44+00:00",
+   "name": "check_columns",
+   "sql_hash": "1cadcbdc448b967a",
+   "kind": "query",
+   "est_bytes": 10485760,
+   "billed_bytes": 10485760,
+   "cache_hit": false,
+   "job_id": "fb6eb3f4-5e39-4eea-a64a-1fb4b0b6bcc5"
+  },
+  {
+   "ts": "2026-10-12T07:36:45+00:00",
+   "name": "dry_run",
+   "sql_hash": "dccb3ac1caff060f",
+   "kind": "dry_run",
+   "est_bytes": 874377399,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:36:45+00:00",
+   "name": "dry_run",
+   "sql_hash": "fe38d9a7dda27c0b",
+   "kind": "dry_run",
+   "est_bytes": 4240289791,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:36:45+00:00",
+   "name": "dry_run",
+   "sql_hash": "cb89acd5ef60a04f",
+   "kind": "dry_run",
+   "est_bytes": 5973721306,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:36:47+00:00",
+   "name": "check_freshness",
+   "sql_hash": "cb89acd5ef60a04f",
+   "kind": "query",
+   "est_bytes": 5973721306,
+   "billed_bytes": 5973737472,
+   "cache_hit": false,
+   "job_id": "6381d232-ba46-47b2-920e-14f51d562a11"
+  },
+  {
+   "ts": "2026-10-12T07:36:47+00:00",
+   "name": "dry_run",
+   "sql_hash": "c3519d7de807bc19",
+   "kind": "dry_run",
+   "est_bytes": 726856333,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:36:48+00:00",
+   "name": "check_dedupe",
+   "sql_hash": "c3519d7de807bc19",
+   "kind": "query",
+   "est_bytes": 726856333,
+   "billed_bytes": 394264576,
+   "cache_hit": false,
+   "job_id": "416e56d9-8d7b-4928-b416-d0d8cdc40906"
+  },
+  {
+   "ts": "2026-10-12T07:36:54+00:00",
+   "name": "dry_run",
+   "sql_hash": "9ea58c1581b52bd1",
+   "kind": "dry_run",
+   "est_bytes": 36322711487,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:36:55+00:00",
+   "name": "dry_run",
+   "sql_hash": "9c1f1daa78e84b72",
+   "kind": "dry_run",
+   "est_bytes": 34285547643,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:36:55+00:00",
+   "name": "dry_run",
+   "sql_hash": "79aa61ed6cc36d0b",
+   "kind": "dry_run",
+   "est_bytes": 48829116364,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:36:56+00:00",
+   "name": "dry_run",
+   "sql_hash": "0fcf776014b2b2e7",
+   "kind": "dry_run",
+   "est_bytes": 67350081666,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:36:56+00:00",
+   "name": "dry_run",
+   "sql_hash": "a781cf16a1d2785e",
+   "kind": "dry_run",
+   "est_bytes": 63314289591,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:36:57+00:00",
+   "name": "dry_run",
+   "sql_hash": "3df5411f82d64bea",
+   "kind": "dry_run",
+   "est_bytes": 16780670120,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:36:57+00:00",
+   "name": "dry_run",
+   "sql_hash": "7d5437d98e2432a4",
+   "kind": "dry_run",
+   "est_bytes": 3338451870,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:36:58+00:00",
+   "name": "dry_run",
+   "sql_hash": "e32644119ea68caf",
+   "kind": "dry_run",
+   "est_bytes": 3591922190,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:37:45+00:00",
+   "name": "dry_run",
+   "sql_hash": "ab4825c69d9c1a66",
+   "kind": "dry_run",
+   "est_bytes": 1235,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:37:48+00:00",
+   "name": "selftest_sweeps",
+   "sql_hash": "ab4825c69d9c1a66",
+   "kind": "query",
+   "est_bytes": 1235,
+   "billed_bytes": 20971520,
+   "cache_hit": false,
+   "job_id": "f96e9442-6826-4c8a-8abf-a41385bed869"
+  },
+  {
+   "ts": "2026-10-12T07:37:48+00:00",
+   "name": "dry_run",
+   "sql_hash": "27647a1e8b575610",
+   "kind": "dry_run",
+   "est_bytes": 1220,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:37:49+00:00",
+   "name": "selftest_flows",
+   "sql_hash": "27647a1e8b575610",
+   "kind": "query",
+   "est_bytes": 1220,
+   "billed_bytes": 20971520,
+   "cache_hit": false,
+   "job_id": "6e6860a5-38f2-4c6d-9253-f516882e8b54"
+  },
+  {
+   "ts": "2026-10-12T07:38:47+00:00",
+   "name": "dry_run",
+   "sql_hash": "3df5411f82d64bea",
+   "kind": "dry_run",
+   "est_bytes": 16780670120,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:38:54+00:00",
+   "name": "extract_oct25_hourly",
+   "sql_hash": "3df5411f82d64bea",
+   "kind": "materialize",
+   "est_bytes": 16780670120,
+   "billed_bytes": 16381902848,
+   "cache_hit": false,
+   "job_id": "a6e52e0f-8e96-4ffc-b795-fcbbf5dfcb58",
+   "table": "vein-bq-10120733.vein.x_oct25_hourly_c00"
+  },
+  {
+   "ts": "2026-10-12T07:38:58+00:00",
+   "name": "dry_run",
+   "sql_hash": "8558b5e7bebf42d8",
+   "kind": "dry_run",
+   "est_bytes": 763407809,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:38:59+00:00",
+   "name": "usde_daily_bq",
+   "sql_hash": "8558b5e7bebf42d8",
+   "kind": "query",
+   "est_bytes": 763407809,
+   "billed_bytes": 764411904,
+   "cache_hit": false,
+   "job_id": "229ed4e7-9698-4fe4-9c76-fe4bda50da90"
+  },
+  {
+   "ts": "2026-10-12T07:39:01+00:00",
+   "name": "dry_run",
+   "sql_hash": "7d5437d98e2432a4",
+   "kind": "dry_run",
+   "est_bytes": 3338451870,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:39:07+00:00",
+   "name": "extract_ftx_hourly",
+   "sql_hash": "7d5437d98e2432a4",
+   "kind": "materialize",
+   "est_bytes": 3338451870,
+   "billed_bytes": 2940207104,
+   "cache_hit": false,
+   "job_id": "b0f524db-2e13-412f-879d-ae39d6d867f3",
+   "table": "vein-bq-10120733.vein.x_ftx_hourly_c00"
+  },
+  {
+   "ts": "2026-10-12T07:39:10+00:00",
+   "name": "dry_run",
+   "sql_hash": "e32644119ea68caf",
+   "kind": "dry_run",
+   "est_bytes": 3591922190,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:39:15+00:00",
+   "name": "extract_svb_hourly",
+   "sql_hash": "e32644119ea68caf",
+   "kind": "materialize",
+   "est_bytes": 3591922190,
+   "billed_bytes": 3193962496,
+   "cache_hit": false,
+   "job_id": "16deb0f0-487f-4015-99fb-bdc16fb85abc",
+   "table": "vein-bq-10120733.vein.x_svb_hourly_c00"
+  },
+  {
+   "ts": "2026-10-12T07:39:22+00:00",
+   "name": "dry_run",
+   "sql_hash": "9ea58c1581b52bd1",
+   "kind": "dry_run",
+   "est_bytes": 36322711487,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:39:26+00:00",
+   "name": "extract_core_daily",
+   "sql_hash": "9ea58c1581b52bd1",
+   "kind": "materialize",
+   "est_bytes": 36322711487,
+   "billed_bytes": 35924213760,
+   "cache_hit": false,
+   "job_id": "db837754-f954-405c-8aec-09f565c961c4",
+   "table": "vein-bq-10120733.vein.x_core_daily_c00"
+  },
+  {
+   "ts": "2026-10-12T07:39:29+00:00",
+   "name": "dry_run",
+   "sql_hash": "9c1f1daa78e84b72",
+   "kind": "dry_run",
+   "est_bytes": 34285547643,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:39:34+00:00",
+   "name": "extract_core_daily",
+   "sql_hash": "9c1f1daa78e84b72",
+   "kind": "materialize",
+   "est_bytes": 34285547643,
+   "billed_bytes": 33886830592,
+   "cache_hit": false,
+   "job_id": "d660cd30-64ec-4d93-bd76-cf7a0c1ef279",
+   "table": "vein-bq-10120733.vein.x_core_daily_c01"
+  },
+  {
+   "ts": "2026-10-12T07:39:36+00:00",
+   "name": "dry_run",
+   "sql_hash": "79aa61ed6cc36d0b",
+   "kind": "dry_run",
+   "est_bytes": 48829116364,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:39:41+00:00",
+   "name": "extract_core_daily",
+   "sql_hash": "79aa61ed6cc36d0b",
+   "kind": "materialize",
+   "est_bytes": 48829116364,
+   "billed_bytes": 48430579712,
+   "cache_hit": false,
+   "job_id": "31c42a45-2547-426a-b400-b64edb0bcf87",
+   "table": "vein-bq-10120733.vein.x_core_daily_c02"
+  },
+  {
+   "ts": "2026-10-12T07:39:45+00:00",
+   "name": "dry_run",
+   "sql_hash": "0fcf776014b2b2e7",
+   "kind": "dry_run",
+   "est_bytes": 67350081666,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:39:48+00:00",
+   "name": "extract_core_daily",
+   "sql_hash": "0fcf776014b2b2e7",
+   "kind": "materialize",
+   "est_bytes": 67350081666,
+   "billed_bytes": 66951577600,
+   "cache_hit": false,
+   "job_id": "04d4e23e-2bb1-4df8-83b5-1aa5f2ca0a07",
+   "table": "vein-bq-10120733.vein.x_core_daily_c03"
+  },
+  {
+   "ts": "2026-10-12T07:39:52+00:00",
+   "name": "dry_run",
+   "sql_hash": "a781cf16a1d2785e",
+   "kind": "dry_run",
+   "est_bytes": 63314289591,
+   "billed_bytes": 0,
+   "cache_hit": false,
+   "job_id": null
+  },
+  {
+   "ts": "2026-10-12T07:39:55+00:00",
+   "name": "extract_core_daily",
+   "sql_hash": "a781cf16a1d2785e",
+   "kind": "materialize",
+   "est_bytes": 63314289591,
+   "billed_bytes": 62915608576,
+   "cache_hit": false,
+   "job_id": "eaffe31c-1529-4d7c-8cf6-16926a68dbcd",
+   "table": "vein-bq-10120733.vein.x_core_daily_c04"
+  }
+ ]
+}

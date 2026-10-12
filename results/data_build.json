@@ -113,5 +113,126 @@
     "base_fingerprint": "3b5658d34f4b"
   },
   "generated": "2026-10-12",
-  "data_backend": "bigquery"
+  "data_backend": "bigquery",
+  "checks": {
+    "schema_ok": true,
+    "partitioning": [
+      "block_timestamp (via view; pruning verified by dry run: 1 day 0.81 GiB, 10 days 3.95 GiB)"
+    ],
+    "clustering": [],
+    "freshness_max_block_timestamp": "2026-10-12 07:36:35+00:00",
+    "dedupe": {
+      "n": 10501,
+      "nd": 10501,
+      "upper_n": 0
+    }
+  },
+  "budget": {
+    "plan": {
+      "core_daily": {
+        "chunks": [
+          {
+            "chunk": "2025-01-01..2025-04-21",
+            "gib": 33.83
+          },
+          {
+            "chunk": "2025-04-21..2025-08-09",
+            "gib": 31.93
+          },
+          {
+            "chunk": "2025-08-09..2025-11-27",
+            "gib": 45.48
+          },
+          {
+            "chunk": "2025-11-27..2026-03-17",
+            "gib": 62.72
+          },
+          {
+            "chunk": "2026-03-17..2026-06-30",
+            "gib": 58.97
+          }
+        ],
+        "gib": 232.93
+      },
+      "oct25_hourly": {
+        "chunks": [
+          {
+            "chunk": "2025-09-15..2025-10-25",
+            "gib": 15.63
+          }
+        ],
+        "gib": 15.63
+      },
+      "ftx_hourly": {
+        "chunks": [
+          {
+            "chunk": "2022-11-01..2022-11-16",
+            "gib": 3.11
+          }
+        ],
+        "gib": 3.11
+      },
+      "svb_hourly": {
+        "chunks": [
+          {
+            "chunk": "2023-03-01..2023-03-16",
+            "gib": 3.35
+          }
+        ],
+        "gib": 3.35
+      }
+    },
+    "planned_gib": 255.01,
+    "headroom_gib": 694.05
+  },
+  "selftest": {
+    "sweeps_sql_rows": 1,
+    "sweeps_pandas_rows": 1,
+    "flow_rows": 8,
+    "flow_volume_sql": 25200.0,
+    "passed": true
+  },
+  "usde_daily": [
+    {
+      "day": "2025-10-08",
+      "usde_bn": 1.405215219242275,
+      "dune_bn": 1.405,
+      "rel_diff": 0.00015318095535592712
+    },
+    {
+      "day": "2025-10-09",
+      "usde_bn": 0.7445863560857423,
+      "dune_bn": 0.745,
+      "rel_diff": -0.0005552267305472331
+    },
+    {
+      "day": "2025-10-10",
+      "usde_bn": 3.089553427042713,
+      "dune_bn": 3.09,
+      "rel_diff": -0.00014452199264940868
+    },
+    {
+      "day": "2025-10-11",
+      "usde_bn": 8.82760321454038,
+      "dune_bn": 8.828,
+      "rel_diff": -4.494624599223026e-05
+    },
+    {
+      "day": "2025-10-12",
+      "usde_bn": 1.3280244315427225,
+      "dune_bn": 1.328,
+      "rel_diff": 1.839724602595595e-05
+    },
+    {
+      "day": "2025-10-13",
+      "usde_bn": 0.6876978380684178,
+      "dune_bn": 0.688,
+      "rel_diff": -0.0004391888540438485
+    }
+  ],
+  "usde_daily_check": {
+    "tolerance": 0.02,
+    "passed": true,
+    "failed_days": []
+  }
 }

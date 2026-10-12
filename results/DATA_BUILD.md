@@ -115,8 +115,8 @@ Limitation: Tier-0 can only find deposit addresses of exchanges that have hot-wa
 | Poloniex | 25 | 0 |
 | FTX | 20 | 0 |
 | Bitvavo | 18 | 0 |
-| MEXC | 17 | 0 |
 | CoinEx | 17 | 0 |
+| MEXC | 17 | 0 |
 | Crypto.com | 16 | 0 |
 
 ### Unmapped names with an 'exchange' category
