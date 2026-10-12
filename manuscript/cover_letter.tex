@@ -15,7 +15,7 @@
 
 \vspace{1em}
 \noindent\textbf{Manuscript title:}\\
-VEIN: On-Chain Causal Risk Attribution for Cryptocurrency Systemic Risk
+Counterfactual Attribution of Crypto Systemic Stress on an Auditable On-Chain Graph
 
 \vspace{1em}
 \noindent\textbf{Authors (in submission-system order):}\\
@@ -64,47 +64,57 @@ Hung Yen, Vietnam\\
 \href{mailto:vinh.dq4@buv.edu.vn}{vinh.dq4@buv.edu.vn}
 
 \vspace{1em}
-\noindent The Editor\\
-\emph{Financial Innovation}
+\noindent The Editor-in-Chief\\
+\emph{Digital Finance}
 
 \vspace{1em}
-\noindent Dear Editor,
+\noindent Dear Editor-in-Chief,
 
 \vspace{0.5em}
-I am pleased to submit my manuscript, \textbf{``VEIN: On-Chain Causal Risk
-Attribution for Cryptocurrency Systemic Risk,''} for consideration as a
-research article in \emph{Financial Innovation}.
+I am submitting the manuscript \textbf{``Counterfactual Attribution of Crypto
+Systemic Stress on an Auditable On-Chain Graph''} for consideration in
+\emph{Digital Finance}. Crypto-asset markets have repeatedly transmitted distress
+between exchanges, lending protocols, and stablecoin issuers, most recently in
+the liquidation cascade of October 2025. Measures of this contagion commonly
+infer the network from price co-movement, using CoVaR-type or marginal expected
+shortfall statistics. The resulting graphs are estimated rather than observed,
+and the attributions built on them cannot be checked against the transfers that
+moved funds between entities. Public blockchains record those transfers, but the
+raw ledger becomes an entity-level graph only after addresses are resolved to
+institutions.
 
-The paper proposes VEIN (Verifiable Entity-resolved Interventional/counterfactual
-Network risk), a framework that treats the resolved on-chain transaction ledger
-as an auditable candidate structural skeleton for a Pearl-style structural
-causal model of cryptocurrency systemic risk, rather than inferring the
-contagion graph statistically from price co-movement as prior causal measures
-do. On this graph the paper defines an interventional risk measure (On-Chain
-Causal CoVaR) and, to the best of our knowledge, the first on-chain
-counterfactual (Pearl Level-3) systemic-risk attribution measure proposed for
-crypto markets, which decomposes a realised loss into the Shapley-exact share
-attributable to each upstream entity's distress. The complete pipeline---a
-four-tier entity-resolution layer over Dune Analytics' decoded Ethereum data,
-the structural causal model, and the risk measures---is implemented and
-evaluated on real on-chain data around the October 2025 cascading liquidation
-event, with generality checks on the FTX (2022) and USDC/SVB (2023) stress
-episodes, and is subjected to a validity and falsification battery (placebo
-controls, unobserved-confounding robustness at both the coefficient and
-ranking level, resolution robustness, and external validity against the
-documented event narrative).
+The manuscript treats the entity-resolved on-chain ledger as an auditable
+candidate skeleton for a linear structural causal model of entity stress. On this
+model it defines On-Chain Causal CoVaR and a counterfactual loss attribution. The
+analytic results are central. The interventional effect of one entity's stress on
+another entity's tail measure is a network multiplier that depends on the lagged
+coefficients and the directed paths, not on the flows or the shock distribution.
+This yields flow-free bounds and implies zero attribution between entities with
+no directed path. The attribution is invariant to how event-window shocks are
+abducted, so that choice affects only the hinge loss. The linear Shapley
+attribution has a closed-form walk decomposition, and an exact subset algorithm
+computes it with $2^p$ rather than $p!\cdot p$ model evaluations. The paper gives
+equal weight to the auditable ledger-based attribution and to its application to
+the October 2025 cascade, with checks on the FTX (2022) and USDC/SVB (2023)
+episodes. In that application the ranking differs from $\Delta$CoVaR (Spearman
+0.52) and remains stable under coefficient perturbation (mean Spearman 0.88 across
+25 perturbations). The analytic checks refer to the daily specification. The
+advantage of the observed graph over a price-estimated graph at hourly frequency
+is small and not consistent across specifications, and I report it as weak
+evidence.
 
-We believe this manuscript is a strong fit for \emph{Financial Innovation}'s
-scope at the intersection of blockchain, computational financial intelligence,
-and financial risk management and analysis. The paper combines a methodological
-contribution (an exact, order-robust counterfactual attribution measure) with
-an extensive real-data empirical evaluation, and reports negative and
-suggestive results as candidly as positive ones.
+The paper fits the scope of \emph{Digital Finance} on three counts. It addresses
+systemic risk in crypto-asset markets and how that risk is measured. It addresses
+supervisory transparency, since each attribution traces back to public ledger
+records and an explicit model. It also provides reproducible inputs: the code, the
+query definitions, and the derived result files are openly available. Raw query
+outputs are regenerated from public Dune Analytics data.
 
-This manuscript is original, has not been published previously, and is not
-under consideration at any other journal.
-
-Thank you for considering this manuscript. I look forward to your response.
+This manuscript is original, has not been published previously, and is not under
+consideration at any other journal. It is single-authored, and the author declares
+no competing interests. The code and derived results are publicly available at
+\url{https://github.com/vinhqdang/VEIN-On-Chain-Causal-Risk-Attribution-for-Cryptocurrency-Systemic-Risk}.
+Thank you for considering this manuscript.
 
 \vspace{1.5em}
 \noindent Sincerely,
@@ -135,8 +145,8 @@ implementation, the real-data evaluation pipeline, and all result artefacts
 underlying every number, table, and figure in this paper are publicly
 available at
 \url{https://github.com/vinhqdang/VEIN-On-Chain-Causal-Risk-Attribution-for-Cryptocurrency-Systemic-Risk}.
-The repository includes the full source code, cached query results, and
-scripts that reproduce every reported result. All underlying blockchain and
+The repository includes the full source code, the SQL issued to Dune, and
+the scripts and derived result files that reproduce every reported result. All underlying blockchain and
 market data are public and were obtained from Dune Analytics
 (\url{https://dune.com}), DefiLlama (\url{https://defillama.com}), and
 Etherscan (\url{https://etherscan.io}); no restricted or proprietary data
