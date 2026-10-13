@@ -6,6 +6,7 @@
 | 2026 (earlier) | Financial Innovation | Dune data, empirical framing | Manuscript and cover letter prepared (commits f6c1b5c–b59bda2) |
 | 2026 (earlier) | Computational Economics | Dune data, empirical framing | Desk rejected |
 | 2026-10-12 | Digital Finance (Springer) | Methods paper on BigQuery public data, full abduction, bootstrap uncertainty | Submitted (blinded LaTeX package `manuscript/vein_latex_submission.zip`, commit 0a09548) |
+| 2026-10-13 | Digital Finance (Springer) | Same content | Technical check: author names must appear in the manuscript; resubmitted with author details (`manuscript/vein_latex_submission_named.zip`, built by `manuscript/make_named_package.py`) |
 
 ## Submitted version (Digital Finance)
 
